@@ -22,8 +22,8 @@ def callback_worker(call):
         controller.add_new_user(user_id)
     user = controller.users[user_id]
     if call.data == 'estimate':
-        user.status = Status.IN_PROGRESS
         send_sample(bot, controller, user_id)
+        user.status = Status.IN_PROGRESS
     if call.data == 'correct':
         send_ok_to_correct(bot, controller, user_id)
         send_sample(bot, controller, user_id)

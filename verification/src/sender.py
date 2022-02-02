@@ -5,8 +5,8 @@ from verification.settings.panels import *
 
 def send_sample(bot, controller, user_id):
     user = controller.users.get(user_id, None)
-    if user.status is Status.READY:
-        sample = user.generate_sample()
+    if user.status is Status.READY or not user.last:
+        sample = controller.generate_sample_for_user(user_id)
     else:
         sample = user.last
     text = create_text_form_sample(sample)
@@ -34,5 +34,6 @@ def send_info(bot, controller, user_id):
 
 
 def create_text_form_sample(sample: Sample):  # TODO
-    return "This as sample"
+    content = SAMPLE_DESCRIPTION.format(nl=sample.nl.capitalize(), sql=sample.sql)
+    return content
 
