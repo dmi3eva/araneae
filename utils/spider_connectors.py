@@ -7,18 +7,18 @@ from typing import *
 REQUEST_MASK = "SELECT \"{column}\" FROM \"{table}\""
 TABLES_REQUEST = f"SELECT name FROM sqlite_master WHERE type='table'"
 
-from IPython.display import HTML, display
+# from IPython.display import HTML, display
 
-def progress(value, max=100):
-    return HTML("""
-        <progress
-            value='{value}'
-            max='{max}',
-            style='width: 100%'
-        >
-            {value}
-        </progress>
-    """.format(value=value, max=max))
+# def progress(value, max=100):
+#     return HTML("""
+#         <progress
+#             value='{value}'
+#             max='{max}',
+#             style='width: 100%'
+#         >
+#             {value}
+#         </progress>
+#     """.format(value=value, max=max))
 
 class SpiderDB:
     def __init__(self):
@@ -94,8 +94,8 @@ class SpiderDB:
 class EnSpiderDB(SpiderDB):
     def __init__(self):
         super().__init__()
-        self.db_path = "datasets/spider/database"
-        self.schemes_path = "datasets/spider/tables.json"
+        self.db_path = "../datasets/spider/database"
+        self.schemes_path = "../datasets/spider/tables.json"
 
     def extract_dbs(self):
         return os.listdir(self.db_path)

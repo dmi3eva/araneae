@@ -1,6 +1,9 @@
+from telebot import types
+
 from verification.settings.content import *
 from verification.src.controller import *
 from verification.settings.panels import *
+from utils.spider_connectors import *
 
 
 def send_sample(bot, controller, user_id):
@@ -26,6 +29,15 @@ def send_whats_wrong(bot, controller, user_id):
 
 
 def send_tables(bot, controller, user_id):
+    user = controller.users[user_id]
+    sample = user.last
+    en_spider = EnSpiderDB()
+    tables = en_spider.get_db_tables(sample.db)
+    buttons = []
+    for table_title in tables:
+        new_btn = types.InlineKeyboardButton(text=f'\U0001F44D {table_title}', callback_data=f'TABLE_{table_title}')
+        buttons.append(new_btn)
+
     bot.send_message(user_id, ERROR, parse_mode="HTML", reply_markup=error_panel)
 
 
