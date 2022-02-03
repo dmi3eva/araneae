@@ -35,10 +35,13 @@ def send_tables(bot, controller, user_id):
     tables = en_spider.get_db_tables(sample.db)
     buttons = []
     for table_title in tables:
-        new_btn = types.InlineKeyboardButton(text=f'\U0001F44D {table_title}', callback_data=f'TABLE_{table_title}')
+        new_btn = types.InlineKeyboardButton(text=f'\U0001F4C3 {table_title}', callback_data=f'TABLE_{table_title}')
         buttons.append(new_btn)
-
-    bot.send_message(user_id, ERROR, parse_mode="HTML", reply_markup=error_panel)
+    tables_panel = types.InlineKeyboardMarkup(row_width=2)
+    for left_btn, right_btn in zip(buttons[::2], buttons[1::2]):
+        tables_panel.add(left_btn, right_btn)
+    tables_panel.add(back_btn)
+    bot.send_message(user_id, TABLE_TITLE, parse_mode="HTML", reply_markup=tables_panel)
 
 
 def send_info(bot, controller, user_id):

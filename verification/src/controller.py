@@ -61,6 +61,6 @@ class Controller:
             nl=json_sample['question'],
             sql=json_sample['query']
         )
-        self.last = deepcopy(generated_sample)
+        self.users[user_id].last = deepcopy(generated_sample)
         return generated_sample
 
