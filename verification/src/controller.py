@@ -8,10 +8,13 @@ from verification.settings.configuration import *
 
 SAMPLES_PATH = '../datasets/araneae/araneae.json'
 
+
 class Status(Enum):
     READY = 0
     IN_PROGRESS = 1
     ERROR_DESCRIBING = 2
+    DB_EXPLORING = 3
+    INFO_READING = 4
 
 
 class State(Enum):
@@ -35,7 +38,7 @@ class Sample:
 class User:
     def __init__(self, user_id):
         self.id: str = user_id
-        self.last: Union[Sample, None] = None
+        self.last_sample: Optional[Sample] = None
         self.state: State = State.SAMPLE
         self.status: Status = Status.READY
 
@@ -61,6 +64,6 @@ class Controller:
             nl=json_sample['question'],
             sql=json_sample['query']
         )
-        self.users[user_id].last = deepcopy(generated_sample)
+        self.users[user_id].last_sample = deepcopy(generated_sample)
         return generated_sample
 

@@ -22,20 +22,30 @@ def callback_worker(call):
         controller.add_new_user(user_id)
     user = controller.users[user_id]
     if call.data == 'estimate':
-        send_sample(bot, controller, user_id)
+        send_new_sample(bot, controller, user_id)
         user.status = Status.IN_PROGRESS
     if call.data == 'correct':
         send_ok_to_correct(bot, controller, user_id)
-        send_sample(bot, controller, user_id)
+        send_new_sample(bot, controller, user_id)
     if call.data == 'incorrect':
         user.status = Status.ERROR_DESCRIBING
         send_whats_wrong(bot, controller, user_id)
     if call.data == 'skip':
-        send_sample(bot, controller, user_id)
+        send_new_sample(bot, controller, user_id)
     if call.data == 'db':
+        user.status = Status.DB_EXPLORING
         send_tables(bot, controller, user_id)
     if call.data == 'info':
+        user.status = Status.INFO_READING
         send_info(bot, controller, user_id)
+    if call.data.startswith('TABLE'):
+        current_table = '#'.join(call.data.split('#')[1:])
+        send_view(bot, controller, user_id, current_table)
+    if call.data == 'back_to_estimation':
+        send_last_sample(bot, controller, user_id)
+        user.status = Status.IN_PROGRESS
+    if call.data == 'back_to_tables':
+        send_tables(bot, controller, user_id)
 
 
 @bot.message_handler(content_types=['text'])
@@ -45,5 +55,5 @@ def text(message):
         pass # TODO
     if user.status is Status.ERROR_DESCRIBING:
         send_ok_to_incorrect(bot, controller, user.id)
-        send_sample(bot, controller, message.chat.id)
+        send_new_sample(bot, controller, message.chat.id)
 bot.polling()
