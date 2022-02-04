@@ -1,6 +1,6 @@
 import json
 from enum import Enum
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import *
 
 
@@ -8,16 +8,22 @@ SCHEMES_PATH = "../datasets/spider/tables.json"
 
 
 class Subquery(Enum):
+    SELECT = "select"
     GROUP_BY = "group_by"
+    LIMIT = "limit"
 
 
 @dataclass
 class Mention:
     type: Subquery
-    db: Union[str, None]
-    table: Union[str, None]
-    column: Union[str, None]
-    values: List[Union[str, None]]
+    db: Optional[str] = None
+    table: Optional[str] = None
+    column: Optional[str] = None
+    values: Optional[List[str]] = None
+    aggregation: Optional[List[str]] = None
+    distinct: bool = False
+    limit: Optional[int] = None
+    details: List[str] = field(default_factory=list)
 
 
 def load_schemes():
@@ -31,33 +37,70 @@ class MentionExtractor:
     def __init__(self):
         self.schemes = load_schemes()
 
-    def parse_col_unit(self, scheme, col_unit):
+    def parse_col_unit(self, scheme, col_unit, type, input_details, aggregation=None, distinct=None) -> Mention:
         col_id = col_unit[1]
         column_description = scheme["column_names_original"][col_id]
         column = column_description[1]
         table_id = column_description[0]
         table = scheme["table_names_original"][table_id]
         mention = Mention(
-            type=Subquery.GROUP_BY,
+            type=type,
             db=scheme["db_id"],
             column=column,
-            values=None
+            aggregation=aggregation,
+            distinct=distinct,
+            details=input_details
         )
         return mention
 
-    def extract_from_group_by(self, scheme, group_by):
-        mentions = []
-        for col_unit in group_by:
-            mentions.append(self.parse_col_unit(scheme, col_unit))
+    def parse_val_unit(self, scheme, val_unit, type, input_details, aggregation=None, distinct=None) -> List[Mention]:
+        unit_op = val_unit[0]
+        col_unit_1 = val_unit[1]
+        mentions = [self.parse_col_unit(scheme, col_unit_1, type, input_details, aggregation, distinct)]
+        if unit_op:
+            col_unit_2 = val_unit[1]
+            from_col_2 = [self.parse_col_unit(scheme, col_unit_2, type, input_details + [unit_op], aggregation, distinct)]
+            mentions += from_col_2
         return mentions
 
-    def get_mentions(self, sample: Dict) -> List[Mention]:
+    def extract_from_select(self, scheme, select, details) -> List[Mention]:
+        dist = select[0]
         mentions = []
-        db = sample['db_id']
-        sql = sample['sample']
+        for select_unit in select[1]:
+            agg = select_unit[0]
+            val_unit = select_unit[1]
+            mentions += self.parse_val_unit(scheme, val_unit, Subquery.SELECT, details, aggregation=agg, distinct=dist)
+        return mentions
+
+    def extract_from_group_by(self, scheme, group_by, details) -> List[Mention]:
+        mentions = []
+        for col_unit in group_by:
+            mentions.append(self.parse_col_unit(scheme, col_unit, Subquery.GROUP_BY, details))
+        return mentions
+
+    def extract_from_limit(self, scheme, limit, details) -> List[Mention]:
+        if limit is not None:
+            return [Mention(type=Subquery.LIMIT, limit=int(limit))]
+        return []
+
+    def get_mentions_from_sql(self, db: str, sql: Dict, details=field(default_factory=list)) -> List[Mention]:
+        mentions = []
         scheme = self.schemes[db]
-        group_by = sql['group_by']
-        mentions += [self.extract_from_group_by(scheme, group_by)]
+        mentions += self.extract_from_select(scheme, sql['select'], details)
+        mentions += self.extract_from_group_by(scheme, sql['groupBy'], details)
+        mentions += self.extract_from_limit(scheme, sql['limit'], details)
+        if sql['intersect']:
+            mentions += self.get_mentions_from_sql(db, sql['intersect'], details=['intersect'])
+        if sql['union']:
+            mentions += self.get_mentions_from_sql(db, sql['union'], details=['union'])
+        if sql['except']:
+            mentions += self.get_mentions_from_sql(db, sql['except'], details=['except'])
+        return mentions
+
+    def get_mentions_from_sample(self, sample: Dict) -> List[Mention]:
+        db = sample['db_id']
+        sql = sample['sql']
+        mentions = self.get_mentions_from_sql(db, sql)
         return mentions
 
 
@@ -71,8 +114,9 @@ if __name__ == "__main__":
         query = sample['query']
         sql = sample['sql']
 
-        mentions = extractor.get_mentions(sample)
-        a = 7
+        mentions = extractor.get_mentions_from_sample(sample)
+        if 'group by' in query.lower():
+            a = 7
 
 
 
