@@ -10,7 +10,24 @@ SCHEMES_PATH = "../datasets/spider/tables.json"
 class Subquery(Enum):
     SELECT = "select"
     GROUP_BY = "group_by"
+    ORDER_BY = 'order_by'
     LIMIT = "limit"
+
+
+class Aggregation(Enum):
+    MAX = 'max'
+    MIN = 'min'
+    COUNT = 'count'
+    SUM = 'sum'
+    AVG = 'avg'
+
+
+class ORDER(Enum):
+    ASC = 'max'
+    DESC = 'min'
+
+
+AGGREGATIONS = [None, Aggregation.MAX, Aggregation.MIN, Aggregation.COUNT, Aggregation.SUM, Aggregation.AVG]
 
 
 @dataclass
@@ -37,23 +54,27 @@ class MentionExtractor:
     def __init__(self):
         self.schemes = load_schemes()
 
-    def parse_col_unit(self, scheme, col_unit, type, input_details, aggregation=None, distinct=None) -> Mention:
+    def parse_col_unit(self, scheme, col_unit, type, input_details, aggregation=0, distinct=None) -> Mention:
         col_id = col_unit[1]
         column_description = scheme["column_names_original"][col_id]
         column = column_description[1]
         table_id = column_description[0]
-        table = scheme["table_names_original"][table_id]
+        if table_id == -1:
+            table = None
+        else:
+            table = scheme["table_names_original"][table_id]
         mention = Mention(
             type=type,
             db=scheme["db_id"],
+            table=table,
             column=column,
-            aggregation=aggregation,
+            aggregation=AGGREGATIONS[aggregation],
             distinct=distinct,
             details=input_details
         )
         return mention
 
-    def parse_val_unit(self, scheme, val_unit, type, input_details, aggregation=None, distinct=None) -> List[Mention]:
+    def parse_val_unit(self, scheme, val_unit, type, input_details, aggregation=0, distinct=None) -> List[Mention]:
         unit_op = val_unit[0]
         col_unit_1 = val_unit[1]
         mentions = [self.parse_col_unit(scheme, col_unit_1, type, input_details, aggregation, distinct)]
@@ -63,6 +84,19 @@ class MentionExtractor:
             mentions += from_col_2
         return mentions
 
+    def extract_from_group_by(self, scheme, group_by, details) -> List[Mention]:
+        mentions = []
+        for col_unit in group_by:
+            mentions.append(self.parse_col_unit(scheme, col_unit, Subquery.GROUP_BY, details))
+        return mentions
+
+    def extract_from_order_by(self, scheme, order_by, details) -> List[Mention]:  # TODO
+        order = order_by[0]
+        mentions = []
+        for val_unit in order_by:
+            mentions += self.parse_val_unit(scheme, val_unit, Subquery.ORDER_BY, details + [order])
+        return mentions
+
     def extract_from_select(self, scheme, select, details) -> List[Mention]:
         dist = select[0]
         mentions = []
@@ -70,12 +104,6 @@ class MentionExtractor:
             agg = select_unit[0]
             val_unit = select_unit[1]
             mentions += self.parse_val_unit(scheme, val_unit, Subquery.SELECT, details, aggregation=agg, distinct=dist)
-        return mentions
-
-    def extract_from_group_by(self, scheme, group_by, details) -> List[Mention]:
-        mentions = []
-        for col_unit in group_by:
-            mentions.append(self.parse_col_unit(scheme, col_unit, Subquery.GROUP_BY, details))
         return mentions
 
     def extract_from_limit(self, scheme, limit, details) -> List[Mention]:
@@ -88,6 +116,7 @@ class MentionExtractor:
         scheme = self.schemes[db]
         mentions += self.extract_from_select(scheme, sql['select'], details)
         mentions += self.extract_from_group_by(scheme, sql['groupBy'], details)
+        mentions += self.extract_from_order_by(scheme, sql['orderBy'], details)
         mentions += self.extract_from_limit(scheme, sql['limit'], details)
         if sql['intersect']:
             mentions += self.get_mentions_from_sql(db, sql['intersect'], details=['intersect'])
