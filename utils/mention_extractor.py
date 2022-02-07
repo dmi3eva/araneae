@@ -13,10 +13,12 @@ class Detail(Enum):
     ORDER_DESC = "order-desc"
     MULTI_OPERATIONS = "multi-operations"
     FROM_VALUE = "from-value"
+    SUB_SQL = "sub_sql"
 
 
 class Subquery(Enum):
     SELECT = "select"
+    FROM = "from"
     GROUP_BY = "group_by"
     ORDER_BY = "order_by"
     HAVING = "having"
@@ -32,9 +34,10 @@ class Aggregation(Enum):
     AVG = 'avg'
 
 
-class ORDER(Enum):
+class Order(Enum):
     ASC = 'max'
     DESC = 'min'
+
 
 
 AGGREGATIONS = [None, Aggregation.MAX, Aggregation.MIN, Aggregation.COUNT, Aggregation.SUM, Aggregation.AVG]
@@ -66,7 +69,10 @@ class MentionExtractor:
         self.schemes = load_schemes()
 
     def parse_col_unit(self, scheme, col_unit, type, input_details, aggregation=0, distinct=None) -> Mention:
-        col_id = col_unit[1]
+        try:
+            col_id = col_unit[1]
+        except:
+            a = 7
         column_description = scheme["column_names_original"][col_id]
         column = column_description[1]
         table_id = column_description[0]
@@ -114,7 +120,7 @@ class MentionExtractor:
             )
             return [value_mention]
         details += [Detail.FROM_VALUE]
-        mentions = self.get_mentions_from_sql(scheme['db_id'], value, details=details)
+        mentions = self.get_mentions_from_sql(scheme['db_id'], value, details=details + [Detail.SUB_SQL])
         return mentions
 
     def parse_cond_unit(self, scheme, cond_unit, type, input_details) -> List[Mention]:
@@ -129,6 +135,22 @@ class MentionExtractor:
             mentions = self._add_values_to_mentions(mentions, val_1, scheme, type, details)
         if val_2:
             mentions = self._add_values_to_mentions(mentions, val_2, scheme, type, details)
+        return mentions
+
+    def parse_table(self, scheme, table_unit, type, input_details) -> List[Mention]:
+        mentions = []
+        if table_unit[0] == 'table_unit':
+            table_id = table_unit[1]
+            table = scheme['table_names_original'][table_id]
+            mention = Mention(
+                type=type,
+                db=scheme['db_id'],
+                table=table
+            )
+            mentions.append(mention)
+        elif table_unit[0] == 'sql':
+            details = input_details + [Detail.SUB_SQL]
+            mentions = self.get_mentions_from_sql(scheme['db_id'], table_unit[1], details)
         return mentions
 
     def parse_condition(self, scheme, conditions, type, input_details) -> List[Mention]:
@@ -180,23 +202,37 @@ class MentionExtractor:
             return [Mention(type=Subquery.LIMIT, limit=int(limit))]
         return []
 
+    def extract_from_from(self, scheme, from_part, details) -> List[Mention]:
+        table_units = from_part['table_units']
+        condition_units = from_part['conds']
+        table_mentions = []
+        for _table_unit in table_units:
+            table_mentions += self.parse_table(scheme, _table_unit, Subquery.FROM, details)
+        if not isinstance(condition_units, list):
+            condition_units = [condition_units]
+        condition_mentions = []
+        for _condition in condition_units:
+            condition_mentions += self.parse_condition(scheme, condition_units, Subquery.FROM, details)
+        return table_mentions + condition_mentions
+
     def get_mentions_from_sql(self, db: str, sql: Dict, details=None) -> List[Mention]:
         mentions = []
         scheme = self.schemes[db]
         if not details:
             details = []
         mentions += self.extract_from_select(scheme, sql['select'], details)
+        mentions += self.extract_from_from(scheme, sql['from'], details)
         mentions += self.extract_from_where(scheme, sql['where'], details)
         mentions += self.extract_from_group_by(scheme, sql['groupBy'], details)
         mentions += self.extract_from_order_by(scheme, sql['orderBy'], details)
         mentions += self.extract_from_having(scheme, sql['having'], details)
         mentions += self.extract_from_limit(scheme, sql['limit'], details)
         if sql['intersect']:
-            mentions += self.get_mentions_from_sql(db, sql['intersect'], details=['intersect'])
+            mentions += self.get_mentions_from_sql(db, sql['intersect'], details=['intersect', Detail.SUB_SQL])
         if sql['union']:
-            mentions += self.get_mentions_from_sql(db, sql['union'], details=['union'])
+            mentions += self.get_mentions_from_sql(db, sql['union'], details=['union', Detail.SUB_SQL])
         if sql['except']:
-            mentions += self.get_mentions_from_sql(db, sql['except'], details=['except'])
+            mentions += self.get_mentions_from_sql(db, sql['except'], details=['except', Detail.SUB_SQL])
         return mentions
 
     def get_mentions_from_sample(self, sample: Dict) -> List[Mention]:
