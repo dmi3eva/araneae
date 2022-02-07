@@ -20,6 +20,7 @@ class Subquery(Enum):
     GROUP_BY = "group_by"
     ORDER_BY = "order_by"
     HAVING = "having"
+    WHERE = "where"
     LIMIT = "limit"
 
 
@@ -105,6 +106,13 @@ class MentionExtractor:
                 values=[value]
             )
             return [value_mention]
+        if isinstance(value, list):
+            value_mention = Mention(
+                type=type,
+                db=scheme["db_id"],
+                values=value
+            )
+            return [value_mention]
         details += [Detail.FROM_VALUE]
         mentions = self.get_mentions_from_sql(scheme['db_id'], value, details=details)
         return mentions
@@ -133,6 +141,10 @@ class MentionExtractor:
 
     def extract_from_having(self, scheme, having, details) -> List[Mention]:
         mentions = self.parse_condition(scheme, having, Subquery.HAVING, details)
+        return mentions
+
+    def extract_from_where(self, scheme, where, details) -> List[Mention]:
+        mentions = self.parse_condition(scheme, where, Subquery.WHERE, details)
         return mentions
 
     def extract_from_group_by(self, scheme, group_by, details) -> List[Mention]:
@@ -174,6 +186,7 @@ class MentionExtractor:
         if not details:
             details = []
         mentions += self.extract_from_select(scheme, sql['select'], details)
+        mentions += self.extract_from_where(scheme, sql['where'], details)
         mentions += self.extract_from_group_by(scheme, sql['groupBy'], details)
         mentions += self.extract_from_order_by(scheme, sql['orderBy'], details)
         mentions += self.extract_from_having(scheme, sql['having'], details)
@@ -194,13 +207,18 @@ class MentionExtractor:
 
     def _add_values_to_mentions(self, mentions, val, scheme, type, details):
         values_mentions = self.parse_value(scheme, val, type, details)
+        new_mentions = []
         values = []
         for _v in values_mentions:
-            values += _v.values
+            if _v.values is not None:  # for SQL
+                values += _v.values
+            else:
+                new_mentions.append(_v)
         for _mention in mentions:
             if not _mention.values:
                 _mention.values = []
             _mention.values += values
+        mentions += new_mentions
         return mentions
 
 
@@ -215,7 +233,7 @@ if __name__ == "__main__":
         sql = sample['sql']
 
         mentions = extractor.get_mentions_from_sample(sample)
-        if len(sql['having']) > 0:
+        if len(sql['where']) > 0:
              a = 7
 
 
