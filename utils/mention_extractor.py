@@ -1,60 +1,12 @@
 import json
-from enum import Enum
-from dataclasses import dataclass, field
 from typing import *
 
-
+from dto.sample import *
 SCHEMES_PATH = "../datasets/spider/tables.json"
-
-
-class Detail(Enum):
-    MULTI_CONDITIONS = "multi-conditions"
-    ORDER_ASC = "order-asc"
-    ORDER_DESC = "order-desc"
-    MULTI_OPERATIONS = "multi-operations"
-    FROM_VALUE = "from-value"
-    SUB_SQL = "sub_sql"
-
-
-class Subquery(Enum):
-    SELECT = "select"
-    FROM = "from"
-    GROUP_BY = "group_by"
-    ORDER_BY = "order_by"
-    HAVING = "having"
-    WHERE = "where"
-    LIMIT = "limit"
-
-
-class Aggregation(Enum):
-    MAX = 'max'
-    MIN = 'min'
-    COUNT = 'count'
-    SUM = 'sum'
-    AVG = 'avg'
-
-
-class Order(Enum):
-    ASC = 'max'
-    DESC = 'min'
-
 
 
 AGGREGATIONS = [None, Aggregation.MAX, Aggregation.MIN, Aggregation.COUNT, Aggregation.SUM, Aggregation.AVG]
 CONDITION_OPS = ['not', 'between', '=', '>', '<', '>=', '<=', '!=', 'in', 'like', 'is', 'exists']
-
-
-@dataclass
-class Mention:
-    type: Subquery
-    db: Optional[str] = None
-    table: Optional[str] = None
-    column: Optional[str] = None
-    values: Optional[List[str]] = None
-    aggregation: Optional[List[str]] = None
-    distinct: bool = False
-    limit: Optional[int] = None
-    details: List[str] = field(default_factory=lambda: [])
 
 
 def load_schemes():
@@ -194,7 +146,8 @@ class MentionExtractor:
         for select_unit in select[1]:
             agg = select_unit[0]
             val_unit = select_unit[1]
-            mentions += self.parse_val_unit(scheme, val_unit, Subquery.SELECT, details, aggregation=agg, distinct=dist)
+            val_mentions = self.parse_val_unit(scheme, val_unit, Subquery.SELECT, details, aggregation=agg, distinct=dist)
+            mentions += val_mentions
         return mentions
 
     def extract_from_limit(self, scheme, limit, details) -> List[Mention]:
@@ -263,14 +216,13 @@ if __name__ == "__main__":
         araneae = json.load(table_file)
 
     extractor = MentionExtractor()
-    for ind, sample in enumerate(araneae[80:]):
+    for ind, sample in enumerate(araneae[4:]):
         question = sample['question']
         query = sample['query']
         sql = sample['sql']
 
         mentions = extractor.get_mentions_from_sample(sample)
-        if len(sql['where']) > 0:
-             a = 7
+        a = 7
 
 
 
