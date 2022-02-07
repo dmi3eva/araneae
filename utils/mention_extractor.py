@@ -10,7 +10,8 @@ SCHEMES_PATH = "../datasets/spider/tables.json"
 class Subquery(Enum):
     SELECT = "select"
     GROUP_BY = "group_by"
-    ORDER_BY = 'order_by'
+    ORDER_BY = "order_by"
+    HAVING = "having"
     LIMIT = "limit"
 
 
@@ -40,7 +41,7 @@ class Mention:
     aggregation: Optional[List[str]] = None
     distinct: bool = False
     limit: Optional[int] = None
-    details: List[str] = field(default_factory=list)
+    details: List[str] = field(default_factory=lambda: [])
 
 
 def load_schemes():
@@ -84,6 +85,14 @@ class MentionExtractor:
             mentions += from_col_2
         return mentions
 
+    def parse_condition(self, scheme, val_unit, type, input_details, aggregation=0, distinct=None) -> List[Mention]:
+        mentions = []
+        return mentions
+
+    def extract_from_having(self, scheme, having, details) -> List[Mention]:
+        mentions = self.parse_condition(scheme, having, Subquery.HAVING, details)
+        return mentions
+
     def extract_from_group_by(self, scheme, group_by, details) -> List[Mention]:
         mentions = []
         for col_unit in group_by:
@@ -91,9 +100,11 @@ class MentionExtractor:
         return mentions
 
     def extract_from_order_by(self, scheme, order_by, details) -> List[Mention]:  # TODO
+        if len(order_by) == 0:
+            return []
         order = order_by[0]
         mentions = []
-        for val_unit in order_by:
+        for val_unit in order_by[1]:
             mentions += self.parse_val_unit(scheme, val_unit, Subquery.ORDER_BY, details + [order])
         return mentions
 
@@ -111,12 +122,15 @@ class MentionExtractor:
             return [Mention(type=Subquery.LIMIT, limit=int(limit))]
         return []
 
-    def get_mentions_from_sql(self, db: str, sql: Dict, details=field(default_factory=list)) -> List[Mention]:
+    def get_mentions_from_sql(self, db: str, sql: Dict, details=None) -> List[Mention]:
         mentions = []
         scheme = self.schemes[db]
+        if not details:
+            details = []
         mentions += self.extract_from_select(scheme, sql['select'], details)
         mentions += self.extract_from_group_by(scheme, sql['groupBy'], details)
         mentions += self.extract_from_order_by(scheme, sql['orderBy'], details)
+        mentions += self.extract_from_having(scheme, sql['having'], details)
         mentions += self.extract_from_limit(scheme, sql['limit'], details)
         if sql['intersect']:
             mentions += self.get_mentions_from_sql(db, sql['intersect'], details=['intersect'])
@@ -138,7 +152,7 @@ if __name__ == "__main__":
         araneae = json.load(table_file)
 
     extractor = MentionExtractor()
-    for ind, sample in enumerate(araneae):
+    for ind, sample in enumerate(araneae[2:]):
         question = sample['question']
         query = sample['query']
         sql = sample['sql']
