@@ -2,7 +2,7 @@ import json
 from typing import *
 
 from dto.sample import *
-SCHEMES_PATH = "../datasets/spider/tables.json"
+SCHEMES_PATH = "../resources/datasets/spider/tables.json"
 
 
 AGGREGATIONS = [None, Aggregation.MAX, Aggregation.MIN, Aggregation.COUNT, Aggregation.SUM, Aggregation.AVG]
@@ -212,7 +212,7 @@ class MentionExtractor:
 
 
 if __name__ == "__main__":
-    with open('../datasets/araneae/araneae.json') as table_file:
+    with open('../resources/datasets/araneae/araneae.json') as table_file:
         araneae = json.load(table_file)
 
     extractor = MentionExtractor()
