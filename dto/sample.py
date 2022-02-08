@@ -33,6 +33,18 @@ class Order(Enum):
     ASC = 'max'
     DESC = 'min'
 
+
+class Sample:
+    def __init__(self):
+        self.question: Optional[str] = None
+        self.query: Optional[str] = None
+        self.sql: Optional[Dict] = None
+        self.mentions: List[Mention] = None
+        self.specifications: Optional[Dict] = None
+        self.query_toks: Optional[List] = None
+        self.query_toks_no_values: Optional[List] = None
+
+
 @dataclass
 class Mention:
     type: Subquery
