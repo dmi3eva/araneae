@@ -94,8 +94,8 @@ class SpiderDB:
 class EnSpiderDB(SpiderDB):
     def __init__(self):
         super().__init__()
-        self.db_path = "../datasets/spider/database"
-        self.schemes_path = "../datasets/spider/tables.json"
+        self.db_path = "../resources/datasets/spider/database"
+        self.schemes_path = "../resources/datasets/spider/tables.json"
 
     def extract_dbs(self):
         return os.listdir(self.db_path)

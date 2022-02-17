@@ -1,4 +1,6 @@
 import json
+import telebot
+
 from random import choice
 from copy import deepcopy
 from dataclasses import dataclass
@@ -6,7 +8,7 @@ from enum import Enum
 from typing import *
 from verification.settings.configuration import *
 
-SAMPLES_PATH = '../datasets/araneae/araneae.json'
+SAMPLES_PATH = '../resources/datasets/araneae/araneae.json'
 
 
 class Status(Enum):
@@ -39,6 +41,7 @@ class User:
     def __init__(self, user_id):
         self.id: str = user_id
         self.last_sample: Optional[Sample] = None
+        self.last_message: Any = None
         self.state: State = State.SAMPLE
         self.status: Status = Status.READY
 

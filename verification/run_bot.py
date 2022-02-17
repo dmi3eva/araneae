@@ -1,10 +1,11 @@
 import telebot
 
-from settings.configuration import *
-from settings.content import *
-from settings.panels import *
-from src.controller import *
-from src.sender import *
+from verification.settings.configuration import *
+from verification.settings.content import *
+from verification.settings.panels_inline import *
+from verification.src.controller import *
+from verification.src.sender import *
+from verification.utils.common import *
 
 bot = telebot.TeleBot(API_TOKEN)
 controller = Controller()
@@ -12,48 +13,67 @@ controller = Controller()
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
-    send_info(bot, controller, message.chat.id)
+    user_id = message.chat.id
+    user = get_user(controller, user_id)
+    sent_msg = send_info(bot, controller, user_id)
+    user.last_message = sent_msg
 
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_worker(call):
     user_id = call.message.chat.id
-    if user_id not in controller.users.keys():
-        controller.add_new_user(user_id)
-    user = controller.users[user_id]
+    user = get_user(controller, user_id)
+    chat_id = call.message.chat.id
+    sent_msg = None
+
     if call.data == 'estimate':
-        send_new_sample(bot, controller, user_id)
+        sent_msg = send_new_sample(bot, controller, user_id)
         user.status = Status.IN_PROGRESS
     if call.data == 'correct':
-        send_ok_to_correct(bot, controller, user_id)
-        send_new_sample(bot, controller, user_id)
+        user.status = Status.READY
+        just_send_ok_to_correct(bot, controller, user_id)
+        sent_msg = send_new_sample(bot, controller, user_id)
     if call.data == 'incorrect':
         user.status = Status.ERROR_DESCRIBING
         send_whats_wrong(bot, controller, user_id)
     if call.data == 'skip':
-        send_new_sample(bot, controller, user_id)
+        sent_msg = send_new_sample(bot, controller, user_id)
     if call.data == 'db':
         user.status = Status.DB_EXPLORING
-        send_tables(bot, controller, user_id)
+        sent_msg = send_tables(bot, controller, user_id)
     if call.data == 'info':
         user.status = Status.INFO_READING
-        send_info(bot, controller, user_id)
+        sent_msg = send_info(bot, controller, user_id)
     if call.data.startswith('TABLE'):
         current_table = '#'.join(call.data.split('#')[1:])
-        send_view(bot, controller, user_id, current_table)
+        sent_msg = send_view(bot, controller, user_id, current_table)
     if call.data == 'back_to_estimation':
-        send_last_sample(bot, controller, user_id)
+        sent_msg = send_last_sample(bot, controller, user_id)
         user.status = Status.IN_PROGRESS
     if call.data == 'back_to_tables':
-        send_tables(bot, controller, user_id)
+        sent_msg = send_tables(bot, controller, user_id)
+
+    if user.last_message:
+        last_message_id = user.last_message.message_id
+        last_text = user.last_message.text
+        edited_text = f"<code>{last_text}</code>"
+        bot.edit_message_text(edited_text, chat_id=chat_id, message_id=last_message_id, reply_markup=empty_panel, parse_mode="HTML")
+        # if user.last_message.reply_markup:
+        #     bot.edit_message_reply_markup(chat_id=chat_id, message_id=last_message_id, reply_markup=empty_panel)
+
+    user.last_message = sent_msg
 
 
 @bot.message_handler(content_types=['text'])
 def text(message):
-    user = controller.users.get(message.chat.id, None)
+    user_id = message.chat.id
+    user = get_user(controller, user_id)
     if not user:
-        pass # TODO
+        pass  # TODO
     if user.status is Status.ERROR_DESCRIBING:
-        send_ok_to_incorrect(bot, controller, user.id)
-        send_new_sample(bot, controller, message.chat.id)
+        just_send_ok_to_incorrect(bot, controller, user.id)
+        sent_msg = send_new_sample(bot, controller, message.chat.id)
+        user.last_message = sent_msg
+
+
 bot.polling()

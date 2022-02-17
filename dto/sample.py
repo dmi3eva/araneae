@@ -53,6 +53,7 @@ class QueryType(Enum):
 
 
 class QuerySubtype(Enum):
+    WITH_VALUES = "with_values"
     BINARY_TRUE_FALSE = "binary-true-false"
     BINARY_ANTONYMS = "binary-antonyms"
     BINARY_GENDER = "binary-gender"
@@ -108,6 +109,7 @@ query_mapping = {
 class Sample:
     def __init__(self):
         self.id: Optional[int] = None
+        self.db_id: Optional[str] = None
         self.source: Optional[Source] = None
         self.question: Optional[str] = None
         self.query: Optional[str] = None
@@ -127,8 +129,12 @@ class Sample:
                 dicted[_k] = _v.value
         for _query_type in QueryType:
             dicted[_query_type.value] = ""
-            if dicted['specifications'][_query_type]:
-                dicted[_query_type.value] = ', '.join([_s.value for _s in dicted['specifications'][_query_type] if _s])
+            dicted[f"{_query_type.value}-with-values"] = False
+            if not dicted['specifications'][_query_type]:
+                continue
+            dicted[_query_type.value] = ', '.join([_s.value for _s in dicted['specifications'][_query_type] if _s])
+            if QuerySubtype.WITH_VALUES in dicted['specifications'][_query_type]:
+                dicted[f"{_query_type.value}-with-values"] = True
         del dicted['specifications']
         return dicted
 

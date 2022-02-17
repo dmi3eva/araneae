@@ -75,8 +75,7 @@ class Araneae:
     def create_sample_from_json(self, sample_json: Dict, source: Source) -> Sample:
         generated_sample = Sample()
         generated_sample.id = len(self.samples.content)
-        if generated_sample.id == 770:
-            a = 7
+        generated_sample.db_id = sample_json.get('db_id', None)
         generated_sample.source = source
         generated_sample.question = sample_json.get('question', None)
         generated_sample.query = sample_json.get('query', None)
@@ -102,6 +101,8 @@ class Araneae:
                 if not specifications[_column_type]:
                     specifications[_column_type] = []
                 specifications[_column_type] += [subtype]
+                if _mention.values:
+                    specifications[_column_type] += [QuerySubtype.WITH_VALUES]
                 specifications[_column_type] = list(set(specifications[_column_type]))
         return specifications
 

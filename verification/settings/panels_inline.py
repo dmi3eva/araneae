@@ -25,3 +25,7 @@ error_panel.add(estimate_btn, info_btn)
 # Other details
 back_to_estimation_btn = types.InlineKeyboardButton(text='\U0001F519 Вернуться к оцениванию', callback_data='back_to_estimation')
 back_to_tables_btn = types.InlineKeyboardButton(text='\U0001F5C2 Список таблиц', callback_data='back_to_tables')
+
+
+# Empty
+empty_panel = types.InlineKeyboardMarkup()

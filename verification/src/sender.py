@@ -1,9 +1,14 @@
 from telebot import types
 
 from verification.settings.content import *
+from verification.settings.panels_inline import *
+from verification.utils import *
 from verification.src.controller import *
-from verification.settings.panels import *
+
 from utils.spider_connectors import *
+
+
+MAX_MESSAGE_LEN = 32000
 
 
 def send_new_sample(bot, controller, user_id):
@@ -13,26 +18,26 @@ def send_new_sample(bot, controller, user_id):
     else:
         sample = user.last_sample
     text = create_text_form_sample(sample)
-    bot.send_message(user_id, text, parse_mode="HTML", reply_markup=request_panel)
+    return bot.send_message(user_id, text, parse_mode="HTML", reply_markup=request_panel)
 
 
 def send_last_sample(bot, controller, user_id):
     user = controller.users.get(user_id, None)
     sample = user.last_sample
     text = create_text_form_sample(sample)
-    bot.send_message(user_id, text, parse_mode="HTML", reply_markup=request_panel)
+    return bot.send_message(user_id, text, parse_mode="HTML", reply_markup=request_panel)
 
 
-def send_ok_to_correct(bot, controller, user_id):
+def just_send_ok_to_correct(bot, controller, user_id):
     bot.send_message(user_id, OK_TO_CORRECT, parse_mode="HTML")
 
 
-def send_ok_to_incorrect(bot, controller, user_id):
+def just_send_ok_to_incorrect(bot, controller, user_id):
     bot.send_message(user_id, OK_TO_INCORRECT, parse_mode="HTML")
 
 
 def send_whats_wrong(bot, controller, user_id):
-    bot.send_message(user_id, WHATS_WRONG, parse_mode="HTML", reply_markup=error_panel)
+    return bot.send_message(user_id, WHATS_WRONG, parse_mode="HTML", reply_markup=error_panel)
 
 
 def send_tables(bot, controller, user_id):
@@ -48,7 +53,7 @@ def send_tables(bot, controller, user_id):
     for left_btn, right_btn in zip(buttons[::2], buttons[1::2]):
         tables_panel.add(left_btn, right_btn)
     tables_panel.add(back_to_estimation_btn)
-    bot.send_message(user_id, TABLE_TITLE, parse_mode="HTML", reply_markup=tables_panel)
+    return bot.send_message(user_id, TABLE_TITLE, parse_mode="HTML", reply_markup=tables_panel)
 
 
 def send_view(bot, controller, user_id, table):
@@ -61,12 +66,14 @@ def send_view(bot, controller, user_id, table):
     view_panel.add(back_to_estimation_btn)
     view_panel.add(back_to_tables_btn)
     view_panel.add(info_btn)
+    if len(view) > MAX_MESSAGE_LEN:
+        view = TOO_LONG + view[:MAX_MESSAGE_LEN]
     bot.send_message(user_id, f"Содержимое таблицы <b>\"{table}\"</b>:", parse_mode="HTML")
-    bot.send_message(user_id, str(view), parse_mode="HTML", reply_markup=view_panel)
+    return bot.send_message(user_id, str(view), parse_mode="HTML", reply_markup=view_panel)
 
 
 def send_info(bot, controller, user_id):
-    bot.send_message(user_id, INSTRUCTIONS, parse_mode="HTML", reply_markup=info_panel)
+    return bot.send_message(user_id, INSTRUCTIONS, parse_mode="HTML", reply_markup=info_panel)
 
 
 def create_text_form_sample(sample: Sample):  # TODO
