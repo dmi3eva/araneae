@@ -51,6 +51,7 @@ class Source(Enum):
 class QueryType(Enum):
     BINARY = "binary"
     DATETIME = "datetime"
+    SIMPLICITY = "simplicity"
 
 
 class QuerySubtype(Enum):
@@ -75,6 +76,8 @@ class QuerySubtype(Enum):
     DATETIME_PLANNED = "datetime-planned"
     DATETIME_ACTUAL = "datetime-actual"
     DATETIME_ORDER = "datetime-order"
+    SIMPLE = "simple"
+    EXTRA_SIMPLE = "extra-simple"
 
 
 query_type_mapping = {_t.value: _t for _t in QueryType}

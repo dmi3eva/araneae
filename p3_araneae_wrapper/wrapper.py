@@ -49,13 +49,16 @@ class Araneae:
         self.load_column_types()
         self.mention_extractor = MentionExtractor()
         self.EXTRACTION_FUNCTIONS = {
-            QueryType.BINARY: lambda s: self._specifications_from_mentions(QueryType.BINARY, s),
-            QueryType.DATETIME: lambda s: self._specifications_from_mentions(QueryType.DATETIME, s)
+            QueryType.BINARY: lambda sample: self._specifications_from_mentions(QueryType.BINARY, sample),
+            QueryType.DATETIME: lambda sample: self._specifications_from_mentions(QueryType.DATETIME, sample),
+            QueryType.SIMPLICITY: lambda sample: self._specifications_simplicity(sample)
         }
 
     def load_column_types(self):
         for _column_type in QueryType:
             path = os.path.join(QUERY_TYPES_PATH, f"{_column_type.value}.json")
+            if not os.path.exists(path):
+                continue
             self.column_types[_column_type] = {}
             with open(path) as column_file:
                 self.column_types[_column_type] = json.load(column_file)
@@ -123,11 +126,21 @@ class Araneae:
             specifications = list(set(specifications))
         return specifications
 
-    def find_all_with_type(self, type_for_search: QueryType) -> SamplesCollection:
+    def _specifications_simplicity(self, sample: Sample) -> Optional[List[QuerySubtype]]:
+        if if_extra_simple(sample):
+            return [QuerySubtype.EXTRA_SIMPLE]
+        if if_simple(sample):
+            return [QuerySubtype.SIMPLE]
+        return None
+
+
+    def find_all_with_type(self, type_for_search: QueryType, subtype: QuerySubtype = None) -> SamplesCollection:
         search_result = SamplesCollection()
         for _sample in self.samples.content:
             subtypes = _sample.specifications[type_for_search]
-            if subtypes:
+            condition_1 = not subtype and subtypes
+            condition_2 = subtype and subtypes and subtype in subtypes
+            if condition_1 or condition_2:
                 search_result.add(_sample)
         return search_result
 
@@ -135,11 +148,21 @@ class Araneae:
 if __name__ == "__main__":
     araneae = Araneae()
     araneae.load_spider()
+
     binary = araneae.find_all_with_type(QueryType.BINARY)
     datetimes = araneae.find_all_with_type(QueryType.DATETIME)
+    extra_simple = araneae.find_all_with_type(QueryType.SIMPLICITY, subtype=QuerySubtype.EXTRA_SIMPLE)
+    simple = araneae.find_all_with_type(QueryType.SIMPLICITY, subtype=QuerySubtype.SIMPLE)
+
     binary.save_in_csv('../resources/results/with_binary.csv')
     datetimes.save_in_csv('../resources/results/with_datetimes.csv')
+    extra_simple.save_in_csv('../resources/results/extra_simple.csv')
+    simple.save_in_csv('../resources/results/simple.csv')
+
     binary.save_in_json('../resources/results/with_binary.json')
     datetimes.save_in_json('../resources/results/with_datetimes.json')
+    extra_simple.save_in_json('../resources/results/extra_simple.json')
+    simple.save_in_json('../resources/results/simple.json')
+
     a = 7
 
