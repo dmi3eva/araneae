@@ -23,3 +23,19 @@ def if_simple(sample: Sample) -> bool:
     if len(mentions) == 3 and len(selects) == 1 and len(froms) == 1 and len(wheres) == 1:
         return True
     return False
+
+
+def if_single_join(sample: Sample) -> bool:
+    mentions = sample.mentions
+    joins = [_t for _t in sample.query_toks if _t.lower() == 'join']
+    if len(joins) == 1:
+        return True
+    return False
+
+
+def if_multi_join(sample: Sample) -> bool:
+    mentions = sample.mentions
+    joins = [_t for _t in sample.query_toks if _t.lower() == 'join']
+    if len(joins) > 1:
+        return True
+    return False

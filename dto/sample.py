@@ -52,6 +52,7 @@ class QueryType(Enum):
     BINARY = "binary"
     DATETIME = "datetime"
     SIMPLICITY = "simplicity"
+    JOIN = "join"
 
 
 class QuerySubtype(Enum):
@@ -78,7 +79,8 @@ class QuerySubtype(Enum):
     DATETIME_ORDER = "datetime-order"
     SIMPLE = "simple"
     EXTRA_SIMPLE = "extra-simple"
-
+    SINGLE_JOIN = "single-join"
+    MULTI_JOIN = "multi-join"
 
 query_type_mapping = {_t.value: _t for _t in QueryType}
 query_subtype_mapping = {_t.value: _t for _t in QuerySubtype}

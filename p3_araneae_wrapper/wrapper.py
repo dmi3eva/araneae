@@ -51,7 +51,8 @@ class Araneae:
         self.EXTRACTION_FUNCTIONS = {
             QueryType.BINARY: lambda sample: self._specifications_from_mentions(QueryType.BINARY, sample),
             QueryType.DATETIME: lambda sample: self._specifications_from_mentions(QueryType.DATETIME, sample),
-            QueryType.SIMPLICITY: lambda sample: self._specifications_simplicity(sample)
+            QueryType.SIMPLICITY: lambda sample: self._specifications_simplicity(sample),
+            QueryType.JOIN: lambda sample: self._specifications_join(sample)
         }
 
     def load_column_types(self):
@@ -133,6 +134,12 @@ class Araneae:
             return [QuerySubtype.SIMPLE]
         return None
 
+    def _specifications_join(self, sample: Sample) -> Optional[List[QuerySubtype]]:
+        if if_single_join(sample):
+            return [QuerySubtype.SINGLE_JOIN]
+        if if_multi_join(sample):
+            return [QuerySubtype.MULTI_JOIN]
+        return None
 
     def find_all_with_type(self, type_for_search: QueryType, subtype: QuerySubtype = None) -> SamplesCollection:
         search_result = SamplesCollection()
@@ -153,16 +160,22 @@ if __name__ == "__main__":
     datetimes = araneae.find_all_with_type(QueryType.DATETIME)
     extra_simple = araneae.find_all_with_type(QueryType.SIMPLICITY, subtype=QuerySubtype.EXTRA_SIMPLE)
     simple = araneae.find_all_with_type(QueryType.SIMPLICITY, subtype=QuerySubtype.SIMPLE)
+    single_join = araneae.find_all_with_type(QueryType.JOIN, subtype=QuerySubtype.SINGLE_JOIN)
+    multi_join = araneae.find_all_with_type(QueryType.JOIN, subtype=QuerySubtype.MULTI_JOIN)
 
     binary.save_in_csv('../resources/results/with_binary.csv')
     datetimes.save_in_csv('../resources/results/with_datetimes.csv')
     extra_simple.save_in_csv('../resources/results/extra_simple.csv')
     simple.save_in_csv('../resources/results/simple.csv')
+    single_join.save_in_csv('../resources/results/single_join.csv')
+    multi_join.save_in_csv('../resources/results/multi_join.csv')
 
     binary.save_in_json('../resources/results/with_binary.json')
     datetimes.save_in_json('../resources/results/with_datetimes.json')
     extra_simple.save_in_json('../resources/results/extra_simple.json')
     simple.save_in_json('../resources/results/simple.json')
+    single_join.save_in_json('../resources/results/single_join.json')
+    multi_join.save_in_json('../resources/results/multi_join.json')
 
     a = 7
 
