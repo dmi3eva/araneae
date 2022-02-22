@@ -3,6 +3,7 @@ from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import *
 
+
 class Detail(Enum):
     MULTI_CONDITIONS = "multi-conditions"
     ORDER_ASC = "order-asc"

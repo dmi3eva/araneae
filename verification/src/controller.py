@@ -17,6 +17,9 @@ class Status(Enum):
     ERROR_DESCRIBING = 2
     DB_EXPLORING = 3
     INFO_READING = 4
+    IN_PROGRESS_FLUENCY = 5
+    IN_PROGRESS_EQUIVALENT = 6
+    IN_PROGRESS_SQL = 7
 
 
 class State(Enum):
