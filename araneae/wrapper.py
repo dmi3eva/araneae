@@ -1,5 +1,6 @@
 import os
 import json
+import dill as pickle
 import pandas as pd
 from copy import deepcopy
 from typing import *
@@ -13,6 +14,11 @@ from dto.sample import *
 
 SPIDER_PATH = "../resources/datasets/spider"
 QUERY_TYPES_PATH = "../resources/query_types"
+ARANEAE_PATH = "../resources/dump/araneae"
+
+SAMPLES_PATH = os.path.join(ARANEAE_PATH, 'samples.dat')
+COLUMN_TYPES_PATH = os.path.join(ARANEAE_PATH, 'column_types.dat')
+
 
 
 class SamplesCollection:
@@ -74,7 +80,8 @@ class Araneae:
     def load_from_csv(self, filepath: str, source: Source):
         pass
 
-    def load_spider(self):
+
+    def import_spider(self):
         dev_path = os.path.join(SPIDER_PATH, 'dev.json')
         train_spider_path = os.path.join(SPIDER_PATH, 'train_spider.json')
         train_others_path = os.path.join(SPIDER_PATH, 'train_others.json')
@@ -83,10 +90,16 @@ class Araneae:
         self.load_from_json(train_others_path, Source.SPIDER_TRAIN_OTHERS)
 
     def load(self):
-        pass
+        with open(SAMPLES_PATH, 'rb') as sample_file:
+            self.samples.content = pickle.load(sample_file)
+        with open(COLUMN_TYPES_PATH, 'rb') as column_type_file:
+            self.column_types = pickle.load(column_type_file)
 
     def save(self):
-        pass
+        with open(SAMPLES_PATH, 'wb') as sample_file:
+            pickle.dump(self.samples.content, sample_file)
+        with open(COLUMN_TYPES_PATH, 'wb') as column_type_file:
+            pickle.dump(self.column_types, column_type_file)
 
     def create_sample_from_json(self, sample_json: Dict, source: Source) -> Sample:
         generated_sample = Sample()
@@ -123,6 +136,8 @@ class Araneae:
             specifications += [subtype]
             if _mention.values:
                 specifications += [QuerySubtype.WITH_VALUES]
+            else:
+                specifications += [QuerySubtype.WITHOUT_VALUES]
         if specifications:
             specifications = list(set(specifications))
         return specifications
@@ -141,12 +156,12 @@ class Araneae:
             return [QuerySubtype.MULTI_JOIN]
         return None
 
-    def find_all_with_type(self, type_for_search: QueryType, subtype: QuerySubtype = None) -> SamplesCollection:
+    def find_all_with_type(self, type: QueryType, subtypes: Optional[List[QuerySubtype]] = None) -> SamplesCollection:
         search_result = SamplesCollection()
         for _sample in self.samples.content:
-            subtypes = _sample.specifications[type_for_search]
-            condition_1 = not subtype and subtypes
-            condition_2 = subtype and subtypes and subtype in subtypes
+            sample_subtypes = _sample.specifications[type]
+            condition_1 = not subtypes and sample_subtypes
+            condition_2 = subtypes and sample_subtypes and all([_s in sample_subtypes for _s in subtypes])
             if condition_1 or condition_2:
                 search_result.add(_sample)
         return search_result
@@ -154,28 +169,36 @@ class Araneae:
 
 if __name__ == "__main__":
     araneae = Araneae()
-    araneae.load_spider()
+    araneae.import_spider()
 
-    binary = araneae.find_all_with_type(QueryType.BINARY)
-    datetimes = araneae.find_all_with_type(QueryType.DATETIME)
-    extra_simple = araneae.find_all_with_type(QueryType.SIMPLICITY, subtype=QuerySubtype.EXTRA_SIMPLE)
-    simple = araneae.find_all_with_type(QueryType.SIMPLICITY, subtype=QuerySubtype.SIMPLE)
-    single_join = araneae.find_all_with_type(QueryType.JOIN, subtype=QuerySubtype.SINGLE_JOIN)
-    multi_join = araneae.find_all_with_type(QueryType.JOIN, subtype=QuerySubtype.MULTI_JOIN)
+    binary_with_values = araneae.find_all_with_type(QueryType.BINARY, subtypes=[QuerySubtype.WITH_VALUES])
+    binary_without_values = araneae.find_all_with_type(QueryType.BINARY, subtypes=[QuerySubtype.WITHOUT_VALUES])
+    datetimes_with_values = araneae.find_all_with_type(QueryType.DATETIME, subtypes=[QuerySubtype.WITH_VALUES])
+    datetimes_without_values = araneae.find_all_with_type(QueryType.DATETIME, subtypes=[QuerySubtype.WITHOUT_VALUES])
+    extra_simple = araneae.find_all_with_type(QueryType.SIMPLICITY, subtypes=[QuerySubtype.EXTRA_SIMPLE])
+    simple = araneae.find_all_with_type(QueryType.SIMPLICITY, subtypes=[QuerySubtype.SIMPLE])
+    single_join = araneae.find_all_with_type(QueryType.JOIN, subtypes=[QuerySubtype.SINGLE_JOIN])
+    multi_join = araneae.find_all_with_type(QueryType.JOIN, subtypes=[QuerySubtype.MULTI_JOIN])
 
-    binary.save_in_csv('../resources/results/with_binary.csv')
-    datetimes.save_in_csv('../resources/results/with_datetimes.csv')
+    binary_with_values.save_in_csv('../resources/results/binary_with_values.csv')
+    datetimes_with_values.save_in_csv('../resources/results/datetimes_with_values.csv')
+    binary_without_values.save_in_csv('../resources/results/binary_without_values.csv')
+    datetimes_without_values.save_in_csv('../resources/results/datetimes_without_values.csv')
     extra_simple.save_in_csv('../resources/results/extra_simple.csv')
     simple.save_in_csv('../resources/results/simple.csv')
     single_join.save_in_csv('../resources/results/single_join.csv')
     multi_join.save_in_csv('../resources/results/multi_join.csv')
 
-    binary.save_in_json('../resources/results/with_binary.json')
-    datetimes.save_in_json('../resources/results/with_datetimes.json')
+    binary_with_values.save_in_csv('../resources/results/binary_with_values.json')
+    datetimes_with_values.save_in_csv('../resources/results/datetimes_with_values.json')
+    binary_without_values.save_in_csv('../resources/results/binary_without_values.json')
+    datetimes_without_values.save_in_csv('../resources/results/datetimes_without_values.json')
     extra_simple.save_in_json('../resources/results/extra_simple.json')
     simple.save_in_json('../resources/results/simple.json')
     single_join.save_in_json('../resources/results/single_join.json')
     multi_join.save_in_json('../resources/results/multi_join.json')
+
+    araneae.save()
 
     a = 7
 

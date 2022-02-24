@@ -1,5 +1,6 @@
 from dto.sample import *
 
+
 def if_extra_simple(sample: Sample) -> bool:
     """"
     Chicking if query = SELECT <SOLE_COLUMN> FROM <SOLE_TABLE>

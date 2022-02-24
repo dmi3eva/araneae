@@ -57,6 +57,7 @@ class QueryType(Enum):
 
 class QuerySubtype(Enum):
     WITH_VALUES = "with_values"
+    WITHOUT_VALUES = "without_values"
     BINARY_TRUE_FALSE = "binary-true-false"
     BINARY_ANTONYMS = "binary-antonyms"
     BINARY_GENDER = "binary-gender"
