@@ -28,7 +28,7 @@ def postprocess(sql_structure: List[str]) -> List[str]:
     return processed[1:]
 
 
-def make_statistic(samples: List[Sample], ignore_agg=True) -> Dict[str, int]:
+def make_sql_statistic(samples: List[Sample], ignore_agg=True) -> Dict[str, int]:
     statistics = {}
     service_words = deepcopy(KEY_WORDS)
     if not ignore_agg:
@@ -40,7 +40,7 @@ def make_statistic(samples: List[Sample], ignore_agg=True) -> Dict[str, int]:
     return statistics
 
 
-def save_statistics(statistics, filename):
+def save_sql_statistics(statistics, filename):
     with open(f"../resources/results/statistics/{filename}.json", 'w') as f:
         json.dump(statistics_with_agg, f)
 
@@ -49,17 +49,11 @@ def save_statistics(statistics, filename):
     df.to_csv(f"../resources/results/statistics/{filename}.csv")
 
 
-def check_for_service(_token):
-    if len(_token) > 1 and _token[1].isupper() and _token.lower() not in OTHER_KEYWORDS and _token.lower() not in\
-            AGGREGATIONS and _token.lower() != "location":
-        print(_token)
-
-
 if __name__ == "__main__":
     araneae = Araneae()
     araneae.load()
-    statistics_with_agg = make_statistic(araneae.samples.content, ignore_agg=False)
-    statistics_without_agg = make_statistic(araneae.samples.content)
-    save_statistics(statistics_with_agg, "22_02_25_with_agg")
-    save_statistics(statistics_without_agg, "22_02_25_without_agg_brackets")
+    statistics_with_agg = make_sql_statistic(araneae.samples.content, ignore_agg=False)
+    statistics_without_agg = make_sql_statistic(araneae.samples.content)
+    save_sql_statistics(statistics_with_agg, "22_02_25_with_agg")
+    save_sql_statistics(statistics_without_agg, "22_02_25_without_agg_brackets")
     a = 7
