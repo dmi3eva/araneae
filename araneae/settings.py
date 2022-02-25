@@ -1,3 +1,5 @@
+#  Conditions, renaming, condition, calendar-functions are collapsing
+
 KEY_WORDS = [
     "select",
     "from",
@@ -9,7 +11,7 @@ KEY_WORDS = [
     "desc",
     "asc",
     "and",
-    "or"
+    "or", 'or',
     "not",
     "like",
     "between",
@@ -17,7 +19,18 @@ KEY_WORDS = [
     "union",
     "having",
     "limit",
-    "*", "*",
+    "in",
+    "not",
+    "except",
+    "cast",
+    "distinct",
+    # "hour",
+    # "second",
+    # "minute",
+    # "year",
+    # "month",
+    # "type,
+    "length",
     ",",
     "(",
     ")"
@@ -27,5 +40,11 @@ AGGREGATIONS = [
     "max",
     "avg",
     "sum",
-    "count"
+    "count",
+    "*", "*",
+
 ]
+OTHER_KEYWORDS = {
+    "as",
+    "on"
+}
