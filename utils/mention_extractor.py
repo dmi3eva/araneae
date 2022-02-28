@@ -1,8 +1,9 @@
+import os
 import json
 from typing import *
+from configure import *
 
 from dto.sample import *
-SCHEMES_PATH = "../resources/datasets/spider/tables.json"
 
 
 AGGREGATIONS = [None, Aggregation.MAX, Aggregation.MIN, Aggregation.COUNT, Aggregation.SUM, Aggregation.AVG]
@@ -24,7 +25,7 @@ class MentionExtractor:
         try:
             col_id = col_unit[1]
         except:
-            a = 7
+            raise ValueError("Problem with col_unit")
         column_description = scheme["column_names_original"][col_id]
         column = column_description[1]
         table_id = column_description[0]

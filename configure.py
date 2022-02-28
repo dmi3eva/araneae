@@ -1,0 +1,22 @@
+from os import curdir, path, getcwd
+
+ROOT_PATH = "C:\\Users\\forka\\PycharmProjects\\araneae"
+
+# results file exploring
+MODEL_REPORT_FOLDER = path.join(ROOT_PATH, "resources", "model_eval")
+TEST_SET_FOLDER = path.join(ROOT_PATH, "resources", "results", "test_sets")
+RESULTS_FOLDER = path.join(ROOT_PATH, "resources", "results", "reports")
+
+# mentions extractor
+SCHEMES_PATH = path.join(ROOT_PATH, 'resources', 'datasets', 'spider', 'tables.json')
+
+# wrapper
+SPIDER_PATH = path.join(ROOT_PATH, "resources", "datasets", "spider")
+RUSSOCAMPUS_PATH = path.join(ROOT_PATH, "resources", "datasets", "russocampus")
+
+QUERY_TYPES_PATH = path.join(ROOT_PATH, "resources", "query_types")
+ARANEAE_PATH = path.join(ROOT_PATH, "resources", "dump", "araneae")
+
+SAMPLES_PATH = path.join(ARANEAE_PATH, 'samples.dat')
+COLUMN_TYPES_PATH = path.join(ARANEAE_PATH, 'column_types.dat')
+INDICES_PATH = path.join(ARANEAE_PATH, 'indices.dat')

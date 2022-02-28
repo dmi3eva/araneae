@@ -2,6 +2,7 @@ import os
 import json
 import dill as pickle
 import pandas as pd
+from configure import *
 from copy import deepcopy
 from typing import *
 
@@ -10,16 +11,6 @@ from utils.mention_extractor import MentionExtractor
 # from utils.preprocessing.custom_sql import *
 # from utils.preprocessing.spider.process_sql import *
 from dto.sample import *
-
-
-SPIDER_PATH = "../resources/datasets/spider"
-RUSSOCAMPUS_PATH = "../resources/datasets/russocampus"
-
-QUERY_TYPES_PATH = "../resources/query_types"
-ARANEAE_PATH = "../resources/dump/araneae"
-
-SAMPLES_PATH = os.path.join(ARANEAE_PATH, 'samples.dat')
-COLUMN_TYPES_PATH = os.path.join(ARANEAE_PATH, 'column_types.dat')
 
 
 class SamplesCollection:
@@ -45,8 +36,8 @@ class SamplesCollection:
         for _sample in self.content:
             row = _sample.to_dict()
             data.append(row)
-        with open(json_path, 'w') as f:
-            json.dump(data, f)
+        with open(json_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False)
 
 
 class Araneae:
@@ -55,12 +46,14 @@ class Araneae:
         self.column_types = {}
         self.load_column_types()
         self.mention_extractor = MentionExtractor()
+        self.start_indices = None
         self.EXTRACTION_FUNCTIONS = {
             QueryType.BINARY: lambda sample: self._specifications_from_mentions(QueryType.BINARY, sample),
             QueryType.DATETIME: lambda sample: self._specifications_from_mentions(QueryType.DATETIME, sample),
             QueryType.SIMPLICITY: lambda sample: self._specifications_simplicity(sample),
             QueryType.JOIN: lambda sample: self._specifications_join(sample)
         }
+
 
     def load_column_types(self):
         for _column_type in QueryType:
@@ -71,12 +64,13 @@ class Araneae:
             with open(path) as column_file:
                 self.column_types[_column_type] = json.load(column_file)
 
-    def load_from_json(self, filepath: str, source: Source):
+    def load_from_json(self, filepath: str, source: Source) -> int:
         with open(filepath) as json_file:
             json_samples = json.load(json_file)
         for _json_sample in json_samples:
             sample = self.create_sample_from_json(_json_sample, source)
             self.samples.content.append(sample)
+        return len(json_samples)
 
     def load_russian_from_json(self, filepath: str, id_start: int) -> int:
         with open(filepath) as json_file:
@@ -97,9 +91,14 @@ class Araneae:
         dev_path = os.path.join(SPIDER_PATH, 'dev.json')
         train_spider_path = os.path.join(SPIDER_PATH, 'train_spider.json')
         train_others_path = os.path.join(SPIDER_PATH, 'train_others.json')
-        self.load_from_json(dev_path, Source.SPIDER_DEV)
-        self.load_from_json(train_spider_path, Source.SPIDER_TRAIN)
-        self.load_from_json(train_others_path, Source.SPIDER_TRAIN_OTHERS)
+        dev_size = self.load_from_json(dev_path, Source.SPIDER_DEV),
+        train_size = self.load_from_json(train_spider_path, Source.SPIDER_TRAIN),
+        other_size = self.load_from_json(train_others_path, Source.SPIDER_TRAIN_OTHERS)
+        self.start_indices = {
+            Source.SPIDER_DEV: 0,
+            Source.SPIDER_TRAIN: dev_size,
+            Source.SPIDER_TRAIN_OTHERS: dev_size + train_size
+        }
 
     def import_russocampus(self):
         ru_dev_path = os.path.join(RUSSOCAMPUS_PATH, 'rusp_dev.json')
@@ -109,17 +108,22 @@ class Araneae:
         train_size = self.load_russian_from_json(ru_train_path, dev_size)
         _ = self.load_russian_from_json(ru_train_others_path, dev_size + train_size)
 
+
     def load(self):
         with open(SAMPLES_PATH, 'rb') as sample_file:
             self.samples.content = pickle.load(sample_file)
         with open(COLUMN_TYPES_PATH, 'rb') as column_type_file:
             self.column_types = pickle.load(column_type_file)
+        with open(INDICES_PATH, 'rb') as indices_file:
+            self.start_indices = pickle.load(indices_file)
 
     def save(self):
         with open(SAMPLES_PATH, 'wb') as sample_file:
             pickle.dump(self.samples.content, sample_file)
         with open(COLUMN_TYPES_PATH, 'wb') as column_type_file:
             pickle.dump(self.column_types, column_type_file)
+        with open(INDICES_PATH, 'wb') as indices_file:
+            pickle.dump(self.start_indices, indices_file)
 
     def create_sample_from_json(self, sample_json: Dict, source: Source) -> Sample:
         generated_sample = Sample()
@@ -192,8 +196,6 @@ class Araneae:
         return None
 
 
-
-
 if __name__ == "__main__":
     araneae = Araneae()
     araneae.import_spider()
@@ -208,23 +210,23 @@ if __name__ == "__main__":
     single_join = araneae.find_all_with_type(QueryType.JOIN, subtypes=[QuerySubtype.SINGLE_JOIN])
     multi_join = araneae.find_all_with_type(QueryType.JOIN, subtypes=[QuerySubtype.MULTI_JOIN])
 
-    binary_with_values.save_in_csv('../resources/results/binary_with_values.csv')
-    datetimes_with_values.save_in_csv('../resources/results/datetimes_with_values.csv')
-    binary_without_values.save_in_csv('../resources/results/binary_without_values.csv')
-    datetimes_without_values.save_in_csv('../resources/results/datetimes_without_values.csv')
-    extra_simple.save_in_csv('../resources/results/extra_simple.csv')
-    simple.save_in_csv('../resources/results/simple.csv')
-    single_join.save_in_csv('../resources/results/single_join.csv')
-    multi_join.save_in_csv('../resources/results/multi_join.csv')
+    binary_with_values.save_in_csv('../resources/results/test_sets/binary_with_values.csv')
+    datetimes_with_values.save_in_csv('../resources/results/test_sets/datetimes_with_values.csv')
+    binary_without_values.save_in_csv('../resources/results/test_sets/binary_without_values.csv')
+    datetimes_without_values.save_in_csv('../resources/results/test_sets/datetimes_without_values.csv')
+    extra_simple.save_in_csv('../resources/results/test_sets/extra_simple.csv')
+    simple.save_in_csv('../resources/results/test_sets/simple.csv')
+    single_join.save_in_csv('../resources/results/test_sets/single_join.csv')
+    multi_join.save_in_csv('../resources/results/test_sets/multi_join.csv')
 
-    binary_with_values.save_in_csv('../resources/results/binary_with_values.json')
-    datetimes_with_values.save_in_csv('../resources/results/datetimes_with_values.json')
-    binary_without_values.save_in_csv('../resources/results/binary_without_values.json')
-    datetimes_without_values.save_in_csv('../resources/results/datetimes_without_values.json')
-    extra_simple.save_in_json('../resources/results/extra_simple.json')
-    simple.save_in_json('../resources/results/simple.json')
-    single_join.save_in_json('../resources/results/single_join.json')
-    multi_join.save_in_json('../resources/results/multi_join.json')
+    binary_with_values.save_in_json('../resources/results/test_sets/binary_with_values.json')
+    datetimes_with_values.save_in_json('../resources/results/test_sets/datetimes_with_values.json')
+    binary_without_values.save_in_json('../resources/results/test_sets/binary_without_values.json')
+    datetimes_without_values.save_in_json('../resources/results/test_sets/datetimes_without_values.json')
+    extra_simple.save_in_json('../resources/results/test_sets/extra_simple.json')
+    simple.save_in_json('../resources/results/test_sets/simple.json')
+    single_join.save_in_json('../resources/results/test_sets/single_join.json')
+    multi_join.save_in_json('../resources/results/test_sets/multi_join.json')
 
     araneae.save()
 
