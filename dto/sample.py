@@ -125,6 +125,8 @@ class Sample:
         self.specifications: Optional[Dict] = None
         self.query_toks: Optional[List] = None
         self.query_toks_no_values: Optional[List] = None
+        self.russian_question: Optional[str] = None
+        self.russian_query: Optional[str] = None
 
     def to_dict(self) -> Dict:
         dicted = deepcopy(self.__dict__)

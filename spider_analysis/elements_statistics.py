@@ -36,7 +36,7 @@ def save_elements_statistics(statistics, filename):
     with open(f"../resources/results/statistics/{filename}.json", 'w') as f:
         json.dump(statistics, f)
 
-    data = [{"SQL-structure": str(_s), "Amount": _a} for _s, _a in statistics.items()]
+    data = [{"Elements": str(_s), "Amount": _a} for _s, _a in statistics.items()]
     df = pd.DataFrame(data=data)
     df.to_csv(f"../resources/results/statistics/{filename}.csv")
 

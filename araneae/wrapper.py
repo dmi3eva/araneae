@@ -13,12 +13,13 @@ from dto.sample import *
 
 
 SPIDER_PATH = "../resources/datasets/spider"
+RUSSOCAMPUS_PATH = "../resources/datasets/russocampus"
+
 QUERY_TYPES_PATH = "../resources/query_types"
 ARANEAE_PATH = "../resources/dump/araneae"
 
 SAMPLES_PATH = os.path.join(ARANEAE_PATH, 'samples.dat')
 COLUMN_TYPES_PATH = os.path.join(ARANEAE_PATH, 'column_types.dat')
-
 
 
 class SamplesCollection:
@@ -77,9 +78,20 @@ class Araneae:
             sample = self.create_sample_from_json(_json_sample, source)
             self.samples.content.append(sample)
 
+    def load_russian_from_json(self, filepath: str, id_start: int) -> int:
+        with open(filepath) as json_file:
+            json_samples = json.load(json_file)
+        current_ind = id_start
+        for _json_sample in json_samples:
+            cusrrent_sample = self.samples.content[current_ind]
+            self._verify_translation(cusrrent_sample, _json_sample)
+            cusrrent_sample.russian_query = _json_sample['query']
+            cusrrent_sample.russian_question = _json_sample['question']
+            current_ind += 1
+        return len(json_samples)
+
     def load_from_csv(self, filepath: str, source: Source):
         pass
-
 
     def import_spider(self):
         dev_path = os.path.join(SPIDER_PATH, 'dev.json')
@@ -88,6 +100,14 @@ class Araneae:
         self.load_from_json(dev_path, Source.SPIDER_DEV)
         self.load_from_json(train_spider_path, Source.SPIDER_TRAIN)
         self.load_from_json(train_others_path, Source.SPIDER_TRAIN_OTHERS)
+
+    def import_russocampus(self):
+        ru_dev_path = os.path.join(RUSSOCAMPUS_PATH, 'rusp_dev.json')
+        ru_train_path = os.path.join(RUSSOCAMPUS_PATH, 'rusp_train.json')
+        ru_train_others_path = os.path.join(RUSSOCAMPUS_PATH, 'rusp_train_others.json')
+        dev_size = self.load_russian_from_json(ru_dev_path, 0)
+        train_size = self.load_russian_from_json(ru_train_path, dev_size)
+        _ = self.load_russian_from_json(ru_train_others_path, dev_size + train_size)
 
     def load(self):
         with open(SAMPLES_PATH, 'rb') as sample_file:
@@ -120,6 +140,21 @@ class Araneae:
         for _query_type in QueryType:
             specifications[_query_type] = self.EXTRACTION_FUNCTIONS[_query_type](sample)
         return specifications
+
+    def find_all_with_type(self, type: QueryType, subtypes: Optional[List[QuerySubtype]] = None) -> SamplesCollection:
+        search_result = SamplesCollection()
+        for _sample in self.samples.content:
+            sample_subtypes = _sample.specifications[type]
+            condition_1 = not subtypes and sample_subtypes
+            condition_2 = subtypes and sample_subtypes and all([_s in sample_subtypes for _s in subtypes])
+            if condition_1 or condition_2:
+                search_result.add(_sample)
+        return search_result
+
+    def _verify_translation(self, sample: Sample, translation_json: Dict):
+        if sample.db_id != translation_json['db_id']:
+            raise ValueError(f"Translation problem: {sample.id} = {sample.question} ({translation_json['question']})")
+
 
     def _specifications_from_mentions(self, query_type: QueryType, sample: Sample) -> Optional[List[QuerySubtype]]:
         specifications = None
@@ -156,20 +191,13 @@ class Araneae:
             return [QuerySubtype.MULTI_JOIN]
         return None
 
-    def find_all_with_type(self, type: QueryType, subtypes: Optional[List[QuerySubtype]] = None) -> SamplesCollection:
-        search_result = SamplesCollection()
-        for _sample in self.samples.content:
-            sample_subtypes = _sample.specifications[type]
-            condition_1 = not subtypes and sample_subtypes
-            condition_2 = subtypes and sample_subtypes and all([_s in sample_subtypes for _s in subtypes])
-            if condition_1 or condition_2:
-                search_result.add(_sample)
-        return search_result
+
 
 
 if __name__ == "__main__":
     araneae = Araneae()
     araneae.import_spider()
+    araneae.import_russocampus()
 
     binary_with_values = araneae.find_all_with_type(QueryType.BINARY, subtypes=[QuerySubtype.WITH_VALUES])
     binary_without_values = araneae.find_all_with_type(QueryType.BINARY, subtypes=[QuerySubtype.WITHOUT_VALUES])

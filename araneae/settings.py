@@ -10,30 +10,19 @@ KEY_WORDS = [
     "group",
     "desc",
     "asc",
-    "and",
-    "or", 'or',
-    "not",
-    "like",
-    "between",
     "intersect",
     "union",
     "having",
     "limit",
     "in",
-    "not",
     "except",
-    "cast",
-    "distinct",
     # "hour",
     # "second",
     # "minute",
     # "year",
     # "month",
     # "type,
-    "length",
-    ",",
-    "(",
-    ")"
+    ","
 ]
 AGGREGATIONS = [
     "min",
@@ -41,8 +30,18 @@ AGGREGATIONS = [
     "avg",
     "sum",
     "count",
+    "between",
     "*", "*",
-
+    "distinct",
+    "cast",
+    "length",
+    "and",
+    "or", 'or',
+    "not",
+    "like",
+    "not",
+    "(",
+    ")"
 ]
 OTHER_KEYWORDS = {
     "as",

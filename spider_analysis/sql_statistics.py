@@ -55,5 +55,5 @@ if __name__ == "__main__":
     statistics_with_agg = make_sql_statistic(araneae.samples.content, ignore_agg=False)
     statistics_without_agg = make_sql_statistic(araneae.samples.content)
     save_sql_statistics(statistics_with_agg, "22_02_25_with_agg")
-    save_sql_statistics(statistics_without_agg, "22_02_25_without_agg_brackets")
+    save_sql_statistics(statistics_without_agg, "22_02_25_without_functions")
     a = 7
