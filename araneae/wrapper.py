@@ -51,7 +51,8 @@ class Araneae:
             QueryType.BINARY: lambda sample: self._specifications_from_mentions(QueryType.BINARY, sample),
             QueryType.DATETIME: lambda sample: self._specifications_from_mentions(QueryType.DATETIME, sample),
             QueryType.SIMPLICITY: lambda sample: self._specifications_simplicity(sample),
-            QueryType.JOIN: lambda sample: self._specifications_join(sample)
+            QueryType.JOIN: lambda sample: self._specifications_join(sample),
+            QueryType.SELECT: lambda sample: self._specifications_select(sample)
         }
 
 
@@ -159,7 +160,6 @@ class Araneae:
         if sample.db_id != translation_json['db_id']:
             raise ValueError(f"Translation problem: {sample.id} = {sample.question} ({translation_json['question']})")
 
-
     def _specifications_from_mentions(self, query_type: QueryType, sample: Sample) -> Optional[List[QuerySubtype]]:
         specifications = None
         values = self.column_types[query_type]
@@ -195,6 +195,18 @@ class Araneae:
             return [QuerySubtype.MULTI_JOIN]
         return None
 
+    def _specifications_select(self, sample: Sample) -> Optional[List[QuerySubtype]]:
+        subtypes = []
+        if if_multi_select(sample):
+            subtypes.append(QuerySubtype.MULTI_SELECT)
+        if if_hetero_agg(sample):
+            subtypes.append(QuerySubtype.HETERO_AGG)
+        if if_mono_agg(sample):
+            subtypes.append(QuerySubtype.MONO_AGG)
+        if len(subtypes) == 0:
+            return None
+        return subtypes
+
 
 if __name__ == "__main__":
     araneae = Araneae()
@@ -209,24 +221,34 @@ if __name__ == "__main__":
     simple = araneae.find_all_with_type(QueryType.SIMPLICITY, subtypes=[QuerySubtype.SIMPLE])
     single_join = araneae.find_all_with_type(QueryType.JOIN, subtypes=[QuerySubtype.SINGLE_JOIN])
     multi_join = araneae.find_all_with_type(QueryType.JOIN, subtypes=[QuerySubtype.MULTI_JOIN])
+    multi_select = araneae.find_all_with_type(QueryType.SELECT, subtypes=[QuerySubtype.MULTI_SELECT])
+    mono_agg = araneae.find_all_with_type(QueryType.SELECT, subtypes=[QuerySubtype.MONO_AGG])
+    hetero_agg = araneae.find_all_with_type(QueryType.SELECT, subtypes=[QuerySubtype.HETERO_AGG])
 
-    binary_with_values.save_in_csv('../resources/results/test_sets/binary_with_values.csv')
-    datetimes_with_values.save_in_csv('../resources/results/test_sets/datetimes_with_values.csv')
-    binary_without_values.save_in_csv('../resources/results/test_sets/binary_without_values.csv')
-    datetimes_without_values.save_in_csv('../resources/results/test_sets/datetimes_without_values.csv')
-    extra_simple.save_in_csv('../resources/results/test_sets/extra_simple.csv')
-    simple.save_in_csv('../resources/results/test_sets/simple.csv')
-    single_join.save_in_csv('../resources/results/test_sets/single_join.csv')
-    multi_join.save_in_csv('../resources/results/test_sets/multi_join.csv')
+    test_set_path = '../resources/results/test_sets'
+    binary_with_values.save_in_csv(f'{test_set_path}/binary_with_values.csv')
+    datetimes_with_values.save_in_csv(f'{test_set_path}/datetimes_with_values.csv')
+    binary_without_values.save_in_csv(f'{test_set_path}/binary_without_values.csv')
+    datetimes_without_values.save_in_csv(f'{test_set_path}/datetimes_without_values.csv')
+    extra_simple.save_in_csv(f'{test_set_path}/extra_simple.csv')
+    simple.save_in_csv(f'{test_set_path}/simple.csv')
+    single_join.save_in_csv(f'{test_set_path}/single_join.csv')
+    multi_join.save_in_csv(f'{test_set_path}/multi_join.csv')
+    multi_select.save_in_csv(f'{test_set_path}/multi_select.csv')
+    mono_agg.save_in_csv(f'{test_set_path}/mono_agg.csv')
+    hetero_agg.save_in_csv(f'{test_set_path}/hetero_agg.csv')
 
-    binary_with_values.save_in_json('../resources/results/test_sets/binary_with_values.json')
-    datetimes_with_values.save_in_json('../resources/results/test_sets/datetimes_with_values.json')
-    binary_without_values.save_in_json('../resources/results/test_sets/binary_without_values.json')
-    datetimes_without_values.save_in_json('../resources/results/test_sets/datetimes_without_values.json')
-    extra_simple.save_in_json('../resources/results/test_sets/extra_simple.json')
-    simple.save_in_json('../resources/results/test_sets/simple.json')
-    single_join.save_in_json('../resources/results/test_sets/single_join.json')
-    multi_join.save_in_json('../resources/results/test_sets/multi_join.json')
+    binary_with_values.save_in_json(f'{test_set_path}/binary_with_values.json')
+    datetimes_with_values.save_in_json(f'{test_set_path}/datetimes_with_values.json')
+    binary_without_values.save_in_json(f'{test_set_path}/binary_without_values.json')
+    datetimes_without_values.save_in_json(f'{test_set_path}/datetimes_without_values.json')
+    extra_simple.save_in_json(f'{test_set_path}/extra_simple.json')
+    simple.save_in_json(f'{test_set_path}/simple.json')
+    single_join.save_in_json(f'{test_set_path}/single_join.json')
+    multi_join.save_in_json(f'{test_set_path}/multi_join.json')
+    multi_select.save_in_json(f'{test_set_path}/multi_select.json')
+    mono_agg.save_in_json(f'{test_set_path}/mono_agg.json')
+    hetero_agg.save_in_json(f'{test_set_path}/hetero_agg.json')
 
     araneae.save()
 

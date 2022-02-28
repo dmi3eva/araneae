@@ -53,6 +53,7 @@ class QueryType(Enum):
     DATETIME = "datetime"
     SIMPLICITY = "simplicity"
     JOIN = "join"
+    SELECT = "select"
 
 
 class QuerySubtype(Enum):
@@ -82,6 +83,9 @@ class QuerySubtype(Enum):
     EXTRA_SIMPLE = "extra-simple"
     SINGLE_JOIN = "single-join"
     MULTI_JOIN = "multi-join"
+    MULTI_SELECT = "multi-select"
+    HETERO_AGG = "hetero-agg"
+    MONO_AGG = "mono-agg"
 
 query_type_mapping = {_t.value: _t for _t in QueryType}
 query_subtype_mapping = {_t.value: _t for _t in QuerySubtype}
@@ -109,6 +113,11 @@ query_mapping = {
         QuerySubtype.DATETIME_PLANNED,
         QuerySubtype.DATETIME_ACTUAL,
         QuerySubtype.DATETIME_ORDER,
+    ],
+    QueryType.SELECT: [
+        QuerySubtype.MULTI_SELECT,
+        QuerySubtype.HETERO_AGG,
+        QuerySubtype.MONO_AGG
     ]
 }
 
