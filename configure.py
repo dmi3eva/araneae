@@ -2,15 +2,16 @@ from os import curdir, path, getcwd
 
 ROOT_PATH = "C:\\Users\\forka\\PycharmProjects\\araneae"
 
-# results file exploring
+# Results file exploring
 MODEL_REPORT_FOLDER = path.join(ROOT_PATH, "resources", "model_eval")
 TEST_SET_FOLDER = path.join(ROOT_PATH, "resources", "results", "test_sets")
 RESULTS_FOLDER = path.join(ROOT_PATH, "resources", "results", "reports")
+ERROR_PATH = path.join(ROOT_PATH, "resources", "results", "reports", "errors.txt")
 
-# mentions extractor
+# Mentions extractor
 SCHEMES_PATH = path.join(ROOT_PATH, 'resources', 'datasets', 'spider', 'tables.json')
 
-# wrapper
+# Wrapper
 SPIDER_PATH = path.join(ROOT_PATH, "resources", "datasets", "spider")
 RUSSOCAMPUS_PATH = path.join(ROOT_PATH, "resources", "datasets", "russocampus")
 

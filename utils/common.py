@@ -3,7 +3,7 @@ from dto.sample import *
 
 def if_extra_simple(sample: Sample) -> bool:
     """"
-    Chicking if query = SELECT <SOLE_COLUMN> FROM <SOLE_TABLE>
+    Checking if query = SELECT <SOLE_COLUMN> FROM <SOLE_TABLE>
     """
     mentions = sample.mentions
     selects = [_m for _m in mentions if _m.type is Subquery.SELECT]
@@ -15,7 +15,7 @@ def if_extra_simple(sample: Sample) -> bool:
 
 def if_simple(sample: Sample) -> bool:
     """"
-    Chicking if query = SELECT <SOLE_COLUMN> FROM <SOLE_TABLE> WHERE <SOLE_CONDITION>
+    Checking if query = SELECT <SOLE_COLUMN> FROM <SOLE_TABLE> WHERE <SOLE_CONDITION>
     """
     mentions = sample.mentions
     selects = [_m for _m in mentions if _m.type is Subquery.SELECT]

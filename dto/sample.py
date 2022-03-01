@@ -56,6 +56,7 @@ class QueryType(Enum):
     SELECT = "select"
 
 
+
 class QuerySubtype(Enum):
     WITH_VALUES = "with_values"
     WITHOUT_VALUES = "without_values"
@@ -132,16 +133,25 @@ class Sample:
         self.sql: Optional[Dict] = None
         self.mentions: Optional[List[Mention]] = None
         self.specifications: Optional[Dict] = None
+        self.question_toks: Optional[List] = None
         self.query_toks: Optional[List] = None
         self.query_toks_no_values: Optional[List] = None
         self.russian_question: Optional[str] = None
         self.russian_query: Optional[str] = None
+        self.russian_query_toks: Optional[str] = None
+        self.russian_question_toks: Optional[List] = None
+        self.russian_query_toks_no_values: Optional[List] = None
 
     def to_dict(self) -> Dict:
         dicted = deepcopy(self.__dict__)
         del dicted['mentions']
         del dicted['query_toks']
         del dicted['query_toks_no_values']
+        del dicted['question_toks']
+        del dicted['russian_query_toks']
+        del dicted['russian_query_toks_no_values']
+        del dicted['russian_question_toks']
+
         for _k, _v in dicted.items():
             if isinstance(_v, Enum):
                 dicted[_k] = _v.value

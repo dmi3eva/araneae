@@ -82,6 +82,9 @@ class Araneae:
             self._verify_translation(cusrrent_sample, _json_sample)
             cusrrent_sample.russian_query = _json_sample['query']
             cusrrent_sample.russian_question = _json_sample['question']
+            cusrrent_sample.russian_query_toks = _json_sample['query_toks']
+            cusrrent_sample.russian_question_toks = _json_sample['question_toks']
+            cusrrent_sample.russian_query_toks_no_values = _json_sample['query_toks_no_value']
             current_ind += 1
         return len(json_samples)
 
@@ -135,7 +138,8 @@ class Araneae:
         generated_sample.query = sample_json.get('query', None)
         generated_sample.sql = sample_json.get('question', None)
         generated_sample.query_toks = sample_json.get('query_toks', None)
-        generated_sample.query_toks_no_values = sample_json.get('query_toks_no_values', None)
+        generated_sample.query_toks_no_values = sample_json.get('query_toks_no_value', None)
+        generated_sample.question_toks = sample_json.get('question_toks', None)
         generated_sample.mentions = self.mention_extractor.get_mentions_from_sample(sample_json)
         generated_sample.specifications = self.extract_specifications(generated_sample)
         return generated_sample

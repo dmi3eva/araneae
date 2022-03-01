@@ -30,11 +30,15 @@ def estimate(araneae: Araneae, source: Source, test_set_path: str, model_path: s
     executed = model_report['per_item']
     mapping = make_mapping(araneae, source, executed)
     correct = 0
+    size = 0
     for _sample in test_set:
         id = _sample['id']
-        if id in mapping.keys() and mapping[id]['exact']:
-           correct += 1
-    return correct/len(test_set)
+        if id not in mapping.keys():
+            continue
+        size += 1
+        if mapping[id]['exact']:
+            correct += 1
+    return correct / size
 
 
 def enumerate_samples(araneae: Araneae, source: Source, samples: List[dict]):
