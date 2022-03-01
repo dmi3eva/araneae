@@ -52,7 +52,8 @@ class Araneae:
             QueryType.DATETIME: lambda sample: self._specifications_from_mentions(QueryType.DATETIME, sample),
             QueryType.SIMPLICITY: lambda sample: self._specifications_simplicity(sample),
             QueryType.JOIN: lambda sample: self._specifications_join(sample),
-            QueryType.SELECT: lambda sample: self._specifications_select(sample)
+            QueryType.SELECT: lambda sample: self._specifications_select(sample),
+            QueryType.LOGIC: lambda sample: self._specifications_logic(sample)
         }
 
 
@@ -209,6 +210,25 @@ class Araneae:
             subtypes.append(QuerySubtype.MONO_AGG)
         if len(subtypes) == 0:
             return None
+        return subtypes
+
+    def _specifications_logic(self, sample: Sample) -> Optional[List[QuerySubtype]]:
+        and_or = {"and", "or", "или", "и"}
+        subtypes = []
+        sql_logic_keys = get_logic_keys_from_sql(sample.query_toks_no_values)
+        nl_logic_keys = get_logic_keys_from_nl(sample.question_toks) + get_logic_keys_from_nl(sample.russian_question_toks)
+        if len(sql_logic_keys) > 0:
+            subtypes.append(QuerySubtype.LOGIC_SQL_ALL)
+        if len(nl_logic_keys) > 0:
+            subtypes.append(QuerySubtype.LOGIC_NL_ALL)
+        sql_and_or = and_or.intersection(set(sql_logic_keys))
+        nl_and_or = and_or.intersection(set(nl_logic_keys))
+        if len(sql_and_or) > 0:
+            subtypes.append(QuerySubtype.LOGIC_SQL_AND_OR)
+        if len(nl_and_or) > 0:
+            subtypes.append(QuerySubtype.LOGIC_NL_AND_OR)
+        if ('and' in sql_and_or and 'or' in nl_and_or) or ('or' in sql_and_or and 'and' in nl_and_or):
+            subtypes.append(QuerySubtype.LOGIC_VS)
         return subtypes
 
 

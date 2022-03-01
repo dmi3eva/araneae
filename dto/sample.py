@@ -54,7 +54,7 @@ class QueryType(Enum):
     SIMPLICITY = "simplicity"
     JOIN = "join"
     SELECT = "select"
-
+    LOGIC = "logic"
 
 
 class QuerySubtype(Enum):
@@ -87,6 +87,11 @@ class QuerySubtype(Enum):
     MULTI_SELECT = "multi-select"
     HETERO_AGG = "hetero-agg"
     MONO_AGG = "mono-agg"
+    LOGIC_NL_ALL = "logic-nl-all"
+    LOGIC_SQL_ALL = "logic-sql-all"
+    LOGIC_NL_AND_OR = "logic-nl-and-or"
+    LOGIC_SQL_AND_OR = "logic-sql-and-or"
+    LOGIC_VS = "logic-vs"
 
 query_type_mapping = {_t.value: _t for _t in QueryType}
 query_subtype_mapping = {_t.value: _t for _t in QuerySubtype}

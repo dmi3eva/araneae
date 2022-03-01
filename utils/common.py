@@ -64,3 +64,16 @@ def if_mono_agg(sample: Sample) -> bool:
     if len(aggs) != len(set(aggs)):
         return True
     return False
+
+
+def get_logic_keys_from_sql(words: List[str]) -> List[str]:
+    keywords = ["and", "or", "not", "all", "any", "some", "in", "between", "exists", "in", "like"]
+    logic_words = [_w.lower() for _w in words if _w.lower() in keywords]
+    return logic_words
+
+
+def get_logic_keys_from_nl(words: List[str]) -> List[str]:
+    keywords = ["and", "or", "not", "all", "any", "some", "between", "exists",
+                "и", "или", "не", "все", "некоторые", "хотя", "между", "существует", "любой"]
+    logic_words = [_w.lower() for _w in words if _w.lower() in keywords]
+    return logic_words
