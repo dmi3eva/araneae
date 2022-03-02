@@ -17,12 +17,16 @@ def make_test_set_report(araneae: Araneae, source: Source) -> Dict[str, Dict[str
         report[_model] = {}
         for _test_set in test_set_names:
             test_set_path = os.path.join(TEST_SET_FOLDER, _test_set)
-            accuracy = estimate(araneae, source, test_set_path, model_path)
-            report[_model][_test_set] = accuracy
+            accuracy, size = estimate(araneae, source, test_set_path, model_path)
+            report[_model][_test_set] = {
+                "accuracy": accuracy,
+                "size": size
+            }
+
     return report
 
 
-def estimate(araneae: Araneae, source: Source, test_set_path: str, model_path: str) -> float:
+def estimate(araneae: Araneae, source: Source, test_set_path: str, model_path: str) -> (float, int):
     with open(test_set_path, "r", encoding='utf-8') as json_file:
         test_set = json.load(json_file)
     with open(model_path, "r", encoding='utf-8') as json_file:
@@ -38,7 +42,7 @@ def estimate(araneae: Araneae, source: Source, test_set_path: str, model_path: s
         size += 1
         if mapping[id]['exact']:
             correct += 1
-    return correct / size
+    return correct / size, size
 
 
 def enumerate_samples(araneae: Araneae, source: Source, samples: List[dict]):
@@ -62,11 +66,12 @@ def save_sql_statistics(report, filename):
 
     data = []
     for _model, _result in report.items():
-        for _test_set, _accurcy in _result.items():
+        for _test_set, _result in _result.items():
             row = {
-                        "Model": str(_model),
-                        "Test-set": str(_test_set),
-                        "Amount": _accurcy
+                "Model": str(_model),
+                "Test-set": str(_test_set),
+                "Accuracy": _result["accuracy"],
+                "Size": _result["size"]
             }
             data.append(row)
     df = pandas.DataFrame(data=data)
@@ -77,4 +82,4 @@ if __name__ == "__main__":
     araneae = Araneae()
     araneae.load()
     report = make_test_set_report(araneae, Source.SPIDER_DEV)
-    save_sql_statistics(report, "2022-02-28")
+    save_sql_statistics(report, "2022-03-02")

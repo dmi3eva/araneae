@@ -4,7 +4,7 @@ ROOT_PATH = "C:\\Users\\forka\\PycharmProjects\\araneae"
 
 # Results file exploring
 MODEL_REPORT_FOLDER = path.join(ROOT_PATH, "resources", "model_eval")
-TEST_SET_FOLDER = path.join(ROOT_PATH, "resources", "results", "test_sets")
+TEST_SET_FOLDER = path.join(ROOT_PATH, "resources", "results", "test_sets", "csv")
 RESULTS_FOLDER = path.join(ROOT_PATH, "resources", "results", "reports")
 ERROR_PATH = path.join(ROOT_PATH, "resources", "results", "reports", "errors.txt")
 

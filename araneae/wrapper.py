@@ -89,6 +89,10 @@ class Araneae:
             current_ind += 1
         return len(json_samples)
 
+    def add_specifications(self):
+        for _sample in self.samples.content:
+            _sample.specifications = self.extract_specifications(_sample)
+
     def load_from_csv(self, filepath: str, source: Source):
         pass
 
@@ -142,7 +146,6 @@ class Araneae:
         generated_sample.query_toks_no_values = sample_json.get('query_toks_no_value', None)
         generated_sample.question_toks = sample_json.get('question_toks', None)
         generated_sample.mentions = self.mention_extractor.get_mentions_from_sample(sample_json)
-        generated_sample.specifications = self.extract_specifications(generated_sample)
         return generated_sample
 
     def extract_specifications(self, sample: Sample) -> Dict:
@@ -213,7 +216,7 @@ class Araneae:
         return subtypes
 
     def _specifications_logic(self, sample: Sample) -> Optional[List[QuerySubtype]]:
-        and_or = {"and", "or", "или", "и"}
+        and_or = {"and", "or", "или", "и", "intersect", "union"}
         subtypes = []
         sql_logic_keys = get_logic_keys_from_sql(sample.query_toks_no_values)
         nl_logic_keys = get_logic_keys_from_nl(sample.question_toks) + get_logic_keys_from_nl(sample.russian_question_toks)
@@ -227,8 +230,16 @@ class Araneae:
             subtypes.append(QuerySubtype.LOGIC_SQL_AND_OR)
         if len(nl_and_or) > 0:
             subtypes.append(QuerySubtype.LOGIC_NL_AND_OR)
-        if ('and' in sql_and_or and 'or' in nl_and_or) or ('or' in sql_and_or and 'and' in nl_and_or):
-            subtypes.append(QuerySubtype.LOGIC_VS)
+        condition_1 = ('and' in sql_and_or or "intersect" in sql_and_or) and ('or' in nl_and_or)
+        condition_2 = ('or' in sql_and_or or "union" in sql_and_or) and ('and' in nl_and_or)
+        if condition_1 or condition_2:
+            if sample.id not in [
+                # and refer to other construction, or replaced by union
+                754, 755, 1033,
+                # ??? AND & OR in NL
+                177
+            ]:
+                subtypes.append(QuerySubtype.LOGIC_VS)
         return subtypes
 
 
@@ -236,6 +247,7 @@ if __name__ == "__main__":
     araneae = Araneae()
     araneae.import_spider()
     araneae.import_russocampus()
+    araneae.add_specifications()
 
     binary_with_values = araneae.find_all_with_type(QueryType.BINARY, subtypes=[QuerySubtype.WITH_VALUES])
     binary_without_values = araneae.find_all_with_type(QueryType.BINARY, subtypes=[QuerySubtype.WITHOUT_VALUES])
@@ -248,33 +260,45 @@ if __name__ == "__main__":
     multi_select = araneae.find_all_with_type(QueryType.SELECT, subtypes=[QuerySubtype.MULTI_SELECT])
     mono_agg = araneae.find_all_with_type(QueryType.SELECT, subtypes=[QuerySubtype.MONO_AGG])
     hetero_agg = araneae.find_all_with_type(QueryType.SELECT, subtypes=[QuerySubtype.HETERO_AGG])
+    logic_vice_versa = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_VS])
+    logic_all_nl_sql = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SQL_ALL, QuerySubtype.LOGIC_NL_ALL])
+    logic_andor_nl_sql = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SQL_AND_OR, QuerySubtype.LOGIC_NL_AND_OR])
+    logic_sql = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SQL_ALL])
 
-    test_set_path = '../resources/results/test_sets'
-    binary_with_values.save_in_csv(f'{test_set_path}/binary_with_values.csv')
-    datetimes_with_values.save_in_csv(f'{test_set_path}/datetimes_with_values.csv')
-    binary_without_values.save_in_csv(f'{test_set_path}/binary_without_values.csv')
-    datetimes_without_values.save_in_csv(f'{test_set_path}/datetimes_without_values.csv')
-    extra_simple.save_in_csv(f'{test_set_path}/extra_simple.csv')
-    simple.save_in_csv(f'{test_set_path}/simple.csv')
-    single_join.save_in_csv(f'{test_set_path}/single_join.csv')
-    multi_join.save_in_csv(f'{test_set_path}/multi_join.csv')
-    multi_select.save_in_csv(f'{test_set_path}/multi_select.csv')
-    mono_agg.save_in_csv(f'{test_set_path}/mono_agg.csv')
-    hetero_agg.save_in_csv(f'{test_set_path}/hetero_agg.csv')
+    test_set_path_csv = '../resources/results/test_sets/csv'
+    binary_with_values.save_in_csv(f'{test_set_path_csv}/binary_with_values.csv')
+    datetimes_with_values.save_in_csv(f'{test_set_path_csv}/datetimes_with_values.csv')
+    binary_without_values.save_in_csv(f'{test_set_path_csv}/binary_without_values.csv')
+    datetimes_without_values.save_in_csv(f'{test_set_path_csv}/datetimes_without_values.csv')
+    extra_simple.save_in_csv(f'{test_set_path_csv}/extra_simple.csv')
+    simple.save_in_csv(f'{test_set_path_csv}/simple.csv')
+    single_join.save_in_csv(f'{test_set_path_csv}/single_join.csv')
+    multi_join.save_in_csv(f'{test_set_path_csv}/multi_join.csv')
+    multi_select.save_in_csv(f'{test_set_path_csv}/multi_select.csv')
+    mono_agg.save_in_csv(f'{test_set_path_csv}/mono_agg.csv')
+    hetero_agg.save_in_csv(f'{test_set_path_csv}/hetero_agg.csv')
+    logic_vice_versa.save_in_csv(f'{test_set_path_csv}/logic_vice_versa.csv')
+    logic_all_nl_sql.save_in_csv(f'{test_set_path_csv}/logic_all_nl_sql.csv')
+    logic_andor_nl_sql.save_in_csv(f'{test_set_path_csv}/logic_andor_nl_sql.csv')
+    logic_sql.save_in_csv(f'{test_set_path_csv}/logic_sql.csv')
 
-    binary_with_values.save_in_json(f'{test_set_path}/binary_with_values.json')
-    datetimes_with_values.save_in_json(f'{test_set_path}/datetimes_with_values.json')
-    binary_without_values.save_in_json(f'{test_set_path}/binary_without_values.json')
-    datetimes_without_values.save_in_json(f'{test_set_path}/datetimes_without_values.json')
-    extra_simple.save_in_json(f'{test_set_path}/extra_simple.json')
-    simple.save_in_json(f'{test_set_path}/simple.json')
-    single_join.save_in_json(f'{test_set_path}/single_join.json')
-    multi_join.save_in_json(f'{test_set_path}/multi_join.json')
-    multi_select.save_in_json(f'{test_set_path}/multi_select.json')
-    mono_agg.save_in_json(f'{test_set_path}/mono_agg.json')
-    hetero_agg.save_in_json(f'{test_set_path}/hetero_agg.json')
+    test_set_path_json = '../resources/results/test_sets/json'
+    binary_with_values.save_in_json(f'{test_set_path_json}/binary_with_values.json')
+    datetimes_with_values.save_in_json(f'{test_set_path_json}/datetimes_with_values.json')
+    binary_without_values.save_in_json(f'{test_set_path_json}/binary_without_values.json')
+    datetimes_without_values.save_in_json(f'{test_set_path_json}/datetimes_without_values.json')
+    extra_simple.save_in_json(f'{test_set_path_json}/extra_simple.json')
+    simple.save_in_json(f'{test_set_path_json}/simple.json')
+    single_join.save_in_json(f'{test_set_path_json}/single_join.json')
+    multi_join.save_in_json(f'{test_set_path_json}/multi_join.json')
+    multi_select.save_in_json(f'{test_set_path_json}/multi_select.json')
+    mono_agg.save_in_json(f'{test_set_path_json}/mono_agg.json')
+    hetero_agg.save_in_json(f'{test_set_path_json}/hetero_agg.json')
+    logic_vice_versa.save_in_json(f'{test_set_path_json}/logic_vice_versa.json')
+    logic_all_nl_sql.save_in_json(f'{test_set_path_json}/logic_all_nl_sql.json')
+    logic_andor_nl_sql.save_in_json(f'{test_set_path_json}/logic_andor_nl_sql.json')
+    logic_sql.save_in_json(f'{test_set_path_json}/logic_sql.json')
 
     araneae.save()
-
     a = 7
 
