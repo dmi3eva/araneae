@@ -21,6 +21,16 @@ def send_new_sample(bot, controller, user_id):
     return bot.send_message(user_id, text, parse_mode="HTML", reply_markup=request_panel)
 
 
+def send_fluency_sample(bot, controller, user_id):
+    user = controller.users.get(user_id, None)
+    if user.status is Status.READY or not user.last_sample:
+        sample = controller.generate_sample_for_user(user_id)
+    else:
+        sample = user.last_sample
+    text = create_text_form_sample(sample)
+    return bot.send_message(user_id, text, parse_mode="HTML", reply_markup=request_panel)
+
+
 def send_last_sample(bot, controller, user_id):
     user = controller.users.get(user_id, None)
     sample = user.last_sample
@@ -76,8 +86,8 @@ def send_info(bot, controller, user_id):
     return bot.send_message(user_id, INSTRUCTIONS, parse_mode="HTML", reply_markup=info_panel)
 
 
-def create_text_form_sample(sample: Sample):  # TODO
-    content = SQL_DESCRIPTION.format(nl=sample.nl.capitalize(), sql=sample.sql)
+def create_text_form_sample(sample: BotSample, text: str):  # TODO
+    content = text.format(nl=sample.nl.capitalize(), sql=sample.sql)
     return content
 
 

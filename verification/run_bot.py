@@ -1,8 +1,9 @@
 import telebot
 
-from verification.settings.configuration import *
+from verification.settings.config import *
 from verification.settings.content import *
 from verification.settings.panels_inline import *
+from verification.settings.state_map import *
 from verification.src.controller import *
 from verification.src.sender import *
 from verification.utils.common import *

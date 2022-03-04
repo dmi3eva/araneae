@@ -6,7 +6,7 @@ from copy import deepcopy
 from dataclasses import dataclass
 from enum import Enum
 from typing import *
-from verification.settings.configuration import *
+from verification.settings.config import *
 
 SAMPLES_PATH = '../resources/datasets/araneae/araneae.json'
 
@@ -20,6 +20,9 @@ class Status(Enum):
     IN_PROGRESS_FLUENCY = 5
     IN_PROGRESS_EQUIVALENT = 6
     IN_PROGRESS_SQL = 7
+    ERROR_DESCRIBING_FLUENCY = 8
+    ERROR_DESCRIBING_EQUIVALENT = 9
+    ERROR_DESCRIBING_SQL = 10
 
 
 class State(Enum):
@@ -31,7 +34,7 @@ class State(Enum):
 
 
 @dataclass
-class Sample:
+class BotSample:
     db: Optional[str] = None
     nl: Optional[str] = None
     sql: Optional[str] = None
@@ -43,7 +46,7 @@ class Sample:
 class User:
     def __init__(self, user_id):
         self.id: str = user_id
-        self.last_sample: Optional[Sample] = None
+        self.last_sample: Optional[BotSample] = None
         self.last_message: Any = None
         self.state: State = State.SAMPLE
         self.status: Status = Status.READY
@@ -62,13 +65,14 @@ class Controller:
     def add_new_user(self, user_id):
         self.users[user_id] = User(user_id)
 
-    def generate_sample_for_user(self, user_id) -> Sample:  # TODO
+    def generate_sample_for_user(self, user_id) -> BotSample:  # TODO
         # generated_sample = Sample()
         json_sample = choice(self.samples)
-        generated_sample = Sample(
+        generated_sample = BotSample(
             db=json_sample['db_id'],
             nl=json_sample['question'],
             sql=json_sample['query']
+
         )
         self.users[user_id].last_sample = deepcopy(generated_sample)
         return generated_sample
