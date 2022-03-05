@@ -232,14 +232,14 @@ class Araneae:
             subtypes.append(QuerySubtype.LOGIC_NL_AND_OR)
         condition_1 = ('and' in sql_and_or or "intersect" in sql_and_or) and ('or' in nl_and_or)
         condition_2 = ('or' in sql_and_or or "union" in sql_and_or) and ('and' in nl_and_or)
-        if condition_1 or condition_2:
-            if sample.id not in [
-                # and refer to other construction, or replaced by union
-                754, 755, 1033,
-                # ??? AND & OR in NL
-                177
-            ]:
-                subtypes.append(QuerySubtype.LOGIC_VS)
+        """
+        Don't fit:
+            1. Union = SELECT for several columns
+            2. AND & OR are both in NL
+            3. UNION = WHERE with AND
+        """
+        if (condition_1 or condition_2) and sample.id in [726, 1902, 2387, 2402]:   # TO-DO
+            subtypes.append(QuerySubtype.LOGIC_VS)
         return subtypes
 
 
