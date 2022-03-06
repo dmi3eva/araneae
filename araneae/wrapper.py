@@ -306,7 +306,7 @@ if __name__ == "__main__":
     logic_all_nl_sql.save_in_json(f'{test_set_path_json}/logic_all_nl_sql.json')
     logic_andor_nl_sql.save_in_json(f'{test_set_path_json}/logic_andor_nl_sql.json')
     logic_sql.save_in_json(f'{test_set_path_json}/logic_sql.json')
-    logic_and_with_or_nl.save_in_json(f'{test_set_path_csv}/logic_and_with_or_nl.json')
+    logic_and_with_or_nl.save_in_json(f'{test_set_path_json}/logic_and_with_or_nl.json')
 
     araneae.save()
     a = 7
