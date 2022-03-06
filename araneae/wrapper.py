@@ -216,6 +216,8 @@ class Araneae:
         return subtypes
 
     def _specifications_logic(self, sample: Sample) -> Optional[List[QuerySubtype]]:
+        and_keys = {"and", "и"}
+        or_keys = {"or", "или"}
         and_or = {"and", "or", "или", "и", "intersect", "union"}
         subtypes = []
         sql_logic_keys = get_logic_keys_from_sql(sample.query_toks_no_values)
@@ -226,10 +228,14 @@ class Araneae:
             subtypes.append(QuerySubtype.LOGIC_NL_ALL)
         sql_and_or = and_or.intersection(set(sql_logic_keys))
         nl_and_or = and_or.intersection(set(nl_logic_keys))
+        nl_and = and_keys.intersection(set(nl_logic_keys))
+        nl_or = or_keys.intersection(set(nl_logic_keys))
         if len(sql_and_or) > 0:
             subtypes.append(QuerySubtype.LOGIC_SQL_AND_OR)
         if len(nl_and_or) > 0:
-            subtypes.append(QuerySubtype.LOGIC_NL_AND_OR)
+            subtypes.append(QuerySubtype.LOGIC_NL_AND_OR_OR)
+        if len(nl_and) > 0 and len(nl_or) > 0:
+            subtypes.append(QuerySubtype.LOGIC_NL_AND_AND_OR)
         condition_1 = ('and' in sql_and_or or "intersect" in sql_and_or) and ('or' in nl_and_or)
         condition_2 = ('or' in sql_and_or or "union" in sql_and_or) and ('and' in nl_and_or)
         """
@@ -262,8 +268,9 @@ if __name__ == "__main__":
     hetero_agg = araneae.find_all_with_type(QueryType.SELECT, subtypes=[QuerySubtype.HETERO_AGG])
     logic_vice_versa = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_VS])
     logic_all_nl_sql = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SQL_ALL, QuerySubtype.LOGIC_NL_ALL])
-    logic_andor_nl_sql = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SQL_AND_OR, QuerySubtype.LOGIC_NL_AND_OR])
+    logic_andor_nl_sql = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SQL_AND_OR, QuerySubtype.LOGIC_NL_AND_OR_OR])
     logic_sql = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SQL_ALL])
+    logic_and_with_or_nl = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_NL_AND_AND_OR])
 
     test_set_path_csv = '../resources/results/test_sets/csv'
     binary_with_values.save_in_csv(f'{test_set_path_csv}/binary_with_values.csv')
@@ -281,6 +288,7 @@ if __name__ == "__main__":
     logic_all_nl_sql.save_in_csv(f'{test_set_path_csv}/logic_all_nl_sql.csv')
     logic_andor_nl_sql.save_in_csv(f'{test_set_path_csv}/logic_andor_nl_sql.csv')
     logic_sql.save_in_csv(f'{test_set_path_csv}/logic_sql.csv')
+    logic_and_with_or_nl.save_in_csv(f'{test_set_path_csv}/logic_and_with_or_nl.csv')
 
     test_set_path_json = '../resources/results/test_sets/json'
     binary_with_values.save_in_json(f'{test_set_path_json}/binary_with_values.json')
@@ -298,6 +306,7 @@ if __name__ == "__main__":
     logic_all_nl_sql.save_in_json(f'{test_set_path_json}/logic_all_nl_sql.json')
     logic_andor_nl_sql.save_in_json(f'{test_set_path_json}/logic_andor_nl_sql.json')
     logic_sql.save_in_json(f'{test_set_path_json}/logic_sql.json')
+    logic_and_with_or_nl.save_in_json(f'{test_set_path_csv}/logic_and_with_or_nl.json')
 
     araneae.save()
     a = 7

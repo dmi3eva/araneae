@@ -89,7 +89,8 @@ class QuerySubtype(Enum):
     MONO_AGG = "mono-agg"
     LOGIC_NL_ALL = "logic-nl-all"
     LOGIC_SQL_ALL = "logic-sql-all"
-    LOGIC_NL_AND_OR = "logic-nl-and-or"
+    LOGIC_NL_AND_OR_OR = "logic-nl-and-or-or"
+    LOGIC_NL_AND_AND_OR = "logic-nl-and-and-or"
     LOGIC_SQL_AND_OR = "logic-sql-and-or"
     LOGIC_VS = "logic-vs"
 
