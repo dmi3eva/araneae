@@ -55,6 +55,7 @@ class QueryType(Enum):
     JOIN = "join"
     SELECT = "select"
     LOGIC = "logic"
+    NL = "nl"
 
 
 class QuerySubtype(Enum):
@@ -93,6 +94,9 @@ class QuerySubtype(Enum):
     LOGIC_NL_AND_AND_OR = "logic-nl-and-and-or"
     LOGIC_SQL_AND_OR = "logic-sql-and-or"
     LOGIC_VS = "logic-vs"
+    NL_SEVERAL_SENTENCES = "nl-several-sentences"
+    NL_LONG_SQL_SHORT = "nl-long-sql-short"
+    NL_SHORT_SQL_LONG = "nl-short-sql-long"
 
 query_type_mapping = {_t.value: _t for _t in QueryType}
 query_subtype_mapping = {_t.value: _t for _t in QuerySubtype}
