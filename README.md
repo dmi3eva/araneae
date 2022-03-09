@@ -11,3 +11,8 @@ https://jiffyclub.github.io/snakeviz/
 pip install snakeviz
 snakeviz log/profiling/load_from_json.prof
 ```
+
+**To execute linting:**
+```
+pylint araneae/wrapper.py > log/linting/wrapper.txt
+```
