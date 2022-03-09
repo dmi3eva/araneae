@@ -47,3 +47,6 @@ OTHER_KEYWORDS = {
     "as",
     "on"
 }
+
+SQL_NL_THRESHOLD = 2.
+NL_SQL_THRESHOLD = 5.

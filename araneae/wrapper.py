@@ -8,6 +8,7 @@ from typing import *
 
 from utils.common import *
 from utils.mention_extractor import MentionExtractor
+from araneae.settings import *
 # from utils.preprocessing.custom_sql import *
 # from utils.preprocessing.spider.process_sql import *
 from dto.sample import *
@@ -53,7 +54,8 @@ class Araneae:
             QueryType.SIMPLICITY: lambda sample: self._specifications_simplicity(sample),
             QueryType.JOIN: lambda sample: self._specifications_join(sample),
             QueryType.SELECT: lambda sample: self._specifications_select(sample),
-            QueryType.LOGIC: lambda sample: self._specifications_logic(sample)
+            QueryType.LOGIC: lambda sample: self._specifications_logic(sample),
+            QueryType.NL: lambda sample: self._specifications_nl(sample)
         }
 
 
@@ -248,6 +250,19 @@ class Araneae:
             subtypes.append(QuerySubtype.LOGIC_VS)
         return subtypes
 
+    def _specifications_nl(self, sample: Sample) -> Optional[List[QuerySubtype]]:
+        subtypes = []
+        sentences_amount = get_sentences_amount(sample.question)
+        sql_tokens = len(sample.query_toks)
+        nl_tokens = len(sample.question_toks)
+        if sentences_amount > 1:
+            subtypes.append(QuerySubtype.NL_SEVERAL_SENTENCES)
+        if sql_tokens / nl_tokens >= SQL_NL_THRESHOLD:
+            subtypes.append(QuerySubtype.NL_SHORT_SQL_LONG)
+        if nl_tokens / sql_tokens >= NL_SQL_THRESHOLD:
+            subtypes.append(QuerySubtype.NL_LONG_SQL_SHORT)
+        return subtypes
+
 
 if __name__ == "__main__":
     araneae = Araneae()
@@ -271,6 +286,9 @@ if __name__ == "__main__":
     logic_andor_nl_sql = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SQL_AND_OR, QuerySubtype.LOGIC_NL_AND_OR_OR])
     logic_sql = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SQL_ALL])
     logic_and_with_or_nl = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_NL_AND_AND_OR])
+    nl_several_sentences = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_SEVERAL_SENTENCES])
+    nl_short_sql_long = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_SHORT_SQL_LONG])
+    nl_long_sql_short = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_LONG_SQL_SHORT])
 
     test_set_path_csv = '../resources/results/test_sets/csv'
     binary_with_values.save_in_csv(f'{test_set_path_csv}/binary_with_values.csv')
@@ -289,6 +307,9 @@ if __name__ == "__main__":
     logic_andor_nl_sql.save_in_csv(f'{test_set_path_csv}/logic_andor_nl_sql.csv')
     logic_sql.save_in_csv(f'{test_set_path_csv}/logic_sql.csv')
     logic_and_with_or_nl.save_in_csv(f'{test_set_path_csv}/logic_and_with_or_nl.csv')
+    nl_several_sentences.save_in_csv(f'{test_set_path_csv}/nl_several_sentences.csv')
+    nl_short_sql_long.save_in_csv(f'{test_set_path_csv}/nl_short_sql_long.csv')
+    nl_long_sql_short.save_in_csv(f'{test_set_path_csv}/nl_long_sql_short.csv')
 
     test_set_path_json = '../resources/results/test_sets/json'
     binary_with_values.save_in_json(f'{test_set_path_json}/binary_with_values.json')
@@ -307,7 +328,9 @@ if __name__ == "__main__":
     logic_andor_nl_sql.save_in_json(f'{test_set_path_json}/logic_andor_nl_sql.json')
     logic_sql.save_in_json(f'{test_set_path_json}/logic_sql.json')
     logic_and_with_or_nl.save_in_json(f'{test_set_path_json}/logic_and_with_or_nl.json')
+    nl_several_sentences.save_in_json(f'{test_set_path_json}/nl_several_sentences.json')
+    nl_short_sql_long.save_in_json(f'{test_set_path_json}/nl_short_sql_long.json')
+    nl_long_sql_short.save_in_json(f'{test_set_path_json}/nl_long_sql_short.json')
 
     araneae.save()
     a = 7
-

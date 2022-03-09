@@ -1,4 +1,5 @@
 from dto.sample import *
+import re
 
 
 def if_extra_simple(sample: Sample) -> bool:
@@ -79,3 +80,25 @@ def get_logic_keys_from_nl(words: List[str]) -> List[str]:
     if words:
         logic_words = [_w.lower() for _w in words if _w.lower() in keywords]
     return logic_words
+
+
+def punctuation_processing(text: str) -> str:
+    text = text.lower()
+    text = re.sub("[!?.]+", '.', text)
+    text = re.sub("mr.", '', text)
+    text = re.sub("ph.d.", '', text)
+    text = re.sub(".\d", '', text)
+    text = re.sub(" \w.", '', text)
+    return text
+
+def get_sentences_amount(text: str) -> int:
+    processed = punctuation_processing(text)
+    sentences = processed.split('.')
+    sentences = list(filter(lambda x: len(x) > 0, sentences))
+    sentences_amount = len(sentences)
+    return sentences_amount
+
+if __name__ == "__main__":
+    text = "who acted the role of "" Mr. Bean """
+    amount = get_sentences_amount(text)
+    print(amount)
