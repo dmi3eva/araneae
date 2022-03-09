@@ -87,6 +87,7 @@ def punctuation_processing(text: str) -> str:
     text = re.sub("[!?.]+", '.', text)
     text = re.sub("mr.", '', text)
     text = re.sub("ph.d.", '', text)
+    text = re.sub("i.e.", '', text)
     text = re.sub(".\d", '', text)
     text = re.sub(" \w.", '', text)
     return text
