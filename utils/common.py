@@ -1,5 +1,20 @@
-from dto.sample import *
 import re
+import os
+import cProfile
+
+from dto.sample import *
+from configure import *
+
+
+def profile(func):
+    """Decorator for run function profile"""
+    def wrapper(*args, **kwargs):
+        profile_filename = os.path.join(PROF_PATH, func.__name__ + '.prof')
+        profiler = cProfile.Profile()
+        result = profiler.runcall(func, *args, **kwargs)
+        profiler.dump_stats(profile_filename)
+        return result
+    return wrapper
 
 
 def if_extra_simple(sample: Sample) -> bool:
@@ -68,14 +83,14 @@ def if_mono_agg(sample: Sample) -> bool:
 
 
 def get_logic_keys_from_sql(words: List[str]) -> List[str]:
-    keywords = ["and", "or", "not", "all", "any", "some", "in", "between", "exists", "in", "like", "union", "intersect"]
+    keywords = {"and", "or", "not", "all", "any", "some", "in", "between", "exists", "in", "like", "union", "intersect"}
     logic_words = [_w.lower() for _w in words if _w.lower() in keywords]
     return logic_words
 
 
 def get_logic_keys_from_nl(words: List[str]) -> List[str]:
-    keywords = ["and", "or", "not", "all", "any", "some", "between", "exists",
-                "и", "или", "не", "все", "некоторые", "хотя", "между", "существует", "любой"]
+    keywords = {"and", "or", "not", "all", "any", "some", "between", "exists",
+                "и", "или", "не", "все", "некоторые", "хотя", "между", "существует", "любой"}
     logic_words = []
     if words:
         logic_words = [_w.lower() for _w in words if _w.lower() in keywords]
@@ -92,12 +107,14 @@ def punctuation_processing(text: str) -> str:
     text = re.sub(" \w.", '', text)
     return text
 
+
 def get_sentences_amount(text: str) -> int:
     processed = punctuation_processing(text)
     sentences = processed.split('.')
     sentences = list(filter(lambda x: len(x) > 0, sentences))
     sentences_amount = len(sentences)
     return sentences_amount
+
 
 if __name__ == "__main__":
     text = "who acted the role of "" Mr. Bean """

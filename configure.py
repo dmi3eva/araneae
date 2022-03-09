@@ -21,3 +21,6 @@ ARANEAE_PATH = path.join(ROOT_PATH, "resources", "dump", "araneae")
 SAMPLES_PATH = path.join(ARANEAE_PATH, 'samples.dat')
 COLUMN_TYPES_PATH = path.join(ARANEAE_PATH, 'column_types.dat')
 INDICES_PATH = path.join(ARANEAE_PATH, 'indices.dat')
+
+# Profiling
+PROF_PATH = path.join(ROOT_PATH, "log", "profiling")

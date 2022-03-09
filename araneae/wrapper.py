@@ -68,6 +68,7 @@ class Araneae:
             with open(path) as column_file:
                 self.column_types[_column_type] = json.load(column_file)
 
+
     def load_from_json(self, filepath: str, source: Source) -> int:
         with open(filepath) as json_file:
             json_samples = json.load(json_file)
@@ -90,6 +91,7 @@ class Araneae:
             cusrrent_sample.russian_query_toks_no_values = _json_sample['query_toks_no_value']
             current_ind += 1
         return len(json_samples)
+
 
     def add_specifications(self):
         for _sample in self.samples.content:
@@ -150,6 +152,7 @@ class Araneae:
         generated_sample.mentions = self.mention_extractor.get_mentions_from_sample(sample_json)
         return generated_sample
 
+    @profile
     def extract_specifications(self, sample: Sample) -> Dict:
         specifications = {}
         for _query_type in QueryType:
