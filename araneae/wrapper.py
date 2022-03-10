@@ -264,6 +264,8 @@ class Araneae:
             subtypes.append(QuerySubtype.NL_SHORT_SQL_LONG)
         if nl_tokens / sql_tokens >= NL_SQL_THRESHOLD:
             subtypes.append(QuerySubtype.NL_LONG_SQL_SHORT)
+        if nl_tokens >= LONG_NL:
+            subtypes.append(QuerySubtype.NL_LONG)
         return subtypes
 
 
@@ -292,6 +294,7 @@ if __name__ == "__main__":
     nl_several_sentences = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_SEVERAL_SENTENCES])
     nl_short_sql_long = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_SHORT_SQL_LONG])
     nl_long_sql_short = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_LONG_SQL_SHORT])
+    nl_long = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_LONG])
 
     test_set_path_csv = '../resources/results/test_sets/csv'
     binary_with_values.save_in_csv(f'{test_set_path_csv}/binary_with_values.csv')
@@ -313,6 +316,7 @@ if __name__ == "__main__":
     nl_several_sentences.save_in_csv(f'{test_set_path_csv}/nl_several_sentences.csv')
     nl_short_sql_long.save_in_csv(f'{test_set_path_csv}/nl_short_sql_long.csv')
     nl_long_sql_short.save_in_csv(f'{test_set_path_csv}/nl_long_sql_short.csv')
+    nl_long.save_in_csv(f'{test_set_path_csv}/nl_long.csv')
 
     test_set_path_json = '../resources/results/test_sets/json'
     binary_with_values.save_in_json(f'{test_set_path_json}/binary_with_values.json')
@@ -334,6 +338,7 @@ if __name__ == "__main__":
     nl_several_sentences.save_in_json(f'{test_set_path_json}/nl_several_sentences.json')
     nl_short_sql_long.save_in_json(f'{test_set_path_json}/nl_short_sql_long.json')
     nl_long_sql_short.save_in_json(f'{test_set_path_json}/nl_long_sql_short.json')
+    nl_long.save_in_json(f'{test_set_path_csv}/nl_long.json')
 
     araneae.save()
     a = 7

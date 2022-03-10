@@ -1,0 +1,19 @@
+7,what,3652
+106,find,1334
+0,how,1207 (1,many,1151)
+55,who,1161
+81,which,913
+13,show,908
+21,by,873
+53,each,817
+78,most,813
+54,list,782
+281,return,557
+36,order,450
+340,me,450
+112,whose,410
+188,count,302
+210,least,283
+47,distinct,262
+20,ordered,176
+667,top,89
