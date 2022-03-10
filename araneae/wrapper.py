@@ -55,7 +55,8 @@ class Araneae:
             QueryType.JOIN: lambda sample: self._specifications_join(sample),
             QueryType.SELECT: lambda sample: self._specifications_select(sample),
             QueryType.LOGIC: lambda sample: self._specifications_logic(sample),
-            QueryType.NL: lambda sample: self._specifications_nl(sample)
+            QueryType.NL: lambda sample: self._specifications_nl(sample),
+            QueryType.NEGATION: lambda sample: self._specifications_negation(sample)
         }
 
 
@@ -227,11 +228,6 @@ class Araneae:
         subtypes = []
         sql_logic_keys = get_logic_keys_from_sql(sample.query_toks_no_values)
         nl_logic_keys = get_logic_keys_from_nl(sample.question_toks) + get_logic_keys_from_nl(sample.russian_question_toks)
-        if sample.id == 3495:
-            a = 7
-        sql_negations = get_negation_keys(sample.query_toks, sample.query)
-
-        nl_negations = get_negation_keys(sample.question_toks, sample.question)
         if len(sql_logic_keys) > 0:
             subtypes.append(QuerySubtype.LOGIC_SQL_ALL)
         if len(nl_logic_keys) > 0:
@@ -256,14 +252,43 @@ class Araneae:
         """
         if (condition_1 or condition_2) and sample.id in [726, 1902, 2387, 2402]:   # TO-DO
             subtypes.append(QuerySubtype.LOGIC_VS)
-        if len(nl_negations) > 0 and (not contains_logic_set_phrase(sample) or len(nl_negations) > 1)\
-                and sample.id not in [984, 985]:
-            subtypes.append(QuerySubtype.LOGIC_NL_NOT)
-        if len(sql_negations) > 0 or sample.id in [7808, 8568, 168]:
-            subtypes.append(QuerySubtype.LOGIC_SQL_NOT)
         if contains_logic_set_phrase(sample):
             subtypes.append(QuerySubtype.LOGIC_SET_PHRASE)
+        return subtypes
 
+    def _specifications_negation(self, sample: Sample) -> Optional[List[QuerySubtype]]:
+        subtypes = []
+        nl = token_processing(sample.question)
+        sql = token_processing(sample.query)
+        sql_tokens = set([token_processing(_t) for _t in sample.query_toks])
+        nl_tokens = set([token_processing(_t) for _t in sample.question_toks])
+        negation_nl_keywords = {"no", "not", "dont", "doesnt", "isnt", "arent", "didnt", "except", "never", "without"}
+        negation_sql_keywords = {"except", "!", "!=", "null"}
+        not_equal_keywords = {"no", "not", "dont", "doesnt", "isnt", "arent", "didnt", "!", "!=", "null"}
+        except_keywords = {"except", "without"}
+        negations_in_nl = nl_tokens.intersection(negation_nl_keywords)
+        negations_in_sql = sql_tokens.intersection(negation_sql_keywords)
+        if len(negations_in_nl) > 0:
+            subtypes.append(QuerySubtype.NEGATION_NL)
+        sql_condition_1 = len(negations_in_sql) > 0 or "!=" in sql
+        sql_condition_2 = "not in" not in sql or len(negations_in_sql) > 1
+        if sql_condition_1 and sql_condition_2:
+            subtypes.append(QuerySubtype.NEGATION_SQL)
+        if len(subtypes) == 0:
+            return subtypes
+        negations_in_sample = negations_in_nl.union(negations_in_sql)
+        if "no more" in nl:
+            subtypes.append(QuerySubtype.NEGATION_SET_PHRASE)
+        if "never" in nl_tokens:
+            subtypes.append(QuerySubtype.NEGATION_NEVER)
+        if "not only" in nl_tokens:
+            subtypes.append(QuerySubtype.NEGATION_NOT_ONLY)
+        if sample.id in [984, 985]:
+            subtypes.append(QuerySubtype.NEGATION_COMMON_KNOWLEDGE)
+        if len(negations_in_sample.intersection(not_equal_keywords)) > 0:
+            subtypes.append(QuerySubtype.NEGATION_NOT_EQUAL)
+        if len(negations_in_sample.intersection(except_keywords)) > 0:
+            subtypes.append(QuerySubtype.NEGATION_EXCEPT)
         return subtypes
 
     def _specifications_nl(self, sample: Sample) -> Optional[List[QuerySubtype]]:
@@ -305,12 +330,7 @@ if __name__ == "__main__":
     logic_sql = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SQL_ALL])
     logic_and_with_or_nl = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_NL_AND_AND_OR])
     logic_set_phrase = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SET_PHRASE])
-
-    logic_nl_not = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_NL_NOT])
-    logic_sql_not = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SQL_NOT])
-    logic_nl_and_sql_not = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_NL_NOT, QuerySubtype.LOGIC_SQL_NOT])
-
-
+    negation = araneae.find_all_with_type(QueryType.NEGATION)
     nl_several_sentences = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_SEVERAL_SENTENCES])
     nl_short_sql_long = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_SHORT_SQL_LONG])
     nl_long_sql_short = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_LONG_SQL_SHORT])
@@ -333,14 +353,12 @@ if __name__ == "__main__":
     logic_andor_nl_sql.save_in_csv(f'{test_set_path_csv}/logic_andor_nl_sql.csv')
     logic_sql.save_in_csv(f'{test_set_path_csv}/logic_sql.csv')
     logic_and_with_or_nl.save_in_csv(f'{test_set_path_csv}/logic_and_with_or_nl.csv')
-    logic_nl_not.save_in_csv(f'{test_set_path_csv}/logic_nl_not.csv')
-    logic_sql_not.save_in_csv(f'{test_set_path_csv}/logic_sql_not.csv')
-    logic_nl_and_sql_not.save_in_csv(f'{test_set_path_csv}/logic_nl_and_sql_not.csv')
     logic_set_phrase.save_in_csv(f'{test_set_path_csv}/logic_set_phrase.csv')
     nl_several_sentences.save_in_csv(f'{test_set_path_csv}/nl_several_sentences.csv')
     nl_short_sql_long.save_in_csv(f'{test_set_path_csv}/nl_short_sql_long.csv')
     nl_long_sql_short.save_in_csv(f'{test_set_path_csv}/nl_long_sql_short.csv')
     nl_long.save_in_csv(f'{test_set_path_csv}/nl_long.csv')
+    negation.save_in_csv(f'{test_set_path_csv}/negation.csv')
 
     test_set_path_json = '../resources/results/test_sets/json'
     binary_with_values.save_in_json(f'{test_set_path_json}/binary_with_values.json')
@@ -359,14 +377,12 @@ if __name__ == "__main__":
     logic_andor_nl_sql.save_in_json(f'{test_set_path_json}/logic_andor_nl_sql.json')
     logic_sql.save_in_json(f'{test_set_path_json}/logic_sql.json')
     logic_and_with_or_nl.save_in_json(f'{test_set_path_json}/logic_and_with_or_nl.json')
-    logic_nl_not.save_in_json(f'{test_set_path_json}/logic_nl_not.json')
-    logic_sql_not.save_in_json(f'{test_set_path_json}/logic_sql_not.json')
-    logic_nl_and_sql_not.save_in_json(f'{test_set_path_json}/logic_nl_and_sql_not.json')
     logic_set_phrase.save_in_json(f'{test_set_path_json}/logic_set_phrase.json')
     nl_several_sentences.save_in_json(f'{test_set_path_json}/nl_several_sentences.json')
     nl_short_sql_long.save_in_json(f'{test_set_path_json}/nl_short_sql_long.json')
     nl_long_sql_short.save_in_json(f'{test_set_path_json}/nl_long_sql_short.json')
     nl_long.save_in_json(f'{test_set_path_json}/nl_long.json')
+    negation.save_in_json(f'{test_set_path_json}/negation.json')
 
     araneae.save()
     a = 7

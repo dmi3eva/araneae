@@ -55,6 +55,7 @@ class QueryType(Enum):
     JOIN = "join"
     SELECT = "select"
     LOGIC = "logic"
+    NEGATION = "negation"
     NL = "nl"
 
 
@@ -94,10 +95,15 @@ class QuerySubtype(Enum):
     LOGIC_NL_AND_AND_OR = "logic-nl-and-and-or"
     LOGIC_SQL_AND_OR = "logic-sql-and-or"
     LOGIC_VS = "logic-vs"
-    LOGIC_NL_NOT = "logic-nl-not"
-    LOGIC_SQL_NOT = "logic-sql-not"
     LOGIC_SET_PHRASE = "logic-set-phrase"
-
+    NEGATION_NL = "negation-nl"
+    NEGATION_SQL = "negation-sql"
+    NEGATION_SET_PHRASE =  "negation-set-phrase"
+    NEGATION_NEVER = "negation-never"
+    NEGATION_EXCEPT = "negation-except"
+    NEGATION_NOT_EQUAL = "negation-not-equal"
+    NEGATION_NOT_ONLY = "negation-not-only"
+    NEGATION_COMMON_KNOWLEDGE = "negation-common-knowledge"
     NL_SEVERAL_SENTENCES = "nl-several-sentences"
     NL_LONG_SQL_SHORT = "nl-long-sql-short"
     NL_SHORT_SQL_LONG = "nl-short-sql-long"
@@ -140,6 +146,25 @@ query_mapping = {
         QuerySubtype.NL_LONG_SQL_SHORT,
         QuerySubtype.NL_SHORT_SQL_LONG,
         QuerySubtype.NL_LONG
+    ],
+    QueryType.LOGIC: [
+        QuerySubtype.LOGIC_NL_ALL,
+        QuerySubtype.LOGIC_SQL_ALL,
+        QuerySubtype.LOGIC_NL_AND_OR_OR,
+        QuerySubtype.LOGIC_NL_AND_AND_OR,
+        QuerySubtype.LOGIC_SQL_AND_OR,
+        QuerySubtype.LOGIC_VS,
+        QuerySubtype.LOGIC_SET_PHRASE
+    ],
+    QueryType.NEGATION: [
+        QuerySubtype.NEGATION_NL,
+        QuerySubtype.NEGATION_SQL,
+        QuerySubtype.NEGATION_SET_PHRASE,
+        QuerySubtype.NEGATION_NEVER,
+        QuerySubtype.NEGATION_EXCEPT,
+        QuerySubtype.NEGATION_NOT_EQUAL,
+        QuerySubtype.NEGATION_NOT_ONLY,
+        QuerySubtype.NEGATION_COMMON_KNOWLEDGE
     ]
 }
 
