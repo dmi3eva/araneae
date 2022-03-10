@@ -97,6 +97,24 @@ def get_logic_keys_from_nl(words: List[str]) -> List[str]:
     return logic_words
 
 
+def get_negation_keys(words: List[str]) -> List[str]:
+    negations = {"no", "not"}
+    processed = set([_w.lower() for _w in words])
+    return list(negations.intersection(processed))
+
+
+def contains_logic_set_phrase(sample: Sample) -> bool:
+    set_phrases = [
+        "greater or equal",
+        "less or equal"
+    ]
+    processed_question = sample.question.lower()
+    for _phrase in set_phrases:
+        if _phrase in processed_question:
+            return True
+    return False
+
+
 def punctuation_processing(text: str) -> str:
     text = text.lower()
     text = re.sub("[!?.]+", '.', text)

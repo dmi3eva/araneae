@@ -227,6 +227,8 @@ class Araneae:
         subtypes = []
         sql_logic_keys = get_logic_keys_from_sql(sample.query_toks_no_values)
         nl_logic_keys = get_logic_keys_from_nl(sample.question_toks) + get_logic_keys_from_nl(sample.russian_question_toks)
+        sql_negations = get_negation_keys(sample.query_toks)
+        nl_negations = get_negation_keys(sample.question_toks)
         if len(sql_logic_keys) > 0:
             subtypes.append(QuerySubtype.LOGIC_SQL_ALL)
         if len(nl_logic_keys) > 0:
@@ -251,6 +253,12 @@ class Araneae:
         """
         if (condition_1 or condition_2) and sample.id in [726, 1902, 2387, 2402]:   # TO-DO
             subtypes.append(QuerySubtype.LOGIC_VS)
+        if len(nl_negations) > 0:
+            subtypes.append(QuerySubtype.LOGIC_NL_NOT)
+        if len(sql_negations) > 0:
+            subtypes.append(QuerySubtype.LOGIC_SQL_NOT)
+        if contains_logic_set_phrase(sample):
+            subtypes.append(QuerySubtype.LOGIC_SET_PHRASE)
         return subtypes
 
     def _specifications_nl(self, sample: Sample) -> Optional[List[QuerySubtype]]:
@@ -291,10 +299,15 @@ if __name__ == "__main__":
     logic_andor_nl_sql = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SQL_AND_OR, QuerySubtype.LOGIC_NL_AND_OR_OR])
     logic_sql = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SQL_ALL])
     logic_and_with_or_nl = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_NL_AND_AND_OR])
+    logic_nl_not = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_NL_NOT])
+    logic_sql_not = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SQL_NOT])
+    logic_nl_and_sql_not = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_NL_NOT, QuerySubtype.LOGIC_SQL_NOT])
+    logic_set_phrase = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SET_PHRASE])
     nl_several_sentences = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_SEVERAL_SENTENCES])
     nl_short_sql_long = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_SHORT_SQL_LONG])
     nl_long_sql_short = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_LONG_SQL_SHORT])
     nl_long = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_LONG])
+
 
     test_set_path_csv = '../resources/results/test_sets/csv'
     binary_with_values.save_in_csv(f'{test_set_path_csv}/binary_with_values.csv')
@@ -313,6 +326,10 @@ if __name__ == "__main__":
     logic_andor_nl_sql.save_in_csv(f'{test_set_path_csv}/logic_andor_nl_sql.csv')
     logic_sql.save_in_csv(f'{test_set_path_csv}/logic_sql.csv')
     logic_and_with_or_nl.save_in_csv(f'{test_set_path_csv}/logic_and_with_or_nl.csv')
+    logic_nl_not.save_in_csv(f'{test_set_path_csv}/logic_nl_not.csv')
+    logic_sql_not.save_in_csv(f'{test_set_path_csv}/logic_sql_not.csv')
+    logic_nl_and_sql_not.save_in_csv(f'{test_set_path_csv}/logic_nl_and_sql_not.csv')
+    logic_set_phrase.save_in_csv(f'{test_set_path_csv}/logic_set_phrase.csv')
     nl_several_sentences.save_in_csv(f'{test_set_path_csv}/nl_several_sentences.csv')
     nl_short_sql_long.save_in_csv(f'{test_set_path_csv}/nl_short_sql_long.csv')
     nl_long_sql_short.save_in_csv(f'{test_set_path_csv}/nl_long_sql_short.csv')
@@ -335,10 +352,14 @@ if __name__ == "__main__":
     logic_andor_nl_sql.save_in_json(f'{test_set_path_json}/logic_andor_nl_sql.json')
     logic_sql.save_in_json(f'{test_set_path_json}/logic_sql.json')
     logic_and_with_or_nl.save_in_json(f'{test_set_path_json}/logic_and_with_or_nl.json')
+    logic_nl_not.save_in_json(f'{test_set_path_json}/logic_nl_not.json')
+    logic_sql_not.save_in_json(f'{test_set_path_json}/logic_sql_not.json')
+    logic_nl_and_sql_not.save_in_json(f'{test_set_path_json}/logic_nl_and_sql_not.json')
+    logic_set_phrase.save_in_json(f'{test_set_path_json}/logic_set_phrase.json')
     nl_several_sentences.save_in_json(f'{test_set_path_json}/nl_several_sentences.json')
     nl_short_sql_long.save_in_json(f'{test_set_path_json}/nl_short_sql_long.json')
     nl_long_sql_short.save_in_json(f'{test_set_path_json}/nl_long_sql_short.json')
-    nl_long.save_in_json(f'{test_set_path_csv}/nl_long.json')
+    nl_long.save_in_json(f'{test_set_path_json}/nl_long.json')
 
     araneae.save()
     a = 7
