@@ -94,9 +94,14 @@ class QuerySubtype(Enum):
     LOGIC_NL_AND_AND_OR = "logic-nl-and-and-or"
     LOGIC_SQL_AND_OR = "logic-sql-and-or"
     LOGIC_VS = "logic-vs"
+    LOGIC_NL_NOT = "logic-nl-not"
+    LOGIC_SQL_NOT = "logic-sql-not"
+    LOGIC_SET_PHRASE = "logic-set-phrase"
+
     NL_SEVERAL_SENTENCES = "nl-several-sentences"
     NL_LONG_SQL_SHORT = "nl-long-sql-short"
     NL_SHORT_SQL_LONG = "nl-short-sql-long"
+    NL_LONG = "nl-long"
 
 query_type_mapping = {_t.value: _t for _t in QueryType}
 query_subtype_mapping = {_t.value: _t for _t in QuerySubtype}
@@ -129,6 +134,12 @@ query_mapping = {
         QuerySubtype.MULTI_SELECT,
         QuerySubtype.HETERO_AGG,
         QuerySubtype.MONO_AGG
+    ],
+    QueryType.NL: [
+        QuerySubtype.NL_SEVERAL_SENTENCES,
+        QuerySubtype.NL_LONG_SQL_SHORT,
+        QuerySubtype.NL_SHORT_SQL_LONG,
+        QuerySubtype.NL_LONG
     ]
 }
 
