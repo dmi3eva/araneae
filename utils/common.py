@@ -97,15 +97,26 @@ def get_logic_keys_from_nl(words: List[str]) -> List[str]:
     return logic_words
 
 
-def get_negation_keys(words: List[str]) -> List[str]:
-    negations = {"no", "not"}
-    processed = set([_w.lower() for _w in words])
-    return list(negations.intersection(processed))
+def get_negation_keys(words: List[str], sentence: str) -> List[str]:
+    negation_keywords = {
+        "no", "not", "!", "\'no", "except", "never", "without", "!=", "\'no\'", "null",
+        "don't", "doesn't", "dont", "doesnt", "isn't", "isnt", "arent", "didn't", "didnt",
+        "<=", ">=", "0"
+    }
+    processed = set([_w.lower().replace('\'', "").replace("\"", "") for _w in words])
+    negations = negation_keywords.intersection(processed)
+    if "<=" in sentence and "<=" not in negations:
+        negations.add("<=")
+    if ">=" in sentence and ">=" not in negations:
+        negations.add(">=")
+    return list(negations)
 
 
 def contains_logic_set_phrase(sample: Sample) -> bool:
     set_phrases = [
-        "or equal"
+        "or equal",
+        "or before",
+        "or later"
     ]
     processed_question = sample.question.lower()
     for _phrase in set_phrases:

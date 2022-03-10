@@ -44,7 +44,7 @@ def estimate(araneae: Araneae, source: Source, test_set_path: str, model_path: s
             correct += 1
     if size > 0:
         return correct / size, size, len(test_set)
-    return None, None, None
+    return None, size, len(test_set)
 
 
 def enumerate_samples(araneae: Araneae, source: Source, samples: List[dict]):

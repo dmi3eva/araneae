@@ -227,8 +227,11 @@ class Araneae:
         subtypes = []
         sql_logic_keys = get_logic_keys_from_sql(sample.query_toks_no_values)
         nl_logic_keys = get_logic_keys_from_nl(sample.question_toks) + get_logic_keys_from_nl(sample.russian_question_toks)
-        sql_negations = get_negation_keys(sample.query_toks)
-        nl_negations = get_negation_keys(sample.question_toks)
+        if sample.id == 3495:
+            a = 7
+        sql_negations = get_negation_keys(sample.query_toks, sample.query)
+
+        nl_negations = get_negation_keys(sample.question_toks, sample.question)
         if len(sql_logic_keys) > 0:
             subtypes.append(QuerySubtype.LOGIC_SQL_ALL)
         if len(nl_logic_keys) > 0:
@@ -253,12 +256,14 @@ class Araneae:
         """
         if (condition_1 or condition_2) and sample.id in [726, 1902, 2387, 2402]:   # TO-DO
             subtypes.append(QuerySubtype.LOGIC_VS)
-        if len(nl_negations) > 0:
+        if len(nl_negations) > 0 and (not contains_logic_set_phrase(sample) or len(nl_negations) > 1)\
+                and sample.id not in [984, 985]:
             subtypes.append(QuerySubtype.LOGIC_NL_NOT)
-        if len(sql_negations) > 0:
+        if len(sql_negations) > 0 or sample.id in [7808, 8568, 168]:
             subtypes.append(QuerySubtype.LOGIC_SQL_NOT)
         if contains_logic_set_phrase(sample):
             subtypes.append(QuerySubtype.LOGIC_SET_PHRASE)
+
         return subtypes
 
     def _specifications_nl(self, sample: Sample) -> Optional[List[QuerySubtype]]:
@@ -299,15 +304,17 @@ if __name__ == "__main__":
     logic_andor_nl_sql = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SQL_AND_OR, QuerySubtype.LOGIC_NL_AND_OR_OR])
     logic_sql = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SQL_ALL])
     logic_and_with_or_nl = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_NL_AND_AND_OR])
+    logic_set_phrase = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SET_PHRASE])
+
     logic_nl_not = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_NL_NOT])
     logic_sql_not = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SQL_NOT])
     logic_nl_and_sql_not = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_NL_NOT, QuerySubtype.LOGIC_SQL_NOT])
-    logic_set_phrase = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SET_PHRASE])
+
+
     nl_several_sentences = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_SEVERAL_SENTENCES])
     nl_short_sql_long = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_SHORT_SQL_LONG])
     nl_long_sql_short = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_LONG_SQL_SHORT])
     nl_long = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_LONG])
-
 
     test_set_path_csv = '../resources/results/test_sets/csv'
     binary_with_values.save_in_csv(f'{test_set_path_csv}/binary_with_values.csv')
