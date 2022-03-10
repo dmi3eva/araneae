@@ -85,4 +85,4 @@ if __name__ == "__main__":
     araneae = Araneae()
     araneae.load()
     report = make_test_set_report(araneae, Source.SPIDER_DEV)
-    save_sql_statistics(report, "2022-03-09")
+    save_sql_statistics(report, "2022-03-10")

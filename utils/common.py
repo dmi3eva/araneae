@@ -105,8 +105,7 @@ def get_negation_keys(words: List[str]) -> List[str]:
 
 def contains_logic_set_phrase(sample: Sample) -> bool:
     set_phrases = [
-        "greater or equal",
-        "less or equal"
+        "or equal"
     ]
     processed_question = sample.question.lower()
     for _phrase in set_phrases:
