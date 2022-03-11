@@ -89,6 +89,7 @@ class QuerySubtype(Enum):
     MULTI_SELECT = "multi-select"
     HETERO_AGG = "hetero-agg"
     MONO_AGG = "mono-agg"
+    NESTED = "nested"
     LOGIC_NL_ALL = "logic-nl-all"
     LOGIC_SQL_ALL = "logic-sql-all"
     LOGIC_NL_AND_OR_OR = "logic-nl-and-or-or"
@@ -139,7 +140,8 @@ query_mapping = {
     QueryType.SELECT: [
         QuerySubtype.MULTI_SELECT,
         QuerySubtype.HETERO_AGG,
-        QuerySubtype.MONO_AGG
+        QuerySubtype.MONO_AGG,
+        QuerySubtype.NESTED
     ],
     QueryType.NL: [
         QuerySubtype.NL_SEVERAL_SENTENCES,

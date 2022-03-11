@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import dill as pickle
 import pandas as pd
@@ -217,6 +218,9 @@ class Araneae:
             subtypes.append(QuerySubtype.HETERO_AGG)
         if if_mono_agg(sample):
             subtypes.append(QuerySubtype.MONO_AGG)
+        selects = re.findall("select", sample.query)
+        if len(selects) > 1:
+            subtypes.append(QuerySubtype.NESTED)
         if len(subtypes) == 0:
             return None
         return subtypes
@@ -254,6 +258,8 @@ class Araneae:
             subtypes.append(QuerySubtype.LOGIC_VS)
         if contains_logic_set_phrase(sample):
             subtypes.append(QuerySubtype.LOGIC_SET_PHRASE)
+        if len(subtypes) == 0:
+            return None
         return subtypes
 
     def _specifications_negation(self, sample: Sample) -> Optional[List[QuerySubtype]]:
@@ -289,6 +295,8 @@ class Araneae:
             subtypes.append(QuerySubtype.NEGATION_NOT_EQUAL)
         if len(negations_in_sample.intersection(except_keywords)) > 0:
             subtypes.append(QuerySubtype.NEGATION_EXCEPT)
+        if len(subtypes) == 0:
+            return None
         return subtypes
 
     def _specifications_nl(self, sample: Sample) -> Optional[List[QuerySubtype]]:
@@ -335,6 +343,7 @@ if __name__ == "__main__":
     nl_short_sql_long = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_SHORT_SQL_LONG])
     nl_long_sql_short = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_LONG_SQL_SHORT])
     nl_long = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_LONG])
+    nested = araneae.find_all_with_type(QueryType.SELECT, subtypes=[QuerySubtype.NESTED])
 
     test_set_path_csv = '../resources/results/test_sets/csv'
     binary_with_values.save_in_csv(f'{test_set_path_csv}/binary_with_values.csv')
@@ -359,6 +368,7 @@ if __name__ == "__main__":
     nl_long_sql_short.save_in_csv(f'{test_set_path_csv}/nl_long_sql_short.csv')
     nl_long.save_in_csv(f'{test_set_path_csv}/nl_long.csv')
     negation.save_in_csv(f'{test_set_path_csv}/negation.csv')
+    nested.save_in_csv(f'{test_set_path_csv}/nested.csv')
 
     test_set_path_json = '../resources/results/test_sets/json'
     binary_with_values.save_in_json(f'{test_set_path_json}/binary_with_values.json')
@@ -383,6 +393,7 @@ if __name__ == "__main__":
     nl_long_sql_short.save_in_json(f'{test_set_path_json}/nl_long_sql_short.json')
     nl_long.save_in_json(f'{test_set_path_json}/nl_long.json')
     negation.save_in_json(f'{test_set_path_json}/negation.json')
+    nested.save_in_json(f'{test_set_path_json}/nested.json')
 
     araneae.save()
     a = 7
