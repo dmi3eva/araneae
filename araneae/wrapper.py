@@ -438,7 +438,7 @@ if __name__ == "__main__":
     nl_long_sql_short.save_in_json(f'{test_set_path_json}/nl_long_sql_short.json')
     nl_long.save_in_json(f'{test_set_path_json}/nl_long.json')
     negation.save_in_json(f'{test_set_path_json}/negation.json')
-    negation_any_all.save_in_json(f'{test_set_path_csv}/negation_any_all.json')
+    negation_any_all.save_in_json(f'{test_set_path_json}/negation_any_all.json')
     nested.save_in_json(f'{test_set_path_json}/nested.json')
 
     subtypes_path_csv = '../resources/results/subtypes'
