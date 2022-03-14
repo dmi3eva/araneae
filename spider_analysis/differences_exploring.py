@@ -49,8 +49,11 @@ def save_differences(differences, filename, in_first, in_second):
 
 
 if __name__ == "__main__":
-    FIRST_FILE_PATH = 'C:\\Users\\forka\PycharmProjects\\araneae\\resources\\results\\test_sets\\csv\\logic_nl_not.csv'
-    SECOND_FILE_PATH = 'C:\\Users\\forka\PycharmProjects\\araneae\\resources\\results\\test_sets\\csv\\logic_sql_not.csv'
+    # FIRST_FILE_PATH = 'C:\\Users\\forka\PycharmProjects\\araneae\\resources\\results\\test_sets\\csv\\logic_nl_not.csv'
+    # SECOND_FILE_PATH = 'C:\\Users\\forka\PycharmProjects\\araneae\\resources\\results\\test_sets\\csv\\logic_sql_not.csv'
+    FIRST_FILE_PATH = 'C:\\Users\\forka\PycharmProjects\\araneae\\resources\\results\\test_sets\\csv\\negation.csv'
+    SECOND_FILE_PATH = 'C:\\Users\\forka\PycharmProjects\\araneae\\resources\\results\\test_sets\\csv\\negation_old.csv'
     difference_analysis = extract_ids(FIRST_FILE_PATH, SECOND_FILE_PATH)
-    save_differences(difference_analysis, "22_03_10_negation_difference", "Only in NL", "Only in SQL")
+    # save_differences(difference_analysis, "22_03_10_negation_difference", "Only in NL", "Only in SQL")
+    save_differences(difference_analysis, "22_03_14_negation_difference", "Only in NEW", "Only in OLD")
 

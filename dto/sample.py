@@ -105,6 +105,12 @@ class QuerySubtype(Enum):
     NEGATION_NOT_EQUAL = "negation-not-equal"
     NEGATION_NOT_ONLY = "negation-not-only"
     NEGATION_COMMON_KNOWLEDGE = "negation-common-knowledge"
+    NEGATION_NEITHER_NOR = "negation-neither-nor"
+    NEGATION_IGNORING = "negation-ignoring"
+    NEGATION_OTHER_THAN = "negation-other-than"
+    NEGATION_OUTSIDE = "negation-outside"
+    NEGATION_ANY_ALL = "negation-any-all"
+    NEGATION_NULL = "negation-null"
     NL_SEVERAL_SENTENCES = "nl-several-sentences"
     NL_LONG_SQL_SHORT = "nl-long-sql-short"
     NL_SHORT_SQL_LONG = "nl-short-sql-long"
@@ -166,7 +172,13 @@ query_mapping = {
         QuerySubtype.NEGATION_EXCEPT,
         QuerySubtype.NEGATION_NOT_EQUAL,
         QuerySubtype.NEGATION_NOT_ONLY,
-        QuerySubtype.NEGATION_COMMON_KNOWLEDGE
+        QuerySubtype.NEGATION_COMMON_KNOWLEDGE,
+        QuerySubtype.NEGATION_NEITHER_NOR,
+        QuerySubtype.NEGATION_IGNORING,
+        QuerySubtype.NEGATION_OTHER_THAN,
+        QuerySubtype.NEGATION_OUTSIDE,
+        QuerySubtype.NEGATION_ANY_ALL,
+        QuerySubtype.NEGATION_NULL
     ]
 }
 

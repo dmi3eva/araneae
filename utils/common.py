@@ -140,9 +140,12 @@ def punctuation_processing(text: str) -> str:
 
 def token_processing(token):
     processed = token.lower()
-    processed = processed.replace('\'', "")
-    processed = processed.replace("\"", "")
+    processed = re.sub("[\'\"]+", '', processed)
+    # processed = processed.replace('\'', "")
+    # processed = processed.replace("\"", "")
+    # processed = processed.replace("\'", "")
     return processed
+
 
 def get_sentences_amount(text: str) -> int:
     processed = punctuation_processing(text)

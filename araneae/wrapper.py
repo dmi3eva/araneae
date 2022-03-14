@@ -45,10 +45,15 @@ class SamplesCollection:
         data = []
         for _sample in self.content:
             row = {
-                'nl_eng': _sample.question,
-                'sql_eng': _sample.query
+                'id': _sample.id,
+                'question': _sample.question,
+                'query': _sample.query
             }
             for _subtype in query_mapping[query_type]:
+                if not _sample.specifications[query_type]:
+                    continue
+                if query_type not in _sample.specifications.keys():
+                    continue
                 if _subtype in _sample.specifications[query_type]:
                     row[_subtype.name] = 1
                 else:
@@ -280,24 +285,34 @@ class Araneae:
 
     def _specifications_negation(self, sample: Sample) -> Optional[List[QuerySubtype]]:
         subtypes = []
+        if sample.id == 2476:
+            a = 7
         nl = token_processing(sample.question)
         sql = token_processing(sample.query)
         sql_tokens = set([token_processing(_t) for _t in sample.query_toks])
         nl_tokens = set([token_processing(_t) for _t in sample.question_toks])
-        negation_nl_keywords = {"no", "not", "dont", "doesnt", "isnt", "arent", "didnt", "except", "never", "without"}
+        negation_nl_keywords = {"no", "not", "dont", "doesnt", "isnt", "arent", "didnt", "except", "never",
+                                "without", "non", "nt", "nor", "ignore", "ignoring", "exclude", "excluding"}
         negation_sql_keywords = {"except", "!", "!=", "null"}
-        not_equal_keywords = {"no", "not", "dont", "doesnt", "isnt", "arent", "didnt", "!", "!=", "null"}
-        except_keywords = {"except", "without"}
+        not_equal_keywords = {"no", "not", "dont", "doesnt", "isnt", "arent", "didnt", "!", "!=", "null", "nor", "not"}
+        except_keywords = {"except", "without", "exclude", "excluding", "ignore", "ignoring", "exclude", "excluding"}
         negations_in_nl = nl_tokens.intersection(negation_nl_keywords)
         negations_in_sql = sql_tokens.intersection(negation_sql_keywords)
-        if len(negations_in_nl) > 0:
+        VALUES_IDS = {1993, 5660, 5664}  # ID of samples in which "No" is part of value
+        if len(negations_in_nl) > 0 and sample.id not in VALUES_IDS:
             subtypes.append(QuerySubtype.NEGATION_NL)
+        STRUCTURE_IDS = {5516, 5517, 9081, 9082, 9083, 9084, 9085, 9148,
+                         1230, 1558, 3520, 3521, 3522, 3523, 4027, 8830}  # Samples with complex structure, not negations
+        NULL_IDS = {4460, 4467, 4468, 4480, 4487, 3494, 3526}
+        TOKENIZATION_IDS = {609, 610}
         sql_condition_1 = len(negations_in_sql) > 0 or "!=" in sql
         sql_condition_2 = "not in" not in sql or len(negations_in_sql) > 1
-        if sql_condition_1 and sql_condition_2:
+        sql_condition_3 = sample.id not in STRUCTURE_IDS
+        sql_condition_4 = sample.id not in NULL_IDS and sample.id not in TOKENIZATION_IDS
+        if sql_condition_1 and sql_condition_2 and sql_condition_3 and sql_condition_4:
             subtypes.append(QuerySubtype.NEGATION_SQL)
         if len(subtypes) == 0:
-            return subtypes
+            return None
         negations_in_sample = negations_in_nl.union(negations_in_sql)
         if "no more" in nl:
             subtypes.append(QuerySubtype.NEGATION_SET_PHRASE)
@@ -311,6 +326,18 @@ class Araneae:
             subtypes.append(QuerySubtype.NEGATION_NOT_EQUAL)
         if len(negations_in_sample.intersection(except_keywords)) > 0:
             subtypes.append(QuerySubtype.NEGATION_EXCEPT)
+        if "neither" in nl_tokens:
+            subtypes.append(QuerySubtype.NEGATION_NEITHER_NOR)
+        if "ignore" in nl:
+            subtypes.append(QuerySubtype.NEGATION_IGNORING)
+        if "other than" in nl:
+            subtypes.append(QuerySubtype.NEGATION_OTHER_THAN)
+        if "outside" in nl:
+            subtypes.append(QuerySubtype.NEGATION_OUTSIDE)
+        if "any" in nl_tokens or "all" in nl_tokens or "each" in nl_tokens:
+            subtypes.append(QuerySubtype.NEGATION_ANY_ALL)
+        if "null" in nl_tokens or "null" in sql_tokens:
+            subtypes.append(QuerySubtype.NEGATION_NULL)
         if len(subtypes) == 0:
             return None
         return subtypes
@@ -355,6 +382,7 @@ if __name__ == "__main__":
     logic_and_with_or_nl = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_NL_AND_AND_OR])
     logic_set_phrase = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SET_PHRASE])
     negation = araneae.find_all_with_type(QueryType.NEGATION)
+    negation_any_all = araneae.find_all_with_type(QueryType.NEGATION, subtypes=[QuerySubtype.NEGATION_ANY_ALL])
     nl_several_sentences = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_SEVERAL_SENTENCES])
     nl_short_sql_long = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_SHORT_SQL_LONG])
     nl_long_sql_short = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_LONG_SQL_SHORT])
@@ -384,6 +412,7 @@ if __name__ == "__main__":
     nl_long_sql_short.save_in_csv(f'{test_set_path_csv}/nl_long_sql_short.csv')
     nl_long.save_in_csv(f'{test_set_path_csv}/nl_long.csv')
     negation.save_in_csv(f'{test_set_path_csv}/negation.csv')
+    negation_any_all.save_in_csv(f'{test_set_path_csv}/negation_any_all.csv')
     nested.save_in_csv(f'{test_set_path_csv}/nested.csv')
 
     test_set_path_json = '../resources/results/test_sets/json'
@@ -409,10 +438,16 @@ if __name__ == "__main__":
     nl_long_sql_short.save_in_json(f'{test_set_path_json}/nl_long_sql_short.json')
     nl_long.save_in_json(f'{test_set_path_json}/nl_long.json')
     negation.save_in_json(f'{test_set_path_json}/negation.json')
+    negation_any_all.save_in_json(f'{test_set_path_csv}/negation_any_all.json')
     nested.save_in_json(f'{test_set_path_json}/nested.json')
 
     subtypes_path_csv = '../resources/results/subtypes'
     negation.split_by_subtypes(QueryType.NEGATION, f'{subtypes_path_csv}/negation.csv')
+    negation.split_by_subtypes(QueryType.LOGIC, f'{subtypes_path_csv}/logic.csv')
+    negation.split_by_subtypes(QueryType.NL, f'{subtypes_path_csv}/nl.csv')
+    negation.split_by_subtypes(QueryType.SELECT, f'{subtypes_path_csv}/select.csv')
+    negation.split_by_subtypes(QueryType.DATETIME, f'{subtypes_path_csv}/datetime.csv')
+    negation.split_by_subtypes(QueryType.BINARY, f'{subtypes_path_csv}/binary.csv')
 
     araneae.save()
     a = 7
