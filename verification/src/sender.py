@@ -21,7 +21,7 @@ def send_new_sample(bot, controller, user_id):
     return bot.send_message(user_id, text, parse_mode="HTML", reply_markup=request_panel)
 
 
-def send_fluency_sample(bot, controller, user_id):
+def send_fluency_substituted_sample(bot, controller, user_id):
     user = controller.users.get(user_id, None)
     if user.status is Status.READY or not user.last_sample:
         sample = controller.generate_sample_for_user(user_id)
@@ -101,4 +101,4 @@ def prettify_table(table_content):
     for _row in rows:
         view += str(_row)
         view += '\n'
-    return  view
+    return view

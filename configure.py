@@ -24,3 +24,7 @@ INDICES_PATH = path.join(ARANEAE_PATH, 'indices.dat')
 
 # Profiling
 PROF_PATH = path.join(ROOT_PATH, "log", "profiling")
+
+# Verification
+SAMPLES_JSON = path.join(ROOT_PATH, "resources", "datasets", "araneae", "araneae.json")
+SAMPLES_PARAPHRASED_PATH = path.join(ROOT_PATH, "resources", "datasets", "araneae", "paraphrased.json")

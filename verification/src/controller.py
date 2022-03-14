@@ -1,14 +1,10 @@
 import json
-import telebot
-
 from random import choice
 from copy import deepcopy
 from dataclasses import dataclass
 from enum import Enum
 from typing import *
-from verification.settings.config import *
-
-SAMPLES_PATH = '../resources/datasets/araneae/araneae.json'
+from configure import *
 
 
 class Status(Enum):
@@ -40,8 +36,10 @@ class BotSample:
     db: Optional[str] = None
     nl: Optional[str] = None
     sql: Optional[str] = None
-    source_nl: Optional[str] = None
-    source_sql: Optional[str] = None
+    substituted_nl: Optional[str] = None
+    substituted_sql: Optional[str] = None
+    paraphrased_nl: Optional[str] = None
+    paraphrased_sql: Optional[str] = None
     result: Optional[str] = None
 
 
@@ -61,7 +59,7 @@ class Controller:
         self.load_samples()
 
     def load_samples(self):
-        with open(SAMPLES_PATH, 'r') as samples_file:
+        with open(SAMPLES_PARAPHRASED_PATH, 'r') as samples_file:
             self.samples = json.load(samples_file)
 
     def add_new_user(self, user_id):
@@ -73,9 +71,11 @@ class Controller:
         generated_sample = BotSample(
             db=json_sample['db_id'],
             nl=json_sample['question'],
-            sql=json_sample['query']
-
+            sql=json_sample['query'],
+            substituted_nl=json_sample['substituted_question'],
+            substituted_sql=json_sample['substituted_query'],
+            paraphrased_nl=json_sample['paraphrased_question'],
+            paraphrased_sql=json_sample['paraphrased_query']
         )
         self.users[user_id].last_sample = deepcopy(generated_sample)
         return generated_sample
-
