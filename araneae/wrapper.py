@@ -41,6 +41,22 @@ class SamplesCollection:
         with open(json_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False)
 
+    def split_by_subtypes(self, query_type: QueryType, tgt_path: str):
+        data = []
+        for _sample in self.content:
+            row = {
+                'nl_eng': _sample.question,
+                'sql_eng': _sample.query
+            }
+            for _subtype in query_mapping[query_type]:
+                if _subtype in _sample.specifications[query_type]:
+                    row[_subtype.name] = 1
+                else:
+                    row[_subtype.name] = ""
+            data.append(row)
+        df = pd.DataFrame(data=data)
+        df.to_csv(tgt_path, encoding='utf-8')
+
 
 class Araneae:
     def __init__(self):
@@ -394,6 +410,9 @@ if __name__ == "__main__":
     nl_long.save_in_json(f'{test_set_path_json}/nl_long.json')
     negation.save_in_json(f'{test_set_path_json}/negation.json')
     nested.save_in_json(f'{test_set_path_json}/nested.json')
+
+    subtypes_path_csv = '../resources/results/subtypes'
+    negation.split_by_subtypes(QueryType.NEGATION, f'{subtypes_path_csv}/negation.csv')
 
     araneae.save()
     a = 7
