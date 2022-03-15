@@ -4,6 +4,11 @@ from dataclasses import dataclass, field
 from typing import *
 
 
+class Language(Enum):
+    RU = 0
+    EN = 1
+
+
 class Detail(Enum):
     MULTI_CONDITIONS = "multi-conditions"
     ORDER_ASC = "order-asc"

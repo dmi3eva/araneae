@@ -30,4 +30,6 @@ SAMPLES_JSON = path.join(ROOT_PATH, "resources", "datasets", "araneae", "araneae
 SAMPLES_PARAPHRASED_PATH = path.join(ROOT_PATH, "resources", "datasets", "araneae", "paraphrased.json")
 
 # Tokens exploring
-TOKENS_INFO_PATH = path.join(ROOT_PATH, "resources", "results", "tokens", "tokens_info.json")
+MIN_TOKEN_LENGTH = 3
+TOKENS_RU_PATH = path.join(ROOT_PATH, "resources", "results", "tokens", "tokens_info_ru.json")
+TOKENS_EN_PATH = path.join(ROOT_PATH, "resources", "results", "tokens", "tokens_info_en.json")
