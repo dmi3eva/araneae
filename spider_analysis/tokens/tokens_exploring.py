@@ -40,6 +40,7 @@ class QueryDescription:
     db: str
     id: int
     nl: Optional[str] = None
+    type: Optional[Subquery] = None
 
 
 @dataclass
@@ -53,10 +54,11 @@ def token_process(token: str, language: Language) -> str:
     processed = token.lower()
     return processed
 
+
 def extract_tokens_info(dataset: Araneae, language: Language):
     info = dict()
     info = extract_question_info(info, dataset, language)
-    # info = extract_query_info(info, dataset, language)
+    info = extract_query_info(info, dataset, language)
     # info = extract_db_info(info, dataset, language)
     return info
 
@@ -106,13 +108,13 @@ def get_query_token(info: Dict[str, Token], mention: Mention, db: str, nl: str, 
     tokens = extract_token_from_mentions(mention)
     for _token in tokens:
         info[_token] = info.get(_token, Token())
-        if not info[_token].question:
-            info[_token].question = {}
-        db_info = info[_token].question.get(db, [])
+        if not info[_token].query:
+            info[_token].query = {}
+        db_info = info[_token].query.get(db, [])
         db_info.append(
-            QueryDescription(db=db, nl=nl, id=id)
+            QueryDescription(db=db, nl=nl, id=id, type=mention.type.name)  # TODO: just type
         )
-        info[_token].question[db] = db_info
+        info[_token].query[db] = db_info
     return info
 
 
@@ -148,7 +150,7 @@ def info_to_dict(statistics: Dict) -> Dict:
         if token.query:
             info[token_name]["query"] = {
                 _db: [_q.__dict__ for _q in _queries]
-                for _db, _queries in token.question.items()
+                for _db, _queries in token.query.items()
             }
         if token.db:
             info[token_name]["db"] = {
