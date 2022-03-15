@@ -48,7 +48,7 @@ class User:
         self.last_sample: Optional[BotSample] = None
         self.last_message: Any = None
         self.state: State = State.SAMPLE
-        self.status: Status = Status.IN_PROGRESS_FLUENCY_SOURCE
+        self.status: Status = Status.READY
         self.last_status: Status = None
 
 

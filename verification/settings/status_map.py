@@ -18,6 +18,14 @@ class Position:
 
 
 POSITIONS = {
+    Status.READY: Position(
+        current=Status.READY,
+        panel=info_panel,
+        transitions={
+            ESTIMATE: Status.IN_PROGRESS_FLUENCY_SOURCE,
+        },
+        generate_text=lambda controller, user: INSTRUCTIONS
+    ),
     Status.IN_PROGRESS_FLUENCY_SOURCE: Position(
         current=Status.IN_PROGRESS_FLUENCY_SOURCE,
         panel=fluency_source_panel,
@@ -28,7 +36,7 @@ POSITIONS = {
             CALL_DB: Status.DB_EXPLORING,
             CALL_INFO: Status.INFO_READING
         },
-        generate_text=lambda controller, user, sample: generate_fluency_source(controller, user, sample)
+        generate_text=lambda controller, user: generate_fluency_source(controller, user)
     ),
     Status.IN_PROGRESS_FLUENCY_SUBSTITUTION: Position(
         current=Status.IN_PROGRESS_FLUENCY_SUBSTITUTION,
@@ -52,7 +60,7 @@ POSITIONS = {
             CALL_INFO: Status.INFO_READING
         }
     ),
-    Status.Status.IN_PROGRESS_SQL: Position(
+    Status.IN_PROGRESS_SQL: Position(
         current=Status.IN_PROGRESS_SQL,
         panel=sql_panel,
         transitions={

@@ -16,9 +16,11 @@ controller = Controller()
 def start_message(message):
     user_id = message.chat.id
     user = get_user(controller, user_id)
-    sent_msg = send_info(bot, controller, user_id)
+    current_position = POSITIONS[user.status]
+    text = current_position.generate_text(controller, user)
+    panel = current_position.panel
+    sent_msg = bot.send_message(user_id, text, parse_mode="HTML", reply_markup=panel)
     user.last_message = sent_msg
-    user.status = Status.IN_PROGRESS_FLUENCY_SOURCE
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -28,11 +30,13 @@ def callback_worker(call):
     chat_id = call.message.chat.id
 
     # Разбираемся со статусом
+    last_position = POSITIONS[user.status]
+    user.status = last_position.transitions[call.data]
     current_position = POSITIONS[user.status]
-    user.status = current_position.transitions[call.data]
+    sample = user.last_sample
 
     # Текст сообщения
-    text = current_position.generate_text(controller, user, sample)
+    text = current_position.generate_text(controller, user)
 
     # Кнопки
     panel = current_position.panel

@@ -47,7 +47,7 @@ sql_panel.add(skip_btn, db_btn)
 sql_panel.add(info_btn)
 
 # Info menu
-estimate_btn = types.InlineKeyboardButton(text='Перейти к оцениванию', callback_data='estimate')
+estimate_btn = types.InlineKeyboardButton(text='Перейти к оцениванию', callback_data=ESTIMATE)
 info_panel = types.InlineKeyboardMarkup(row_width=1)
 info_panel.add(estimate_btn)
 

@@ -30,12 +30,12 @@ TOO_LONG = "<i>В таблице слишком много данных. Вот 
 
 FLUENCY_DESCRIPTION = '''
 Может ли этот текст быть вопросом к базе данных?
-<i>
-То есть:
+
+<b>То есть:</b>
 \U000025CF Естественно ли он звучит?
 \U000025CF Содержится ли в нем запрос на получение информации?
-</i>
-{nl}
+
+<i> {nl} </i>
 '''
 
 EQV_DESCRIPTION = '''
@@ -88,3 +88,5 @@ CALL_WRONG = 'incorrect'
 CALL_SKIP = "skip"
 CALL_DB = "db"
 CALL_INFO = "info"
+
+ESTIMATE = "estimate"
