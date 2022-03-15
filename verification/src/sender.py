@@ -11,6 +11,13 @@ from utils.spider_connectors import *
 MAX_MESSAGE_LEN = 32000
 
 
+def generate_fluency_source(controller: Controller, user: User, sample: BotSample) -> str:
+    if user.last_sample:
+        sample = controller.generate_sample_for_user(user.id)
+    text = FLUENCY_DESCRIPTION(nl=sample.source_nl)
+    return text
+
+
 def send_new_sample(bot, controller, user_id):
     user = controller.users.get(user_id, None)
     if user.status is Status.READY or not user.last_sample:

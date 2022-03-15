@@ -46,10 +46,11 @@ class Token:
 
 
 def extract_token_info(dataset: Araneae) -> Dict[str, Token]:
-    pass
+    for sample in dataset.samples.content:
+        pass
 
 
-def save_elements_statistics(statistics, filename):
+def save_elements_statistics(statistics, filename) -> NoReturn:
     with open(TOKENS_INFO_PATH, 'w') as f:
         json.dump(statistics, f)
 

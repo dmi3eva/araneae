@@ -18,6 +18,7 @@ def start_message(message):
     user = get_user(controller, user_id)
     sent_msg = send_info(bot, controller, user_id)
     user.last_message = sent_msg
+    user.status = Status.IN_PROGRESS_FLUENCY_SOURCE
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -25,8 +26,26 @@ def callback_worker(call):
     user_id = call.message.chat.id
     user = get_user(controller, user_id)
     chat_id = call.message.chat.id
+
+    # Разбираемся со статусом
     current_position = POSITIONS[user.status]
     user.status = current_position.transitions[call.data]
+
+    # Текст сообщения
+    text = current_position.generate_text(controller, user, sample)
+
+    # Кнопки
+    panel = current_position.panel
+
+    # Отправляем. Редактируем старые. Сохраняем.
+    sent_msg = bot.send_message(user_id, text, parse_mode="HTML", reply_markup=panel)
+    if user.last_message:
+        last_message_id = user.last_message.message_id
+        last_text = user.last_message.text
+        edited_text = f"<code>{last_text}</code>"
+        bot.edit_message_text(edited_text, chat_id=chat_id, message_id=last_message_id, reply_markup=empty_panel, parse_mode="HTML")
+    user.last_message = sent_msg
+
 
 
 # @bot.callback_query_handler(func=lambda call: True)

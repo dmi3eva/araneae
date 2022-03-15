@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from verification.src.controller import *
 from verification.settings.content import *
 from verification.settings.panels_inline import *
+from verification.src.sender import *
 from telebot import types
 
 
@@ -12,6 +13,8 @@ class Position:
     current: Optional[Status] = None
     panel: Optional[types.InlineKeyboardMarkup] = None
     transitions: Optional[Dict[str, Status]] = None
+    generate_text: Optional[Callable] = None
+
 
 
 POSITIONS = {
@@ -24,7 +27,8 @@ POSITIONS = {
             CALL_SKIP: Status.READY,
             CALL_DB: Status.DB_EXPLORING,
             CALL_INFO: Status.INFO_READING
-        }
+        },
+        generate_text=lambda controller, user, sample: generate_fluency_source(controller, user, sample)
     ),
     Status.IN_PROGRESS_FLUENCY_SUBSTITUTION: Position(
         current=Status.IN_PROGRESS_FLUENCY_SUBSTITUTION,
