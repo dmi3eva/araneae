@@ -56,13 +56,19 @@ SQL_DESCRIPTION = '''
 {nl}
 '''
 
-OK_TO_FLUENCY = "Да, звучит естественно"
+OK_TO_FLUENCY_SOURCE = "Да, звучит естественно"
+OK_TO_FLUENCY_SUBSTITUTION = "Да, звучит естественно"
 OK_TO_EQV = "Да, они эквивалентны"
 OK_TO_SQL = "Да, соответствует"
 
-WRONG_TO_FLUENCY = "Нет!"
+WRONG_TO_FLUENCY_SOURCE = "Нет!"
+WRONG_TO_FLUENCY_SUBSTITUTION = "Нет!"
 WRONG_TO_EQV = "Нет, они не эквивалентны"
 WRONG_TO_SQL = "Нет, не соответствует"
+
+DB = "Посмотреть БД"
+SKIP = "Пропустить"
+HELP = "Инструкции"
 
 FLUENCY_CORRECTION = '''
 Если возможно, поправьте вопрос. Важно, чтобы он звучал естественно и соответствовал данному SQL-запросу:
@@ -75,3 +81,10 @@ FLUENCY_CORRECTION = '''
 CORRECTION_DONE = "Сохранить"
 CORRECTION_IMPOSSIBLE = "Не знаю, как поправить запрос"
 ANSWER_TO_IMPOSSIBLE = "Спасибо, что нашли ошибку! Мы рассмотрим этот запрос внимательнее."
+
+
+CALL_OK = 'correct'
+CALL_WRONG = 'incorrect'
+CALL_SKIP = "skip"
+CALL_DB = "db"
+CALL_INFO = "info"

@@ -3,7 +3,7 @@ import telebot
 from verification.settings.config import *
 from verification.settings.content import *
 from verification.settings.panels_inline import *
-from verification.settings.state_map import *
+from verification.settings.status_map import *
 from verification.src.controller import *
 from verification.src.sender import *
 from verification.utils.common import *
@@ -25,44 +25,53 @@ def callback_worker(call):
     user_id = call.message.chat.id
     user = get_user(controller, user_id)
     chat_id = call.message.chat.id
-    sent_msg = None
+    current_position = POSITIONS[user.status]
+    user.status = current_position.transitions[call.data]
 
-    if call.data == 'estimate':
-        sent_msg = send_new_sample(bot, controller, user_id)
-        user.status = Status.IN_PROGRESS
-    if call.data == 'correct':
-        user.status = Status.READY
-        just_send_ok_to_correct(bot, controller, user_id)
-        sent_msg = send_new_sample(bot, controller, user_id)
-    if call.data == 'incorrect':
-        user.status = Status.ERROR_DESCRIBING
-        send_whats_wrong(bot, controller, user_id)
-    if call.data == 'skip':
-        sent_msg = send_new_sample(bot, controller, user_id)
-    if call.data == 'db':
-        user.status = Status.DB_EXPLORING
-        sent_msg = send_tables(bot, controller, user_id)
-    if call.data == 'info':
-        user.status = Status.INFO_READING
-        sent_msg = send_info(bot, controller, user_id)
-    if call.data.startswith('TABLE'):
-        current_table = '#'.join(call.data.split('#')[1:])
-        sent_msg = send_view(bot, controller, user_id, current_table)
-    if call.data == 'back_to_estimation':
-        sent_msg = send_last_sample(bot, controller, user_id)
-        user.status = Status.IN_PROGRESS
-    if call.data == 'back_to_tables':
-        sent_msg = send_tables(bot, controller, user_id)
 
-    if user.last_message:
-        last_message_id = user.last_message.message_id
-        last_text = user.last_message.text
-        edited_text = f"<code>{last_text}</code>"
-        bot.edit_message_text(edited_text, chat_id=chat_id, message_id=last_message_id, reply_markup=empty_panel, parse_mode="HTML")
-        # if user.last_message.reply_markup:
-        #     bot.edit_message_reply_markup(chat_id=chat_id, message_id=last_message_id, reply_markup=empty_panel)
-
-    user.last_message = sent_msg
+# @bot.callback_query_handler(func=lambda call: True)
+# def callback_worker(call):
+#     user_id = call.message.chat.id
+#     user = get_user(controller, user_id)
+#     chat_id = call.message.chat.id
+#     sent_msg = None
+#
+#     if call.data == 'estimate':
+#         sent_msg = send_new_sample(bot, controller, user_id)
+#         user.status = Status.IN_PROGRESS
+#     if call.data == 'correct':
+#         user.status = Status.READY
+#         just_send_ok_to_correct(bot, controller, user_id)
+#         sent_msg = send_new_sample(bot, controller, user_id)
+#     if call.data == 'incorrect':
+#         user.status = Status.ERROR_DESCRIBING
+#         send_whats_wrong(bot, controller, user_id)
+#     if call.data == 'skip':
+#         sent_msg = send_new_sample(bot, controller, user_id)
+#     if call.data == 'db':
+#         user.status = Status.DB_EXPLORING
+#         sent_msg = send_tables(bot, controller, user_id)
+#     if call.data == 'info':
+#         user.status = Status.INFO_READING
+#         sent_msg = send_info(bot, controller, user_id)
+#     if call.data.startswith('TABLE'):
+#         current_table = '#'.join(call.data.split('#')[1:])
+#         sent_msg = send_view(bot, controller, user_id, current_table)
+#     if call.data == 'back_to_estimation':
+#         sent_msg = send_last_sample(bot, controller, user_id)
+#         user.status = Status.IN_PROGRESS
+#     if call.data == 'back_to_tables':
+#         sent_msg = send_tables(bot, controller, user_id)
+#
+#     if user.last_message:
+#         last_message_id = user.last_message.message_id
+#         last_text = user.last_message.text
+#         edited_text = f"<code>{last_text}</code>"
+#         bot.edit_message_text(edited_text, chat_id=chat_id, message_id=last_message_id, reply_markup=empty_panel, parse_mode="HTML")
+#         # if user.last_message.reply_markup:
+#         #     bot.edit_message_reply_markup(chat_id=chat_id, message_id=last_message_id, reply_markup=empty_panel)
+#
+#     user.last_message = sent_msg
 
 
 @bot.message_handler(content_types=['text'])

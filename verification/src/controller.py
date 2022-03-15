@@ -14,11 +14,11 @@ class Status(Enum):
     DB_EXPLORING = 3
     INFO_READING = 4
     IN_PROGRESS_FLUENCY_SOURCE = 5
-    IN_PROGRESS_FLUENCY_PARAPHRASE = 6
+    IN_PROGRESS_FLUENCY_SUBSTITUTION = 6
     IN_PROGRESS_EQUIVALENT = 7
     IN_PROGRESS_SQL = 8
     ERROR_DESCRIBING_FLUENCY_SOURCE = 9
-    ERROR_DESCRIBING_FLUENCY_PARAPHRASE = 10
+    ERROR_DESCRIBING_FLUENCY_SUBSTITUTION = 10
     ERROR_DESCRIBING_EQUIVALENT = 11
     ERROR_DESCRIBING_SQL = 12
 
@@ -34,12 +34,11 @@ class State(Enum):
 @dataclass
 class BotSample:
     db: Optional[str] = None
-    nl: Optional[str] = None
-    sql: Optional[str] = None
+    source_nl: Optional[str] = None
+    source_sql: Optional[str] = None
     substituted_nl: Optional[str] = None
     substituted_sql: Optional[str] = None
     paraphrased_nl: Optional[str] = None
-    paraphrased_sql: Optional[str] = None
     result: Optional[str] = None
 
 
@@ -50,6 +49,7 @@ class User:
         self.last_message: Any = None
         self.state: State = State.SAMPLE
         self.status: Status = Status.READY
+        self.last_status: Status = None
 
 
 class Controller:
@@ -70,12 +70,11 @@ class Controller:
         json_sample = choice(self.samples)
         generated_sample = BotSample(
             db=json_sample['db_id'],
-            nl=json_sample['question'],
-            sql=json_sample['query'],
+            source_nl=json_sample['question'],
+            source_sql=json_sample['query'],
             substituted_nl=json_sample['substituted_question'],
             substituted_sql=json_sample['substituted_query'],
             paraphrased_nl=json_sample['paraphrased_question'],
-            paraphrased_sql=json_sample['paraphrased_query']
-        )
+         )
         self.users[user_id].last_sample = deepcopy(generated_sample)
         return generated_sample

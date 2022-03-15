@@ -87,7 +87,7 @@ def send_info(bot, controller, user_id):
 
 
 def create_text_form_sample(sample: BotSample, text: str):  # TODO
-    content = text.format(nl=sample.nl.capitalize(), sql=sample.sql)
+    content = text.format(nl=sample.source_nl.capitalize(), sql=sample.source_sql)
     return content
 
 

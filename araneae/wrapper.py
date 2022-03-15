@@ -285,7 +285,7 @@ class Araneae:
 
     def _specifications_negation(self, sample: Sample) -> Optional[List[QuerySubtype]]:
         subtypes = []
-        if sample.id == 2476:
+        if sample.id == 4467:
             a = 7
         nl = token_processing(sample.question)
         sql = token_processing(sample.query)
@@ -343,6 +343,8 @@ class Araneae:
         return subtypes
 
     def _specifications_nl(self, sample: Sample) -> Optional[List[QuerySubtype]]:
+        if sample.id == "4467":
+            a = 7
         subtypes = []
         sentences_amount = get_sentences_amount(sample.question)
         sql_tokens = len(sample.query_toks)

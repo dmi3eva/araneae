@@ -10,7 +10,7 @@ for i, _sample in enumerate(samples):
     _sample['substituted_question'] = _sample['question']
     _sample['substituted_query'] = _sample['query']
     _sample['paraphrased_question'] = _sample['question']
-    _sample['paraphrased_query'] = _sample['query']
+
 
 with open(SAMPLES_PARAPHRASED_PATH, 'w') as samples_file:
     json.dump(samples, samples_file)
