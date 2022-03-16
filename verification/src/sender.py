@@ -11,11 +11,29 @@ from utils.spider_connectors import *
 MAX_MESSAGE_LEN = 32000
 
 
-def generate_fluency_source(controller: Controller, user: User) -> str:
+def generate_fluency_source_msg(controller: Controller, user: User) -> str:
     if not user.last_sample:
         user.last_sample = controller.generate_sample_for_user(user.id)
     sample = user.last_sample
-    text = FLUENCY_DESCRIPTION.format(nl=sample.source_nl)
+    text = FLUENCY_SOURCE_DESCRIPTION.format(nl=sample.source_nl)
+    return text
+
+
+def generate_fluency_substitution_msg(controller: Controller, user: User) -> str:
+    sample = user.last_sample
+    text = FLUENCY_SUBSTITUTION_DESCRIPTION.format(nl=sample.substituted_nl)
+    return text
+
+
+def generate_equivalent_msg(controller: Controller, user: User) -> str:
+    sample = user.last_sample
+    text = EQV_DESCRIPTION.format(source=sample.substituted_nl, paraphrase=sample.paraphrased_nl)
+    return text
+
+
+def generate_sql_msg(controller: Controller, user: User) -> str:
+    sample = user.last_sample
+    text = SQL_DESCRIPTION.format(nl=sample.paraphrased_nl, sql=sample.substituted_sql)
     return text
 
 

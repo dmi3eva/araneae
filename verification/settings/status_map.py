@@ -16,7 +16,6 @@ class Position:
     generate_text: Optional[Callable] = None
 
 
-
 POSITIONS = {
     Status.READY: Position(
         current=Status.READY,
@@ -36,7 +35,7 @@ POSITIONS = {
             CALL_DB: Status.DB_EXPLORING,
             CALL_INFO: Status.INFO_READING
         },
-        generate_text=lambda controller, user: generate_fluency_source(controller, user)
+        generate_text=lambda controller, user: generate_fluency_source_msg(controller, user)
     ),
     Status.IN_PROGRESS_FLUENCY_SUBSTITUTION: Position(
         current=Status.IN_PROGRESS_FLUENCY_SUBSTITUTION,
@@ -47,7 +46,8 @@ POSITIONS = {
             CALL_SKIP: Status.READY,
             CALL_DB: Status.DB_EXPLORING,
             CALL_INFO: Status.INFO_READING
-        }
+        },
+        generate_text=lambda controller, user: generate_fluency_substitution_msg(controller, user)
     ),
     Status.IN_PROGRESS_EQUIVALENT: Position(
         current=Status.IN_PROGRESS_EQUIVALENT,
@@ -58,18 +58,20 @@ POSITIONS = {
             CALL_SKIP: Status.READY,
             CALL_DB: Status.DB_EXPLORING,
             CALL_INFO: Status.INFO_READING
-        }
+        },
+        generate_text=lambda controller, user: generate_equivalent_msg(controller, user)
     ),
     Status.IN_PROGRESS_SQL: Position(
         current=Status.IN_PROGRESS_SQL,
         panel=sql_panel,
         transitions={
-            CALL_OK: Status.READY,
+            CALL_OK: Status.IN_PROGRESS_FLUENCY_SOURCE,
             CALL_WRONG: Status.ERROR_DESCRIBING_SQL,
             CALL_SKIP: Status.READY,
             CALL_DB: Status.DB_EXPLORING,
             CALL_INFO: Status.INFO_READING
-        }
+        },
+        generate_text=lambda controller, user: generate_sql_msg(controller, user)
     )
 }
 

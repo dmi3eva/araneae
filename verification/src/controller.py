@@ -40,6 +40,10 @@ class BotSample:
     substituted_sql: Optional[str] = None
     paraphrased_nl: Optional[str] = None
     result: Optional[str] = None
+    ok_fluency_source: bool = True
+    ok_substitution_source: bool = True
+    ok_equivalent: bool = True
+    ok_sql: bool = True
 
 
 class User:
