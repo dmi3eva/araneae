@@ -1,5 +1,6 @@
 
 from araneae.wrapper import Araneae
+from utils.spider_connectors import *
 from dto.sample import *
 from dataclasses import dataclass
 from typing import *
@@ -59,7 +60,18 @@ def extract_tokens_info(dataset: Araneae, language: Language):
     info = dict()
     info = extract_question_info(info, dataset, language)
     info = extract_query_info(info, dataset, language)
-    # info = extract_db_info(info, dataset, language)
+    info = extract_db_info(info, language)
+    return info
+
+
+def extract_db_info(info: Dict[str, Token], language: Language) -> Dict[str, Token]:
+    spider = None
+    if language is Language.RU:
+        spider = RuSpiderDB()
+    else:
+        spider = EnSpiderDB()
+    columns = spider.extract_columns()
+    info = get_columns_tokens(info, columns)
     return info
 
 
@@ -87,6 +99,70 @@ def extract_query_info(info: Dict[str, Token], dataset: Araneae, language: Langu
             nl = sample.russian_query
         for _mention in mentions:
             info = get_query_token(info, _mention, sample.db_id, nl, sample.id)
+    return info
+
+
+def get_columns_tokens(info: Dict[str, Token], columns) -> Dict[str, Token]:
+    for db, db_content in columns.items():
+        for table, table_content in db_content.items():
+            for column in table_content:
+                description = DBDescription(
+                    db=db,
+                    table=table,
+                    column=column,
+                    type=Entity.COLUMN
+                )
+                info = add_db_to_info(info, column, description)
+    return info
+
+
+def get_table_tokens(info: Dict[str, Token], columns: Dict) -> Dict[str, Token]:
+    for db, db_content in columns.items():
+        for table in db_content.keys():
+            description = DBDescription(
+                db=db,
+                table=table,
+                type=Entity.TABLE
+            )
+            info = add_db_to_info(info, table, description)
+    return info
+
+
+def get_db_tokens(info: Dict[str, Token], columns: Dict) -> Dict[str, Token]:
+    for db in columns.keys():
+        description = DBDescription(
+            db=db,
+            type=Entity.DB
+        )
+        info = add_db_to_info(info, db, description)
+    return info
+
+
+def get_value_tokens(info: Dict[str, Token], columns: Dict, spider: SpiderDB) -> Dict[str, Token]:
+    for db, db_content in columns.items():
+        for table, table_content in db_content.items():
+            for column in table_content:
+                values = spider.get_values(db, table, column)
+                for value in values:
+                    description = DBDescription(
+                        db=db,
+                        table=table,
+                        column=column,
+                        value=value,
+                        type=Entity.VALUE
+                    )
+                    info = add_db_to_info(info, value, description)
+    return info
+
+
+def add_db_to_info(info: Dict[str, Token], name: str, description: DBDescription) -> Dict[str, Token]:
+    column_token = info.get(name, Token())
+    if not column_token.db:
+        column_token.db = {}
+    column_db_list = column_token.db.get(description.db, [])
+    column_db_list.append(description)
+    column_token.db[description.db] = column_db_list
+    info[name] = column_token
     return info
 
 
