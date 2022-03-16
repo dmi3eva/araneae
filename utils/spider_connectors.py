@@ -3,6 +3,7 @@ import collections
 import sqlite3
 import os
 from typing import *
+from configure import *
 
 REQUEST_MASK = "SELECT \"{column}\" FROM \"{table}\""
 TABLES_REQUEST = f"SELECT name FROM sqlite_master WHERE type='table'"
@@ -94,8 +95,8 @@ class SpiderDB:
 class EnSpiderDB(SpiderDB):
     def __init__(self):
         super().__init__()
-        self.db_path = "../resources/datasets/spider/database"
-        self.schemes_path = "../resources/datasets/spider/tables.json"
+        self.db_path = SPIDER_DB_PATH
+        self.schemes_path = SPIDER_SCHEMES_PATH
 
     def extract_dbs(self):
         return os.listdir(self.db_path)
@@ -129,7 +130,7 @@ class EnSpiderDB(SpiderDB):
 class RuSpiderDB(SpiderDB):
     def __init__(self):
         super().__init__()
-        self.db_path = "datasets/russocampus/merged_database"
+        self.db_path =RUSSOCAMPUS_DB_PATH
 
     def extract_dbs(self):
         return os.listdir(self.db_path)

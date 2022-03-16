@@ -23,7 +23,6 @@ class Entity(Enum):
 class DBDescription:
     type: Entity
     db: str
-    id: int
     table: Optional[str] = None
     column: Optional[str] = None
     value: Optional[str] = None
@@ -106,35 +105,41 @@ def get_columns_tokens(info: Dict[str, Token], columns) -> Dict[str, Token]:
     for db, db_content in columns.items():
         for table, table_content in db_content.items():
             for column in table_content:
-                description = DBDescription(
-                    db=db,
-                    table=table,
-                    column=column,
-                    type=Entity.COLUMN
-                )
-                info = add_db_to_info(info, column, description)
+                tokens = column.split("_")
+                for token in tokens:
+                    description = DBDescription(
+                        db=db,
+                        table=table,
+                        column=column,
+                        type=Entity.COLUMN.name  # TODO
+                    )
+                    info = add_db_to_info(info, token, description)
     return info
 
 
 def get_table_tokens(info: Dict[str, Token], columns: Dict) -> Dict[str, Token]:
     for db, db_content in columns.items():
         for table in db_content.keys():
-            description = DBDescription(
-                db=db,
-                table=table,
-                type=Entity.TABLE
-            )
-            info = add_db_to_info(info, table, description)
+            tokens = table.split("_")
+            for token in tokens:
+                description = DBDescription(
+                    db=db,
+                    table=table,
+                    type=Entity.TABLE.name  # TODO
+                )
+                info = add_db_to_info(info, token, description)
     return info
 
 
 def get_db_tokens(info: Dict[str, Token], columns: Dict) -> Dict[str, Token]:
     for db in columns.keys():
-        description = DBDescription(
-            db=db,
-            type=Entity.DB
-        )
-        info = add_db_to_info(info, db, description)
+        tokens = db.split("_")
+        for token in tokens:
+            description = DBDescription(
+                db=db,
+                type=Entity.DB.name  # TODO
+            )
+            info = add_db_to_info(info, token, description)
     return info
 
 
@@ -144,14 +149,16 @@ def get_value_tokens(info: Dict[str, Token], columns: Dict, spider: SpiderDB) ->
             for column in table_content:
                 values = spider.get_values(db, table, column)
                 for value in values:
-                    description = DBDescription(
-                        db=db,
-                        table=table,
-                        column=column,
-                        value=value,
-                        type=Entity.VALUE
-                    )
-                    info = add_db_to_info(info, value, description)
+                    tokens = table.split(" ")
+                    for token in tokens:
+                        description = DBDescription(
+                            db=db,
+                            table=table,
+                            column=column,
+                            value=value,
+                            type=Entity.VALUE.name  # TODO
+                        )
+                        info = add_db_to_info(info, token, description)
     return info
 
 
@@ -231,7 +238,7 @@ def info_to_dict(statistics: Dict) -> Dict:
         if token.db:
             info[token_name]["db"] = {
                 _db: [_d.__dict__ for _d in _dbs]
-                for _db, _dbs in token.question.items()
+                for _db, _dbs in token.db.items()
             }
     return info
 

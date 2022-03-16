@@ -33,3 +33,8 @@ SAMPLES_PARAPHRASED_PATH = path.join(ROOT_PATH, "resources", "datasets", "aranea
 MIN_TOKEN_LENGTH = 3
 TOKENS_RU_PATH = path.join(ROOT_PATH, "resources", "results", "tokens", "tokens_info_ru.json")
 TOKENS_EN_PATH = path.join(ROOT_PATH, "resources", "results", "tokens", "tokens_info_en.json")
+
+# Spider connectors
+SPIDER_DB_PATH = path.join(ROOT_PATH, "resources", "datasets", "spider", "database")
+RUSSOCAMPUS_DB_PATH = path.join(ROOT_PATH, "resources", "datasets", "russocampus", "merged_database")
+SPIDER_SCHEMES_PATH = path.join(ROOT_PATH, "resources", "datasets", "spider", "tables.json")
