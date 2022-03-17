@@ -70,7 +70,10 @@ def extract_db_info(info: Dict[str, Token], language: Language) -> Dict[str, Tok
     else:
         spider = EnSpiderDB()
     columns = spider.extract_columns()
+    info = get_tables_tokens(info, columns)
     info = get_columns_tokens(info, columns)
+    info = get_values_tokens(info, columns, spider)
+    print("Values done")
     return info
 
 
@@ -117,7 +120,7 @@ def get_columns_tokens(info: Dict[str, Token], columns) -> Dict[str, Token]:
     return info
 
 
-def get_table_tokens(info: Dict[str, Token], columns: Dict) -> Dict[str, Token]:
+def get_tables_tokens(info: Dict[str, Token], columns: Dict) -> Dict[str, Token]:
     for db, db_content in columns.items():
         for table in db_content.keys():
             tokens = table.split("_")
@@ -143,13 +146,19 @@ def get_db_tokens(info: Dict[str, Token], columns: Dict) -> Dict[str, Token]:
     return info
 
 
-def get_value_tokens(info: Dict[str, Token], columns: Dict, spider: SpiderDB) -> Dict[str, Token]:
+def get_values_tokens(info: Dict[str, Token], columns: Dict, spider: SpiderDB) -> Dict[str, Token]:
+    db_amount = len(columns)
+    ind = 0
     for db, db_content in columns.items():
+        ind += 1
+        print(f"{ind} / {db_amount}")
         for table, table_content in db_content.items():
             for column in table_content:
-                values = spider.get_values(db, table, column)
+                values = set(spider.get_values(db, table, column))
+                if len(values) > 100:
+                    break
                 for value in values:
-                    tokens = table.split(" ")
+                    tokens = value.split(" ")
                     for token in tokens:
                         description = DBDescription(
                             db=db,
@@ -217,6 +226,7 @@ def extract_token_from_mentions(mention: Mention) -> List[str]:
 
 
 def info_to_dict(statistics: Dict) -> Dict:
+    print("To dict started")
     info = {}
     for token_name, token in statistics.items():
         a = 7
@@ -236,10 +246,19 @@ def info_to_dict(statistics: Dict) -> Dict:
                 for _db, _queries in token.query.items()
             }
         if token.db:
-            info[token_name]["db"] = {
+              info[token_name]["db"] = {
                 _db: [_d.__dict__ for _d in _dbs]
                 for _db, _dbs in token.db.items()
             }
+
+    # # Sampling for test
+    # from random import shuffle
+    # part = list(info.values())[:1000]
+    # shuffle(part)
+    # sample_path = path.join(ROOT_PATH, "resources", "results", "tokens", "sample.json")
+    # with open(sample_path, 'w', encoding='utf-8') as f:
+    #     json.dump(part[:10], f, ensure_ascii=False)
+
     return info
 
 
@@ -249,12 +268,17 @@ def save_tokens_info(statistics, filename) -> NoReturn:
         json.dump(tokens_info, f, ensure_ascii=False)
 
 
+
+
+
+
 if __name__ == "__main__":
     araneae = Araneae()
     araneae.load()
 
     en_tokens = extract_tokens_info(araneae, Language.EN)
     save_tokens_info(en_tokens, TOKENS_EN_PATH)
+    print("English ends")
 
     ru_tokens = extract_tokens_info(araneae, Language.RU)
     save_tokens_info(ru_tokens, TOKENS_RU_PATH)

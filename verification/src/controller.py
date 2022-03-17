@@ -84,4 +84,5 @@ class Controller:
             paraphrased_nl=json_sample['paraphrased_question'],
          )
         self.users[user_id].last_sample = deepcopy(generated_sample)
+        self.samples.remove(json_sample)
         return generated_sample

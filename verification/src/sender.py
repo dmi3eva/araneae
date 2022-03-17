@@ -66,7 +66,7 @@ def send_fluency_substituted_sample(bot, controller, user_id):
 def send_last_sample(bot, controller, user_id):
     user = controller.users.get(user_id, None)
     sample = user.last_sample
-    text = create_text_form_sample(sample)
+    text = create_text_form_sample(sample, FLUENCY_SOURCE_DESCRIPTION)
     return bot.send_message(user_id, text, parse_mode="HTML", reply_markup=request_panel)
 
 

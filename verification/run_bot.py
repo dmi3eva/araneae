@@ -32,7 +32,6 @@ def callback_worker(call):
     handle(bot, controller, user, chat_id, reaction)
 
 
-
 @bot.message_handler(content_types=['text'])
 def text(message):
     user_id = message.chat.id

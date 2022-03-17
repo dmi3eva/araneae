@@ -33,6 +33,16 @@ SAMPLES_PARAPHRASED_PATH = path.join(ROOT_PATH, "resources", "datasets", "aranea
 MIN_TOKEN_LENGTH = 3
 TOKENS_RU_PATH = path.join(ROOT_PATH, "resources", "results", "tokens", "tokens_info_ru.json")
 TOKENS_EN_PATH = path.join(ROOT_PATH, "resources", "results", "tokens", "tokens_info_en.json")
+RU_MULTIUSING_ENTITIES = path.join(ROOT_PATH, "resources", "results", "tokens", "multiusing", "all_without_db", "ru.json")
+EN_MULTIUSING_ENTITIES = path.join(ROOT_PATH, "resources", "results", "tokens", "multiusing", "all_without_db", "en.json")
+RU_MULTIUSING_TABLES = path.join(ROOT_PATH, "resources", "results", "tokens", "multiusing", "tables", "ru.json")
+EN_MULTIUSING_TABLES = path.join(ROOT_PATH, "resources", "results", "tokens", "multiusing", "tables", "en.json")
+RU_MULTIUSING_COLUMNS = path.join(ROOT_PATH, "resources", "results", "tokens", "multiusing", "columns", "ru.json")
+EN_MULTIUSING_COLUMNS = path.join(ROOT_PATH, "resources", "results", "tokens", "multiusing", "columns", "en.json")
+RU_MULTIUSING_VALUES = path.join(ROOT_PATH, "resources", "results", "tokens", "multiusing", "values", "ru.json")
+EN_MULTIUSING_VALUES = path.join(ROOT_PATH, "resources", "results", "tokens", "multiusing", "values", "en.json")
+
+
 
 # Spider connectors
 SPIDER_DB_PATH = path.join(ROOT_PATH, "resources", "datasets", "spider", "database")
