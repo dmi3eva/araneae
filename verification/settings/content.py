@@ -66,8 +66,18 @@ SQL_DESCRIPTION = '''
 <i>{nl}</i>
 '''
 
-OK_TO_FLUENCY_SOURCE = "Да, звучит естественно"
-OK_TO_FLUENCY_SUBSTITUTION = "Да, звучит естественно"
+FLUENCY_SOURCE_CORRECTION = """
+\U0001F527 Если возможно, переформулируйте вопрос:
+
+<i>{nl}</i>
+
+Важно, чтобы он соответствовал SQL-запросу:
+
+<code>{sql}</code>
+"""
+
+OK_TO_FLUENCY_SOURCE = "Да, может"
+OK_TO_FLUENCY_SUBSTITUTION = "Да, может"
 OK_TO_EQV = "Да, это одно и то же'"
 OK_TO_SQL = "Да, соответствует"
 
@@ -100,3 +110,4 @@ CALL_DB = "db"
 CALL_INFO = "info"
 
 ESTIMATE = "estimate"
+TEXT_TYPED = "text_typed"

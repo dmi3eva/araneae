@@ -5,6 +5,7 @@ from verification.src.controller import *
 from verification.settings.content import *
 from verification.settings.panels_inline import *
 from verification.src.sender import *
+from verification.src.error_handlers import *
 from telebot import types
 
 
@@ -14,6 +15,7 @@ class Position:
     panel: Optional[types.InlineKeyboardMarkup] = None
     transitions: Optional[Dict[str, Status]] = None
     generate_text: Optional[Callable] = None
+    handle_error: Optional[Callable] = None
 
 
 POSITIONS = {
@@ -23,7 +25,8 @@ POSITIONS = {
         transitions={
             ESTIMATE: Status.IN_PROGRESS_FLUENCY_SOURCE,
         },
-        generate_text=lambda controller, user: INSTRUCTIONS
+        generate_text=lambda controller, user: INSTRUCTIONS,
+        handle_error=lambda user, sample, correction: sample
     ),
     Status.IN_PROGRESS_FLUENCY_SOURCE: Position(
         current=Status.IN_PROGRESS_FLUENCY_SOURCE,
@@ -35,7 +38,8 @@ POSITIONS = {
             CALL_DB: Status.DB_EXPLORING,
             CALL_INFO: Status.INFO_READING
         },
-        generate_text=lambda controller, user: generate_fluency_source_msg(controller, user)
+        generate_text=lambda controller, user: generate_fluency_source_msg(controller, user),
+        handle_error=lambda user, sample, correction: sample
     ),
     Status.IN_PROGRESS_FLUENCY_SUBSTITUTION: Position(
         current=Status.IN_PROGRESS_FLUENCY_SUBSTITUTION,
@@ -47,7 +51,8 @@ POSITIONS = {
             CALL_DB: Status.DB_EXPLORING,
             CALL_INFO: Status.INFO_READING
         },
-        generate_text=lambda controller, user: generate_fluency_substitution_msg(controller, user)
+        generate_text=lambda controller, user: generate_fluency_substitution_msg(controller, user),
+        handle_error=lambda user, sample, correction: sample
     ),
     Status.IN_PROGRESS_EQUIVALENT: Position(
         current=Status.IN_PROGRESS_EQUIVALENT,
@@ -59,7 +64,8 @@ POSITIONS = {
             CALL_DB: Status.DB_EXPLORING,
             CALL_INFO: Status.INFO_READING
         },
-        generate_text=lambda controller, user: generate_equivalent_msg(controller, user)
+        generate_text=lambda controller, user: generate_equivalent_msg(controller, user),
+        handle_error=lambda user, sample, correction: sample
     ),
     Status.IN_PROGRESS_SQL: Position(
         current=Status.IN_PROGRESS_SQL,
@@ -71,7 +77,19 @@ POSITIONS = {
             CALL_DB: Status.DB_EXPLORING,
             CALL_INFO: Status.INFO_READING
         },
-        generate_text=lambda controller, user: generate_sql_msg(controller, user)
+        generate_text=lambda controller, user: generate_sql_msg(controller, user),
+        handle_error=lambda user, sample, correction: sample
+    ),
+    Status.ERROR_DESCRIBING_FLUENCY_SOURCE: Position(
+        current=Status.ERROR_DESCRIBING_FLUENCY_SOURCE,
+        panel=error_fluency_source_panel,
+        transitions={
+            CALL_SKIP: Status.READY,
+            CALL_INFO: Status.INFO_READING,
+            TEXT_TYPED: Status.IN_PROGRESS_FLUENCY_SUBSTITUTION
+        },
+        generate_text=lambda controller, user: generate_error_fluency_source_msg(controller, user),
+        handle_error=lambda user, sample, correction: save_fluency_source_error(user, sample, correction)
     )
 }
 

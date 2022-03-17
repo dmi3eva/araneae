@@ -28,28 +28,21 @@ def callback_worker(call):
     user_id = call.message.chat.id
     user = get_user(controller, user_id)
     chat_id = call.message.chat.id
+    reaction = call.data
+    handle(bot, controller, user, chat_id, reaction)
 
-    # Разбираемся со статусом
-    last_position = POSITIONS[user.status]
-    user.status = last_position.transitions[call.data]
-    current_position = POSITIONS[user.status]
-    sample = user.last_sample
 
-    # Текст сообщения
-    text = current_position.generate_text(controller, user)
 
-    # Кнопки
-    panel = current_position.panel
+@bot.message_handler(content_types=['text'])
+def text(message):
+    user_id = message.chat.id
+    user = get_user(controller, user_id)
+    chat_id = message.chat.id
+    reaction = TEXT_TYPED
+    handle(bot, controller, user, chat_id, reaction)
 
-    # Отправляем. Редактируем старые. Сохраняем.
-    sent_msg = bot.send_message(user_id, text, parse_mode="HTML", reply_markup=panel)
-    if user.last_message:
-        last_message_id = user.last_message.message_id
-        last_text = user.last_message.text
-        edited_text = f"<code>{last_text}</code>"
-        bot.edit_message_text(edited_text, chat_id=chat_id, message_id=last_message_id, reply_markup=empty_panel, parse_mode="HTML")
-    user.last_message = sent_msg
 
+bot.polling()
 
 
 # @bot.callback_query_handler(func=lambda call: True)
@@ -95,18 +88,3 @@ def callback_worker(call):
 #         #     bot.edit_message_reply_markup(chat_id=chat_id, message_id=last_message_id, reply_markup=empty_panel)
 #
 #     user.last_message = sent_msg
-
-
-@bot.message_handler(content_types=['text'])
-def text(message):
-    user_id = message.chat.id
-    user = get_user(controller, user_id)
-    if not user:
-        pass  # TODO
-    if user.status is Status.ERROR_DESCRIBING:
-        just_send_ok_to_incorrect(bot, controller, user.id)
-        sent_msg = send_new_sample(bot, controller, message.chat.id)
-        user.last_message = sent_msg
-
-
-bot.polling()

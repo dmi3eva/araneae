@@ -55,6 +55,9 @@ class User:
         self.status: Status = Status.READY
         self.last_status: Status = None
 
+    def save(self, sample: BotSample) -> NoReturn:
+        print("I have saved")
+
 
 class Controller:
     def __init__(self):

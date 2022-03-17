@@ -37,6 +37,12 @@ def generate_sql_msg(controller: Controller, user: User) -> str:
     return text
 
 
+def generate_error_fluency_source_msg(controller: Controller, user: User) -> str:
+    sample = user.last_sample
+    text = FLUENCY_SOURCE_CORRECTION.format(nl=sample.source_nl, sql=sample.source_sql)
+    return text
+
+
 def send_new_sample(bot, controller, user_id):
     user = controller.users.get(user_id, None)
     if user.status is Status.READY or not user.last_sample:

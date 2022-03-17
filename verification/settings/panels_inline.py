@@ -46,6 +46,13 @@ sql_panel.add(sql_correct_btn, sql_incorrect_btn)
 sql_panel.add(skip_btn, db_btn)
 sql_panel.add(info_btn)
 
+
+# Correction fluency error
+error_fluency_source_panel = types.InlineKeyboardMarkup(row_width=2)
+error_fluency_source_panel.add(skip_btn, db_btn)
+error_fluency_source_panel.add(info_btn)
+
+
 # Info menu
 estimate_btn = types.InlineKeyboardButton(text='Перейти к оцениванию', callback_data=ESTIMATE)
 info_panel = types.InlineKeyboardMarkup(row_width=1)
