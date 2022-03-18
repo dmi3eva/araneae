@@ -155,7 +155,7 @@ def get_values_tokens(info: Dict[str, Token], columns: Dict, spider: SpiderDB) -
         for table, table_content in db_content.items():
             for column in table_content:
                 values = set(spider.get_values(db, table, column))
-                if len(values) > 100:
+                if len(values) > MAX_VALUES_IN_COLUMNS:
                     break
                 for value in values:
                     tokens = value.split(" ")
