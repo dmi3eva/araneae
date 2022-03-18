@@ -182,6 +182,12 @@ class Araneae:
             specifications[_query_type] = self.EXTRACTION_FUNCTIONS[_query_type](sample)
         return specifications
 
+    def extract_DB_specifications(self, sample: Sample) -> Dict:
+        specifications = {}
+        # for _query_type in QueryType:
+        #     specifications[_query_type] = self.EXTRACTION_FUNCTIONS[_query_type](sample)
+        return specifications
+
     def find_all_with_type(self, type: QueryType, subtypes: Optional[List[QuerySubtype]] = None) -> SamplesCollection:
         search_result = SamplesCollection()
         for _sample in self.samples.content:
