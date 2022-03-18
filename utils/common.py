@@ -155,6 +155,26 @@ def get_sentences_amount(text: str) -> int:
     return sentences_amount
 
 
+def contains_db_mentioned(sample: Sample) -> bool:
+    pass
+
+
+def contains_db_hetero(sample: Sample) -> bool:
+    pass
+
+
+def contains_db_homo_tables(sample: Sample) -> bool:
+    pass
+
+
+def contains_db_homo_columns(sample: Sample) -> bool:
+    pass
+
+
+def contains_db_homo_values(sample: Sample) -> bool:
+    pass
+
+
 if __name__ == "__main__":
     text = "who acted the role of "" Mr. Bean """
     amount = get_sentences_amount(text)

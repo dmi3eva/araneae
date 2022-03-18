@@ -78,9 +78,9 @@ class Araneae:
             QueryType.SELECT: lambda sample: araneae._specifications_select(sample),
             QueryType.LOGIC: lambda sample: araneae._specifications_logic(sample),
             QueryType.NL: lambda sample: araneae._specifications_nl(sample),
-            QueryType.NEGATION: lambda sample: self._specifications_negation(sample)
+            QueryType.NEGATION: lambda sample: self._specifications_negation(sample),
+            QueryType.DB: lambda sample: self._specifications_db(sample),
         }
-
 
 
     def load_column_types(self):
@@ -357,6 +357,22 @@ class Araneae:
             subtypes.append(QuerySubtype.NL_LONG_SQL_SHORT)
         if nl_tokens >= LONG_NL:
             subtypes.append(QuerySubtype.NL_LONG)
+        return subtypes
+
+    def _specifications_db(self, sample: Sample) -> Optional[List[QuerySubtype]]:
+        subtypes = []
+        if contains_db_mentioned(sample):
+            subtypes.append(QuerySubtype.DB_MENTIONED_BUT_NOT_USED)
+        if contains_db_hetero(sample):
+            subtypes.append(QuerySubtype.DB_HETERO_AMBIGUITY)
+        if contains_db_homo_tables(sample):
+            subtypes.append(QuerySubtype.DB_TABLES_AMBIGUITY)
+        if contains_db_homo_columns(sample):
+            subtypes.append(QuerySubtype.DB_COLUMNS_AMBIGUITY)
+        if contains_db_homo_values(sample):
+            subtypes.append(QuerySubtype.DB_VALUES_AMBIGUITY)
+
+
         return subtypes
 
 
