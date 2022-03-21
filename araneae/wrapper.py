@@ -406,17 +406,3 @@ class Araneae:
             subtypes.append(QuerySubtype.DB_RU_VALUES_AMBIGUITY)
         return subtypes
 
-
-if __name__ == "__main__":
-    araneae = Araneae()
-    # araneae.import_spider()
-    # araneae.import_russocampus()
-    araneae.load()
-
-
-    # Second portion of specifications
-    second_portion = [QueryType.DB]
-    araneae.add_specifications(second_portion)
-
-    araneae.save()
-    a = 7
