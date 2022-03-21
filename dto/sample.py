@@ -121,11 +121,16 @@ class QuerySubtype(Enum):
     NL_LONG_SQL_SHORT = "nl-long-sql-short"
     NL_SHORT_SQL_LONG = "nl-short-sql-long"
     NL_LONG = "nl-long"
-    DB_MENTIONED_BUT_NOT_USED = "db-mentioned-but-not-used"
-    DB_HETERO_AMBIGUITY = "db-hetero-ambiguity"
-    DB_TABLES_AMBIGUITY = "db-tables-ambiguity"
-    DB_COLUMNS_AMBIGUITY = "db-columns-ambiguity"
-    DB_VALUES_AMBIGUITY = "db-values-ambiguity"
+    DB_EN_MENTIONED_BUT_NOT_USED = "db-en-mentioned-but-not-used"
+    DB_EN_HETERO_AMBIGUITY = "db-en-hetero-ambiguity"
+    DB_EN_TABLES_AMBIGUITY = "db-en-tables-ambiguity"
+    DB_EN_COLUMNS_AMBIGUITY = "db-en-columns-ambiguity"
+    DB_EN_VALUES_AMBIGUITY = "db-en-values-ambiguity"
+    DB_RU_MENTIONED_BUT_NOT_USED = "db-ru-mentioned-but-not-used"
+    DB_RU_HETERO_AMBIGUITY = "db-ru-hetero-ambiguity"
+    DB_RU_TABLES_AMBIGUITY = "db-ru-tables-ambiguity"
+    DB_RU_COLUMNS_AMBIGUITY = "db-ru-columns-ambiguity"
+    DB_RU_VALUES_AMBIGUITY = "db-ru-values-ambiguity"
 
 
 query_type_mapping = {_t.value: _t for _t in QueryType}
@@ -193,11 +198,16 @@ query_mapping = {
         QuerySubtype.NEGATION_NULL
     ],
     QueryType.DB: [
-        QuerySubtype.DB_MENTIONED_BUT_NOT_USED,
-        QuerySubtype.DB_HETERO_AMBIGUITY,
-        QuerySubtype.DB_TABLES_AMBIGUITY,
-        QuerySubtype.DB_COLUMNS_AMBIGUITY,
-        QuerySubtype.DB_VALUES_AMBIGUITY
+        QuerySubtype.DB_EN_MENTIONED_BUT_NOT_USED,
+        QuerySubtype.DB_EN_HETERO_AMBIGUITY,
+        QuerySubtype.DB_EN_TABLES_AMBIGUITY,
+        QuerySubtype.DB_EN_COLUMNS_AMBIGUITY,
+        QuerySubtype.DB_EN_VALUES_AMBIGUITY,
+        QuerySubtype.DB_RU_MENTIONED_BUT_NOT_USED,
+        QuerySubtype.DB_RU_HETERO_AMBIGUITY,
+        QuerySubtype.DB_RU_TABLES_AMBIGUITY,
+        QuerySubtype.DB_RU_COLUMNS_AMBIGUITY,
+        QuerySubtype.DB_RU_VALUES_AMBIGUITY
     ]
 }
 

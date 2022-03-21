@@ -1,5 +1,6 @@
 import re
 import os
+import json
 import cProfile
 
 from dto.sample import *
@@ -155,23 +156,24 @@ def get_sentences_amount(text: str) -> int:
     return sentences_amount
 
 
-def contains_db_mentioned(sample: Sample) -> bool:
+def contains_db_mentioned(sample: Sample, info: Optional[Dict]) -> bool:
+    pass
+    # with open()
+
+
+def contains_db_hetero(sample: Sample, info: Optional[Dict]) -> bool:
     pass
 
 
-def contains_db_hetero(sample: Sample) -> bool:
+def contains_db_homo_tables(sample: Sample, info: Optional[Dict]) -> bool:
     pass
 
 
-def contains_db_homo_tables(sample: Sample) -> bool:
+def contains_db_homo_columns(sample: Sample, info: Optional[Dict]) -> bool:
     pass
 
 
-def contains_db_homo_columns(sample: Sample) -> bool:
-    pass
-
-
-def contains_db_homo_values(sample: Sample) -> bool:
+def contains_db_homo_values(sample: Sample, info: Optional[Dict]) -> bool:
     pass
 
 

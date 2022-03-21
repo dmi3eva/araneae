@@ -68,6 +68,13 @@ class Araneae:
         self.samples: SamplesCollection = SamplesCollection()
         self.column_types = {}
         self.load_column_types()
+        self.db_tokens = {
+            "all": {"ru": None, "en": None},
+            "tables": {"ru": None, "en": None},
+            "columns": {"ru": None, "en": None},
+            "values": {"ru": None, "en": None}
+        }
+        self.load_db_tokens()
         self.mention_extractor = MentionExtractor()
         self.start_indices = None
         self.EXTRACTION_FUNCTIONS = {
@@ -92,6 +99,23 @@ class Araneae:
             with open(path) as column_file:
                 self.column_types[_column_type] = json.load(column_file)
 
+    def load_db_tokens(self):
+        with open(EN_MULTIUSING_ENTITIES, "r", encoding='utf-8') as in_file:
+            self.db_tokens["all"]["en"] = json.load(in_file)
+        with open(EN_MULTIUSING_TABLES, "r", encoding='utf-8') as in_file:
+            self.db_tokens["tables"]["en"] = json.load(in_file)
+        with open(EN_MULTIUSING_COLUMNS, "r", encoding='utf-8') as in_file:
+            self.db_tokens["columns"]["en"] = json.load(in_file)
+        with open(EN_MULTIUSING_VALUES, "r", encoding='utf-8') as in_file:
+            self.db_tokens["values"]["en"] = json.load(in_file)
+        with open(RU_MULTIUSING_ENTITIES, "r", encoding='utf-8') as in_file:
+            self.db_tokens["all"]["ru"] = json.load(in_file)
+        with open(RU_MULTIUSING_TABLES, "r", encoding='utf-8') as in_file:
+            self.db_tokens["tables"]["ru"] = json.load(in_file)
+        with open(RU_MULTIUSING_COLUMNS, "r", encoding='utf-8') as in_file:
+            self.db_tokens["columns"]["ru"] = json.load(in_file)
+        with open(RU_MULTIUSING_VALUES, "r", encoding='utf-8') as in_file:
+            self.db_tokens["values"]["ru"] = json.load(in_file)
 
     def load_from_json(self, filepath: str, source: Source) -> int:
         with open(filepath) as json_file:
@@ -148,8 +172,6 @@ class Araneae:
     def load(self):
         with open(SAMPLES_PATH, 'rb') as sample_file:
             self.samples.content = pickle.load(sample_file)
-        with open(COLUMN_TYPES_PATH, 'rb') as column_type_file:
-            self.column_types = pickle.load(column_type_file)
         with open(INDICES_PATH, 'rb') as indices_file:
             self.start_indices = pickle.load(indices_file)
 
@@ -176,7 +198,7 @@ class Araneae:
         return generated_sample
 
     @profile
-    def extract_specifications(self, sample: Sample, query_types: List[QueryType]) -> Dict:
+    def extract_specifications(self, query_types: List[QueryType], sample: Sample) -> Dict:
         specifications = {}
         for _query_type in query_types:
             specifications[_query_type] = self.EXTRACTION_FUNCTIONS[_query_type](sample)
@@ -361,25 +383,35 @@ class Araneae:
 
     def _specifications_db(self, sample: Sample) -> Optional[List[QuerySubtype]]:
         subtypes = []
-        if contains_db_mentioned(sample):
-            subtypes.append(QuerySubtype.DB_MENTIONED_BUT_NOT_USED)
-        if contains_db_hetero(sample):
-            subtypes.append(QuerySubtype.DB_HETERO_AMBIGUITY)
-        if contains_db_homo_tables(sample):
-            subtypes.append(QuerySubtype.DB_TABLES_AMBIGUITY)
-        if contains_db_homo_columns(sample):
-            subtypes.append(QuerySubtype.DB_COLUMNS_AMBIGUITY)
-        if contains_db_homo_values(sample):
-            subtypes.append(QuerySubtype.DB_VALUES_AMBIGUITY)
+        if contains_db_mentioned(sample, self.db_tokens["all"]["en"]):
+            subtypes.append(QuerySubtype.DB_EN_MENTIONED_BUT_NOT_USED)
+        if contains_db_hetero(sample, self.db_tokens["all"]["en"]):
+            subtypes.append(QuerySubtype.DB_EN_HETERO_AMBIGUITY)
+        if contains_db_homo_tables(sample, self.db_tokens["tables"]["en"]):
+            subtypes.append(QuerySubtype.DB_EN_TABLES_AMBIGUITY)
+        if contains_db_homo_columns(sample, self.db_tokens["columns"]["en"]):
+            subtypes.append(QuerySubtype.DB_EN_COLUMNS_AMBIGUITY)
+        if contains_db_homo_values(sample, self.db_tokens["values"]["en"]):
+            subtypes.append(QuerySubtype.DB_EN_VALUES_AMBIGUITY)
 
-
+        if contains_db_mentioned(sample, self.db_tokens["all"]["ru"]):
+            subtypes.append(QuerySubtype.DB_RU_MENTIONED_BUT_NOT_USED)
+        if contains_db_hetero(sample, self.db_tokens["all"]["ru"]):
+            subtypes.append(QuerySubtype.DB_RU_HETERO_AMBIGUITY)
+        if contains_db_homo_tables(sample, self.db_tokens["tables"]["ru"]):
+            subtypes.append(QuerySubtype.DB_RU_TABLES_AMBIGUITY)
+        if contains_db_homo_columns(sample, self.db_tokens["columns"]["ru"]):
+            subtypes.append(QuerySubtype.DB_RU_COLUMNS_AMBIGUITY)
+        if contains_db_homo_values(sample, self.db_tokens["values"]["ru"]):
+            subtypes.append(QuerySubtype.DB_RU_VALUES_AMBIGUITY)
         return subtypes
 
 
 if __name__ == "__main__":
     araneae = Araneae()
-    araneae.import_spider()
-    araneae.import_russocampus()
+    # araneae.import_spider()
+    # araneae.import_russocampus()
+    araneae.load()
 
     # First portion of specifications
     # first_portion = [QueryType.BINARY, QueryType.DATETIME, QueryType.SIMPLICITY, QueryType.JOIN,
