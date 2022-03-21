@@ -8,6 +8,7 @@ from copy import deepcopy
 from typing import *
 
 from utils.common import *
+from utils.preprocessing.text import *
 from utils.mention_extractor import MentionExtractor
 from araneae.settings import *
 # from utils.preprocessing.custom_sql import *
@@ -309,10 +310,10 @@ class Araneae:
         subtypes = []
         if sample.id == 4467:
             a = 7
-        nl = token_processing(sample.question)
-        sql = token_processing(sample.query)
-        sql_tokens = set([token_processing(_t) for _t in sample.query_toks])
-        nl_tokens = set([token_processing(_t) for _t in sample.question_toks])
+        nl = sample_token_processing(sample.question)
+        sql = sample_token_processing(sample.query)
+        sql_tokens = set([sample_token_processing(_t) for _t in sample.query_toks])
+        nl_tokens = set([sample_token_processing(_t) for _t in sample.question_toks])
         negation_nl_keywords = {"no", "not", "dont", "doesnt", "isnt", "arent", "didnt", "except", "never",
                                 "without", "non", "nt", "nor", "ignore", "ignoring", "exclude", "excluding"}
         negation_sql_keywords = {"except", "!", "!=", "null"}
@@ -383,26 +384,27 @@ class Araneae:
 
     def _specifications_db(self, sample: Sample) -> Optional[List[QuerySubtype]]:
         subtypes = []
-        if contains_db_mentioned(sample, self.db_tokens["all"]["en"]):
+        db = sample.db_id
+        if contains_db_mentioned(sample.question_toks, self.db_tokens["all"]["en"][db], sample.mentions, Language.EN):
             subtypes.append(QuerySubtype.DB_EN_MENTIONED_BUT_NOT_USED)
-        if contains_db_hetero(sample, self.db_tokens["all"]["en"]):
-            subtypes.append(QuerySubtype.DB_EN_HETERO_AMBIGUITY)
-        if contains_db_homo_tables(sample, self.db_tokens["tables"]["en"]):
-            subtypes.append(QuerySubtype.DB_EN_TABLES_AMBIGUITY)
-        if contains_db_homo_columns(sample, self.db_tokens["columns"]["en"]):
-            subtypes.append(QuerySubtype.DB_EN_COLUMNS_AMBIGUITY)
-        if contains_db_homo_values(sample, self.db_tokens["values"]["en"]):
-            subtypes.append(QuerySubtype.DB_EN_VALUES_AMBIGUITY)
-
-        if contains_db_mentioned(sample, self.db_tokens["all"]["ru"]):
-            subtypes.append(QuerySubtype.DB_RU_MENTIONED_BUT_NOT_USED)
-        if contains_db_hetero(sample, self.db_tokens["all"]["ru"]):
-            subtypes.append(QuerySubtype.DB_RU_HETERO_AMBIGUITY)
-        if contains_db_homo_tables(sample, self.db_tokens["tables"]["ru"]):
-            subtypes.append(QuerySubtype.DB_RU_TABLES_AMBIGUITY)
-        if contains_db_homo_columns(sample, self.db_tokens["columns"]["ru"]):
-            subtypes.append(QuerySubtype.DB_RU_COLUMNS_AMBIGUITY)
-        if contains_db_homo_values(sample, self.db_tokens["values"]["ru"]):
-            subtypes.append(QuerySubtype.DB_RU_VALUES_AMBIGUITY)
+        # if contains_db_hetero(sample.question_toks, self.db_tokens["all"]["en"][db]):
+        #     subtypes.append(QuerySubtype.DB_EN_HETERO_AMBIGUITY)
+        # if contains_db_homo_tables(sample.question_toks, self.db_tokens["tables"]["en"][db]):
+        #     subtypes.append(QuerySubtype.DB_EN_TABLES_AMBIGUITY)
+        # if contains_db_homo_columns(sample.question_toks, self.db_tokens["columns"]["en"][db]):
+        #     subtypes.append(QuerySubtype.DB_EN_COLUMNS_AMBIGUITY)
+        # if contains_db_homo_values(sample.question_toks, self.db_tokens["values"]["en"][db]):
+        #     subtypes.append(QuerySubtype.DB_EN_VALUES_AMBIGUITY)
+        #
+        # if contains_db_mentioned(sample.russian_question_toks, self.db_tokens["all"]["ru"][db], sample.mentions):
+        #     subtypes.append(QuerySubtype.DB_RU_MENTIONED_BUT_NOT_USED)
+        # if contains_db_hetero(sample.russian_question_toks, self.db_tokens["all"]["ru"][db]):
+        #     subtypes.append(QuerySubtype.DB_RU_HETERO_AMBIGUITY)
+        # if contains_db_homo_tables(sample.russian_question_toks, self.db_tokens["tables"]["ru"][db]):
+        #     subtypes.append(QuerySubtype.DB_RU_TABLES_AMBIGUITY)
+        # if contains_db_homo_columns(sample.russian_question_toks, self.db_tokens["columns"]["ru"][db]):
+        #     subtypes.append(QuerySubtype.DB_RU_COLUMNS_AMBIGUITY)
+        # if contains_db_homo_values(sample.russian_question_toks, self.db_tokens["values"]["ru"][db]):
+        #     subtypes.append(QuerySubtype.DB_RU_VALUES_AMBIGUITY)
         return subtypes
 

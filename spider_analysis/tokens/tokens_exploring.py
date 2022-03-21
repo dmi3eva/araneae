@@ -1,6 +1,7 @@
 
 from araneae.wrapper import Araneae
 from utils.spider_connectors import *
+from utils.preprocessing.text import *
 from dto.sample import *
 from dataclasses import dataclass
 from typing import *
@@ -50,9 +51,7 @@ class Token:
     query: Optional[Dict[str, QueryDescription]] = None
 
 
-def token_process(token: str, language: Language) -> str:
-    processed = token.lower()
-    return processed
+
 
 
 def extract_tokens_info(dataset: Araneae, language: Language):
@@ -70,9 +69,9 @@ def extract_db_info(info: Dict[str, Token], language: Language) -> Dict[str, Tok
     else:
         spider = EnSpiderDB()
     columns = spider.extract_columns()
-    info = get_tables_tokens(info, columns)
-    info = get_columns_tokens(info, columns)
-    info = get_values_tokens(info, columns, spider)
+    info = get_tables_tokens(info, columns, language)
+    info = get_columns_tokens(info, columns, language)
+    info = get_values_tokens(info, columns, spider, language)
     print("Values done")
     return info
 
@@ -88,7 +87,7 @@ def extract_question_info(info: Dict[str, Token], dataset: Araneae, language: La
             tokens = sample.russian_question_toks
             nl = sample.russian_question
         for _token in tokens:
-            info = get_question_token(info, token_process(_token, language), sample.db_id, nl, sample.id)
+            info = get_question_token(info, db_token_process(_token, language), sample.db_id, nl, sample.id)
     return info
 
 
@@ -104,7 +103,7 @@ def extract_query_info(info: Dict[str, Token], dataset: Araneae, language: Langu
     return info
 
 
-def get_columns_tokens(info: Dict[str, Token], columns) -> Dict[str, Token]:
+def get_columns_tokens(info: Dict[str, Token], columns, language: Language) -> Dict[str, Token]:
     for db, db_content in columns.items():
         for table, table_content in db_content.items():
             for column in table_content:
@@ -116,11 +115,11 @@ def get_columns_tokens(info: Dict[str, Token], columns) -> Dict[str, Token]:
                         column=column,
                         type=Entity.COLUMN.name  # TODO
                     )
-                    info = add_db_to_info(info, token, description)
+                    info = add_db_to_info(info, db_token_process(token, language), description)
     return info
 
 
-def get_tables_tokens(info: Dict[str, Token], columns: Dict) -> Dict[str, Token]:
+def get_tables_tokens(info: Dict[str, Token], columns: Dict, language: Language) -> Dict[str, Token]:
     for db, db_content in columns.items():
         for table in db_content.keys():
             tokens = table.split("_")
@@ -130,7 +129,7 @@ def get_tables_tokens(info: Dict[str, Token], columns: Dict) -> Dict[str, Token]
                     table=table,
                     type=Entity.TABLE.name  # TODO
                 )
-                info = add_db_to_info(info, token, description)
+                info = add_db_to_info(info, db_token_process(token, language), description)
     return info
 
 
@@ -146,7 +145,7 @@ def get_db_tokens(info: Dict[str, Token], columns: Dict) -> Dict[str, Token]:
     return info
 
 
-def get_values_tokens(info: Dict[str, Token], columns: Dict, spider: SpiderDB) -> Dict[str, Token]:
+def get_values_tokens(info: Dict[str, Token], columns: Dict, spider: SpiderDB, language: Language) -> Dict[str, Token]:
     db_amount = len(columns)
     ind = 0
     for db, db_content in columns.items():
@@ -167,7 +166,7 @@ def get_values_tokens(info: Dict[str, Token], columns: Dict, spider: SpiderDB) -
                             value=value,
                             type=Entity.VALUE.name  # TODO
                         )
-                        info = add_db_to_info(info, token, description)
+                        info = add_db_to_info(info, db_token_process(token, language), description)
     return info
 
 
@@ -229,7 +228,6 @@ def info_to_dict(statistics: Dict) -> Dict:
     print("To dict started")
     info = {}
     for token_name, token in statistics.items():
-        a = 7
         info[token_name] = {
             "db": {},
             "question": {},
@@ -266,10 +264,6 @@ def save_tokens_info(statistics, filename) -> NoReturn:
     tokens_info = info_to_dict(statistics)
     with open(filename, 'w', encoding='utf-8') as f:
         json.dump(tokens_info, f, ensure_ascii=False)
-
-
-
-
 
 
 if __name__ == "__main__":

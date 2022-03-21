@@ -5,6 +5,7 @@ import cProfile
 
 from dto.sample import *
 from configure import *
+from utils.preprocessing.text import *
 
 
 def profile(func):
@@ -139,14 +140,6 @@ def punctuation_processing(text: str) -> str:
     return text
 
 
-def token_processing(token):
-    processed = token.lower()
-    processed = re.sub("[\'\"]+", '', processed)
-    # processed = processed.replace('\'', "")
-    # processed = processed.replace("\"", "")
-    # processed = processed.replace("\'", "")
-    return processed
-
 
 def get_sentences_amount(text: str) -> int:
     processed = punctuation_processing(text)
@@ -156,14 +149,35 @@ def get_sentences_amount(text: str) -> int:
     return sentences_amount
 
 
-def contains_db_mentioned(sample: Sample, info: Optional[Dict]) -> bool:
-    pass
-    # with open()
+def db_entity_correspond_to_mention(db_entity: Dict, mention: Mention) -> bool:
+    if db_entity['value'] and mention.values:
+        return True
+    if mention.db != db_entity["db"]:
+        return False
+    if mention.table != db_entity["table"]:
+        return False
+    if mention.column != db_entity["column"]:
+        return False
 
+    return True
+
+
+def contains_db_mentioned(sample_tokens: List[str], db_tokens: Dict, mentions: List[Mention], language: Language) -> bool:
+    for question_token in sample_tokens:
+        processed = db_token_process(question_token, language)
+        db_entities = db_tokens.get(processed, [])
+        used_mentions = []
+        for _db_entity in db_entities:
+            for _mention in mentions:
+                if db_entity_correspond_to_mention(_db_entity, _mention):
+                    used_mentions.append(_mention)
+        wrong_processed = ["id"]
+        if len(used_mentions) == 0 and len(db_entities) > 0 and processed not in wrong_processed:
+            return True
+    return False
 
 def contains_db_hetero(sample: Sample, info: Optional[Dict]) -> bool:
     pass
-
 
 def contains_db_homo_tables(sample: Sample, info: Optional[Dict]) -> bool:
     pass
