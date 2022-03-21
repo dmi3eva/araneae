@@ -1,8 +1,17 @@
 from wrapper import *
 
-TEST_SET_PATH_CSV = '../resources/results/test_sets/csv'
+
+TEST_SET_PATH_CSV  = '../resources/results/test_sets/csv'
 TEST_SET_PATH_JSON = '../resources/results/test_sets/json'
 SUBTYPES_PATH_CSV = '../resources/results/subtypes'
+
+
+def save(test_sets_collections: Dict[str, SamplesCollection]):
+    for name, _test_set in test_sets_collections.items():
+        csv_name = f"{name}.csv"
+        json_name = f"{name}.json"
+        binary_with_values.save_in_csv(f'{TEST_SET_PATH_CSV}/{csv_name}')
+        binary_with_values.save_in_json(f'{TEST_SET_PATH_JSON}/{json_name}')
 
 ########################################################
 #############  Starting   ##############################
@@ -22,6 +31,35 @@ araneae.load()
 #############  Experiments   ##############################
 ########################################################
 
+#########################################################################################
+# DB
+db_pipeline = [QueryType.DB]
+araneae.add_specifications(db_pipeline)
+
+db_en_mentioned = araneae.find_all_with_type(QueryType.DB, subtypes=[QuerySubtype.DB_EN_MENTIONED_BUT_NOT_USED])
+db_en_hetero = araneae.find_all_with_type(QueryType.DB, subtypes=[QuerySubtype.DB_EN_HETERO_AMBIGUITY])
+db_en_tables = araneae.find_all_with_type(QueryType.DB, subtypes=[QuerySubtype.DB_EN_TABLES_AMBIGUITY])
+db_en_columns = araneae.find_all_with_type(QueryType.DB, subtypes=[QuerySubtype.DB_EN_COLUMNS_AMBIGUITY])
+db_en_values = araneae.find_all_with_type(QueryType.DB, subtypes=[QuerySubtype.DB_EN_VALUES_AMBIGUITY])
+
+db_ru_mentioned = araneae.find_all_with_type(QueryType.DB, subtypes=[QuerySubtype.DB_RU_MENTIONED_BUT_NOT_USED])
+db_ru_hetero = araneae.find_all_with_type(QueryType.DB, subtypes=[QuerySubtype.DB_RU_HETERO_AMBIGUITY])
+db_ru_tables = araneae.find_all_with_type(QueryType.DB, subtypes=[QuerySubtype.DB_RU_TABLES_AMBIGUITY])
+db_ru_columns = araneae.find_all_with_type(QueryType.DB, subtypes=[QuerySubtype.DB_RU_COLUMNS_AMBIGUITY])
+db_ru_values = araneae.find_all_with_type(QueryType.DB, subtypes=[QuerySubtype.DB_RU_VALUES_AMBIGUITY])
+
+save({
+    "db_en_mentioned": db_en_mentioned,
+    "db_en_hetero": db_en_hetero,
+    "db_en_tables": db_en_tables,
+    "db_en_columns": db_en_columns,
+    "db_en_values": db_en_values,
+    "db_ru_mentioned": db_ru_mentioned,
+    "db_ru_hetero": db_ru_hetero,
+    "db_ru_tables": db_ru_tables,
+    "db_ru_columns": db_ru_columns,
+    "db_ru_values": db_ru_values
+})
 
 #########################################################################################
 # BINARY
@@ -31,11 +69,10 @@ araneae.load()
 # binary_with_values = araneae.find_all_with_type(QueryType.BINARY, subtypes=[QuerySubtype.WITH_VALUES])
 # binary_without_values = araneae.find_all_with_type(QueryType.BINARY, subtypes=[QuerySubtype.WITHOUT_VALUES])
 #
-# binary_with_values.save_in_csv(f'{test_set_path_csv}/binary_with_values.csv')
-# binary_without_values.save_in_csv(f'{test_set_path_csv}/binary_without_values.csv')
-#
-# binary_with_values.save_in_json(f'{test_set_path_json}/binary_with_values.json')
-# binary_without_values.save_in_json(f'{test_set_path_json}/binary_without_values.json')
+# save({
+#     "binary_with_values": binary_with_values,
+#     "binary_without_values": binary_without_values
+# })
 
 #########################################################################################
 # DATETIME
@@ -45,11 +82,10 @@ araneae.load()
 # datetimes_with_values = araneae.find_all_with_type(QueryType.DATETIME, subtypes=[QuerySubtype.WITH_VALUES])
 # datetimes_without_values = araneae.find_all_with_type(QueryType.DATETIME, subtypes=[QuerySubtype.WITHOUT_VALUES])
 #
-# datetimes_with_values.save_in_csv(f'{test_set_path_csv}/datetimes_with_values.csv')#
-# datetimes_without_values.save_in_csv(f'{test_set_path_csv}/datetimes_without_values.csv')
-#
-# datetimes_with_values.save_in_json(f'{test_set_path_json}/datetimes_with_values.json')
-# datetimes_without_values.save_in_json(f'{test_set_path_json}/datetimes_without_values.json')
+# save({
+#     "datetimes_with_values": datetimes_with_values,
+#     "datetimes_without_values": datetimes_without_values
+# })
 
 
 #########################################################################################
@@ -60,11 +96,10 @@ araneae.load()
 # extra_simple = araneae.find_all_with_type(QueryType.SIMPLICITY, subtypes=[QuerySubtype.EXTRA_SIMPLE])
 # simple = araneae.find_all_with_type(QueryType.SIMPLICITY, subtypes=[QuerySubtype.SIMPLE])
 #
-# extra_simple.save_in_csv(f'{test_set_path_csv}/extra_simple.csv')
-# simple.save_in_csv(f'{test_set_path_csv}/simple.csv')
-#
-# extra_simple.save_in_json(f'{test_set_path_json}/extra_simple.json')
-# simple.save_in_json(f'{test_set_path_json}/simple.json')
+# save({
+#     "extra_simple": extra_simple,
+#     "simple": simple
+# })
 
 
 #########################################################################################
@@ -77,21 +112,14 @@ araneae.load()
 # multi_select = araneae.find_all_with_type(QueryType.SELECT, subtypes=[QuerySubtype.MULTI_SELECT])
 # mono_agg = araneae.find_all_with_type(QueryType.SELECT, subtypes=[QuerySubtype.MONO_AGG])
 # hetero_agg = araneae.find_all_with_type(QueryType.SELECT, subtypes=[QuerySubtype.HETERO_AGG])
-# nested = araneae.find_all_with_type(QueryType.SELECT, subtypes=[QuerySubtype.NESTED])
 #
-# single_join.save_in_csv(f'{test_set_path_csv}/single_join.csv')
-# multi_join.save_in_csv(f'{test_set_path_csv}/multi_join.csv')
-# multi_select.save_in_csv(f'{test_set_path_csv}/multi_select.csv')
-# mono_agg.save_in_csv(f'{test_set_path_csv}/mono_agg.csv')
-# hetero_agg.save_in_csv(f'{test_set_path_csv}/hetero_agg.csv')
-# nested.save_in_csv(f'{test_set_path_csv}/nested.csv')
-#
-# single_join.save_in_json(f'{test_set_path_json}/single_join.json')
-# multi_join.save_in_json(f'{test_set_path_json}/multi_join.json')
-# multi_select.save_in_json(f'{test_set_path_json}/multi_select.json')
-# mono_agg.save_in_json(f'{test_set_path_json}/mono_agg.json')
-# hetero_agg.save_in_json(f'{test_set_path_json}/hetero_agg.json')
-# nested.save_in_json(f'{test_set_path_json}/nested.json')
+# save({
+#     "single_join": single_join,
+#     "multi_join": multi_join,
+#     "multi_select": multi_select,
+#     "mono_agg": mono_agg,
+#     "hetero_agg": hetero_agg
+# })
 
 #########################################################################################
 # NL
@@ -103,15 +131,12 @@ araneae.load()
 # nl_long_sql_short = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_LONG_SQL_SHORT])
 # nl_long = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_LONG])
 #
-# nl_several_sentences.save_in_csv(f'{test_set_path_csv}/nl_several_sentences.csv')
-# nl_short_sql_long.save_in_csv(f'{test_set_path_csv}/nl_short_sql_long.csv')
-# nl_long_sql_short.save_in_csv(f'{test_set_path_csv}/nl_long_sql_short.csv')
-# nl_long.save_in_csv(f'{test_set_path_csv}/nl_long.csv')
-#
-# nl_several_sentences.save_in_json(f'{test_set_path_json}/nl_several_sentences.json')
-# nl_short_sql_long.save_in_json(f'{test_set_path_json}/nl_short_sql_long.json')
-# nl_long_sql_short.save_in_json(f'{test_set_path_json}/nl_long_sql_short.json')
-# nl_long.save_in_json(f'{test_set_path_json}/nl_long.json')
+# save({
+#     "nl_several_sentences": nl_several_sentences,
+#     "nl_short_sql_long": nl_short_sql_long,
+#     "nl_long_sql_short": nl_long_sql_short,
+#     "nl_long": nl_long
+# })
 
 #########################################################################################
 # LOGIC
@@ -126,31 +151,17 @@ araneae.load()
 # logic_set_phrase = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SET_PHRASE])
 # negation = araneae.find_all_with_type(QueryType.NEGATION)
 # negation_any_all = araneae.find_all_with_type(QueryType.NEGATION, subtypes=[QuerySubtype.NEGATION_ANY_ALL])
-# logic_vice_versa.save_in_csv(f'{test_set_path_csv}/logic_vice_versa.csv')
-# logic_all_nl_sql.save_in_csv(f'{test_set_path_csv}/logic_all_nl_sql.csv')
-# logic_andor_nl_sql.save_in_csv(f'{test_set_path_csv}/logic_andor_nl_sql.csv')
-# logic_sql.save_in_csv(f'{test_set_path_csv}/logic_sql.csv')
-# logic_and_with_or_nl.save_in_csv(f'{test_set_path_csv}/logic_and_with_or_nl.csv')
-# logic_set_phrase.save_in_csv(f'{test_set_path_csv}/logic_set_phrase.csv')
-# negation.save_in_csv(f'{test_set_path_csv}/negation.csv')
-# negation_any_all.save_in_csv(f'{test_set_path_csv}/negation_any_all.csv')
 #
-# logic_vice_versa.save_in_json(f'{test_set_path_json}/logic_vice_versa.json')
-# logic_all_nl_sql.save_in_json(f'{test_set_path_json}/logic_all_nl_sql.json')
-# logic_andor_nl_sql.save_in_json(f'{test_set_path_json}/logic_andor_nl_sql.json')
-# logic_sql.save_in_json(f'{test_set_path_json}/logic_sql.json')
-# logic_and_with_or_nl.save_in_json(f'{test_set_path_json}/logic_and_with_or_nl.json')
-# logic_set_phrase.save_in_json(f'{test_set_path_json}/logic_set_phrase.json')
-# negation.save_in_json(f'{test_set_path_json}/negation.json')
-# negation_any_all.save_in_json(f'{test_set_path_json}/negation_any_all.json')
-#
-# negation.split_by_subtypes(QueryType.NEGATION, f'{subtypes_path_csv}/negation.csv')
-# negation.split_by_subtypes(QueryType.LOGIC, f'{subtypes_path_csv}/logic.csv')
-# negation.split_by_subtypes(QueryType.NL, f'{subtypes_path_csv}/nl.csv')
-# negation.split_by_subtypes(QueryType.SELECT, f'{subtypes_path_csv}/select.csv')
-# negation.split_by_subtypes(QueryType.DATETIME, f'{subtypes_path_csv}/datetime.csv')
-# negation.split_by_subtypes(QueryType.BINARY, f'{subtypes_path_csv}/binary.csv')
-
+# save({
+#     "logic_vice_versa": logic_vice_versa,
+#     "logic_all_nl_sql": logic_all_nl_sql,
+#     "logic_andor_nl_sql": logic_andor_nl_sql,
+#     "logic_sql": logic_sql,
+#     "logic_and_with_or_nl": logic_and_with_or_nl,
+#     "logic_set_phrase": logic_set_phrase,
+#     "negation": negation,
+#     "negation_any_all": negation_any_all
+# })
 
 
 
