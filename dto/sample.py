@@ -247,7 +247,7 @@ class Sample:
         for _query_type in QueryType:
             dicted[_query_type.value] = ""
             dicted[f"{_query_type.value}-with-values"] = False
-            if not dicted['specifications'][_query_type]:
+            if not _query_type in dicted['specifications'].keys() or not dicted['specifications'][_query_type]:
                 continue
             dicted[_query_type.value] = ', '.join([_s.value for _s in dicted['specifications'][_query_type] if _s])
             if QuerySubtype.WITH_VALUES in dicted['specifications'][_query_type]:
