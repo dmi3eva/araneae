@@ -21,6 +21,7 @@ class Status(Enum):
     ERROR_DESCRIBING_FLUENCY_SUBSTITUTION = 10
     ERROR_DESCRIBING_EQUIVALENT = 11
     ERROR_DESCRIBING_SQL = 12
+    LAST = 13
 
 
 class State(Enum):
@@ -41,7 +42,7 @@ class BotSample:
     paraphrased_nl: Optional[str] = None
     result: Optional[str] = None
     ok_fluency_source: bool = True
-    ok_substitution_source: bool = True
+    ok_fluency_substitution: bool = True
     ok_equivalent: bool = True
     ok_sql: bool = True
 

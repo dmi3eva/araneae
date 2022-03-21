@@ -11,5 +11,23 @@ from dto.sample import *
 
 def save_fluency_source_error(user: User, sample: BotSample, correction: str) -> NoReturn:
     sample.ok_fluency_source = False
-    sample.source_nl = correction
+    sample.substituted_nl = correction
+    user.save(sample)
+
+
+def save_fluency_substitution_error(user: User, sample: BotSample, correction: str) -> NoReturn:
+    sample.ok_fluency_substitution = False
+    sample.paraphrased_nl = correction
+    user.save(sample)
+
+
+def save_equivalent_error(user: User, sample: BotSample, correction: str) -> NoReturn:
+    sample.ok_equivalent = False
+    sample.paraphrased_nl = correction
+    user.save(sample)
+
+
+def save_sql_error(user: User, sample: BotSample, correction: str) -> NoReturn:
+    sample.ok_sql = False
+    sample.paraphrased_nl = correction
     user.save(sample)

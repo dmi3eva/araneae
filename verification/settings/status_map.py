@@ -34,7 +34,7 @@ POSITIONS = {
         transitions={
             CALL_OK: Status.IN_PROGRESS_FLUENCY_SUBSTITUTION,
             CALL_WRONG: Status.ERROR_DESCRIBING_FLUENCY_SOURCE,
-            CALL_SKIP: Status.READY,
+            CALL_SKIP: Status.IN_PROGRESS_FLUENCY_SOURCE,
             CALL_DB: Status.DB_EXPLORING,
             CALL_INFO: Status.INFO_READING
         },
@@ -47,7 +47,7 @@ POSITIONS = {
         transitions={
             CALL_OK: Status.IN_PROGRESS_EQUIVALENT,
             CALL_WRONG: Status.ERROR_DESCRIBING_FLUENCY_SUBSTITUTION,
-            CALL_SKIP: Status.READY,
+            CALL_SKIP: Status.IN_PROGRESS_FLUENCY_SOURCE,
             CALL_DB: Status.DB_EXPLORING,
             CALL_INFO: Status.INFO_READING
         },
@@ -60,7 +60,7 @@ POSITIONS = {
         transitions={
             CALL_OK: Status.IN_PROGRESS_SQL,
             CALL_WRONG: Status.ERROR_DESCRIBING_EQUIVALENT,
-            CALL_SKIP: Status.READY,
+            CALL_SKIP: Status.IN_PROGRESS_FLUENCY_SOURCE,
             CALL_DB: Status.DB_EXPLORING,
             CALL_INFO: Status.INFO_READING
         },
@@ -73,7 +73,7 @@ POSITIONS = {
         transitions={
             CALL_OK: Status.IN_PROGRESS_FLUENCY_SOURCE,
             CALL_WRONG: Status.ERROR_DESCRIBING_SQL,
-            CALL_SKIP: Status.READY,
+            CALL_SKIP: Status.IN_PROGRESS_FLUENCY_SOURCE,
             CALL_DB: Status.DB_EXPLORING,
             CALL_INFO: Status.INFO_READING
         },
@@ -90,6 +90,48 @@ POSITIONS = {
         },
         generate_text=lambda controller, user: generate_error_fluency_source_msg(controller, user),
         handle_error=lambda user, sample, correction: save_fluency_source_error(user, sample, correction)
+    ),
+    Status.ERROR_DESCRIBING_FLUENCY_SUBSTITUTION: Position(
+        current=Status.ERROR_DESCRIBING_FLUENCY_SUBSTITUTION,
+        panel=error_fluency_substitution_panel,
+        transitions={
+            CALL_SKIP: Status.READY,
+            CALL_INFO: Status.INFO_READING,
+            TEXT_TYPED: Status.IN_PROGRESS_EQUIVALENT
+        },
+        generate_text=lambda controller, user: generate_error_fluency_substitution_msg(controller, user),
+        handle_error=lambda user, sample, correction: save_fluency_substitution_error(user, sample, correction)
+    ),
+    Status.ERROR_DESCRIBING_EQUIVALENT: Position(
+        current=Status.ERROR_DESCRIBING_EQUIVALENT,
+        panel=error_equivalent_panel,
+        transitions={
+            CALL_SKIP: Status.READY,
+            CALL_INFO: Status.INFO_READING,
+            TEXT_TYPED: Status.IN_PROGRESS_EQUIVALENT
+        },
+        generate_text=lambda controller, user: generate_error_equivalent_msg(controller, user),
+        handle_error=lambda user, sample, correction: save_equivalent_error(user, sample, correction)
+    ),
+    Status.ERROR_DESCRIBING_SQL: Position(
+        current=Status.ERROR_DESCRIBING_SQL,
+        panel=error_sql_panel,
+        transitions={
+            CALL_SKIP: Status.READY,
+            CALL_INFO: Status.INFO_READING,
+            TEXT_TYPED: Status.IN_PROGRESS_EQUIVALENT
+        },
+        generate_text=lambda controller, user: generate_error_sql_msg(controller, user),
+        handle_error=lambda user, sample, correction: save_sql_error(user, sample, correction)
+    ),
+    Status.INFO_READING: Position(
+        current=Status.INFO_READING,
+        panel=in_progress_info_panel,
+        transitions={
+            RETURN: Status.LAST,
+        },
+        generate_text=lambda controller, user: INSTRUCTIONS,
+        handle_error=lambda user, sample, correction: sample
     )
 }
 

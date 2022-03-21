@@ -39,7 +39,25 @@ def generate_sql_msg(controller: Controller, user: User) -> str:
 
 def generate_error_fluency_source_msg(controller: Controller, user: User) -> str:
     sample = user.last_sample
-    text = FLUENCY_SOURCE_CORRECTION.format(nl=sample.source_nl, sql=sample.source_sql)
+    text = FLUENCY_SOURCE_CORRECTION.format(nl=sample.substituted_nl, sql=sample.substituted_sql)
+    return text
+
+
+def generate_error_fluency_substitution_msg(controller: Controller, user: User) -> str:
+    sample = user.last_sample
+    text = FLUENCY_SUBSTITUTION_CORRECTION.format(nl=sample.paraphrased_nl, sql=sample.substituted_sql)
+    return text
+
+
+def generate_error_equivalent_msg(controller: Controller, user: User) -> str:
+    sample = user.last_sample
+    text = EQUIVALENT_CORRECTION.format(nl=sample.paraphrased_nl, sql=sample.substituted_sql)
+    return text
+
+
+def generate_error_sql_msg(controller: Controller, user: User) -> str:
+    sample = user.last_sample
+    text = SQL_CORRECTION.format(nl=sample.paraphrased_nl, sql=sample.substituted_sql)
     return text
 
 

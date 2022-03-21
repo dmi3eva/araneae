@@ -52,11 +52,31 @@ error_fluency_source_panel = types.InlineKeyboardMarkup(row_width=2)
 error_fluency_source_panel.add(skip_btn, db_btn)
 error_fluency_source_panel.add(info_btn)
 
+# Correction fluency substitution error
+error_fluency_substitution_panel = types.InlineKeyboardMarkup(row_width=2)
+error_fluency_source_panel.add(skip_btn, db_btn)
+error_fluency_source_panel.add(info_btn)
+
+# Correction equivalent error
+error_equivalent_panel = types.InlineKeyboardMarkup(row_width=2)
+error_equivalent_panel.add(skip_btn, db_btn)
+error_equivalent_panel.add(info_btn)
+
+# Correction SQL error
+error_sql_panel = types.InlineKeyboardMarkup(row_width=2)
+error_sql_panel.add(skip_btn, db_btn)
+error_sql_panel.add(info_btn)
+
 
 # Info menu
 estimate_btn = types.InlineKeyboardButton(text='Перейти к оцениванию', callback_data=ESTIMATE)
 info_panel = types.InlineKeyboardMarkup(row_width=1)
 info_panel.add(estimate_btn)
+
+# In progress info panel
+return_btn = types.InlineKeyboardButton(text='Вернуться к оцениванию', callback_data=RETURN)
+in_progress_info_panel = types.InlineKeyboardMarkup(row_width=1)
+in_progress_info_panel.add(return_btn)
 
 # Error menu
 error_btn = types.InlineKeyboardButton(text='Следующий запрос', callback_data='estimate')

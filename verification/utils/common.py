@@ -15,7 +15,10 @@ def get_user(controller, user_id):
 def handle(bot, controller, user: User, chat_id: str, reaction: Optional[str]) -> NoReturn:
     # Разбираемся со статусом
     last_position = POSITIONS[user.status]
+
     user.status = last_position.transitions[reaction]
+    if user.status is Status.LAST:
+        user.status = user.last_status
     current_position = POSITIONS[user.status]
     sample = user.last_sample
 
@@ -37,3 +40,5 @@ def handle(bot, controller, user: User, chat_id: str, reaction: Optional[str]) -
         bot.edit_message_text(edited_text, chat_id=chat_id, message_id=last_message_id, reply_markup=empty_panel,
                               parse_mode="HTML")
     user.last_message = sent_msg
+    if current_position.current is not Status.INFO_READING:
+        user.last_status = current_position.current
