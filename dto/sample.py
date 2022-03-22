@@ -1,3 +1,6 @@
+import json
+import pandas as pd
+
 from enum import Enum
 from copy import deepcopy
 from dataclasses import dataclass, field
@@ -267,4 +270,53 @@ class Mention:
     distinct: bool = False
     limit: Optional[int] = None
     details: List[str] = field(default_factory=lambda: [])
+
+
+class SamplesCollection:
+    def __init__(self):
+        self.content: List[Sample] = []
+
+    def add(self, new_sample: Sample):
+        self.content.append(new_sample)
+
+    def save_in_csv(self, csv_path, static_content: Dict = None):
+        if not static_content:
+            static_content = {}
+        data = []
+        for _sample in self.content:
+            row = _sample.to_dict()
+            row.update(static_content)
+            data.append(row)
+        df = pd.DataFrame(data=data)
+        df.to_csv(csv_path, encoding='utf-8')
+
+    def save_in_json(self, json_path):
+        data = []
+        for _sample in self.content:
+            row = _sample.to_dict()
+            data.append(row)
+        with open(json_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False)
+
+    def split_by_subtypes(self, query_type: QueryType, tgt_path: str):
+        data = []
+        for _sample in self.content:
+            row = {
+                'id': _sample.id,
+                'question': _sample.question,
+                'query': _sample.query
+            }
+            for _subtype in query_mapping[query_type]:
+                if not _sample.specifications[query_type]:
+                    continue
+                if query_type not in _sample.specifications.keys():
+                    continue
+                if _subtype in _sample.specifications[query_type]:
+                    row[_subtype.name] = 1
+                else:
+                    row[_subtype.name] = ""
+            data.append(row)
+        df = pd.DataFrame(data=data)
+        df.to_csv(tgt_path, encoding='utf-8')
+
 

@@ -160,16 +160,20 @@ def db_entity_correspond_to_mention(db_entity: Dict, mention: Mention) -> bool:
         return False
     return True
 
-
-def contains_db_mentioned(sample: Sample, db_tokens: Dict, language: Language) -> bool:
-    mentions = sample.mentions
+def extract_tokens(sample: Sample, db_tokens: Dict, language: Language, category: str) -> Tuple[Dict, Dict]:
     db = sample.db_id
     if language is Language.EN:
         sample_tokens = sample.question_toks
-        db_tokens = db_tokens["all"]["en"][db]
+        db_tokens = db_tokens[category]["en"][db]
     else:
         sample_tokens = sample.russian_question_toks
-        db_tokens = db_tokens["all"]["ru"][db]
+        db_tokens = db_tokens[category]["ru"][db]
+    return sample_tokens, db_tokens
+
+
+def contains_db_mentioned(sample: Sample, db_tokens: Dict, language: Language) -> bool:
+    mentions = sample.mentions
+    sample_tokens, db_tokens = extract_tokens(sample, db_tokens, language, "all")
     for question_token in sample_tokens:
         processed = db_token_process(question_token, language)
         if len(processed) < 4:  # TODO: take into frequency
@@ -186,20 +190,36 @@ def contains_db_mentioned(sample: Sample, db_tokens: Dict, language: Language) -
     return False
 
 
-def contains_db_hetero(sample: Sample, info: Optional[Dict]) -> bool:
-    pass
+def contains_db_hetero(sample: Sample, db_tokens: Dict, language: Language) -> bool:
+    sample_tokens, db_tokens = extract_tokens(sample, db_tokens, language, "all")
+    for token in sample_tokens:
+        if token in db_tokens.keys():
+            return True
+    return False
 
 
-def contains_db_homo_tables(sample: Sample, info: Optional[Dict]) -> bool:
-    pass
+def contains_db_homo_tables(sample: Sample, db_tokens: Dict, language: Language) -> bool:
+    sample_tokens, db_tokens = extract_tokens(sample, db_tokens, language, "tables")
+    for token in sample_tokens:
+        if token in db_tokens.keys():
+            return True
+    return False
 
 
-def contains_db_homo_columns(sample: Sample, info: Optional[Dict]) -> bool:
-    pass
+def contains_db_homo_columns(sample: Sample, db_tokens: Dict, language: Language) -> bool:
+    sample_tokens, db_tokens = extract_tokens(sample, db_tokens, language, "columns")
+    for token in sample_tokens:
+        if token in db_tokens.keys():
+            return True
+    return False
 
 
-def contains_db_homo_values(sample: Sample, info: Optional[Dict]) -> bool:
-    pass
+def contains_db_homo_values(sample: Sample, db_tokens: Dict, language: Language) -> bool:
+    sample_tokens, db_tokens = extract_tokens(sample, db_tokens, language, "values")
+    for token in sample_tokens:
+        if token in db_tokens.keys():
+            return True
+    return False
 
 
 if __name__ == "__main__":

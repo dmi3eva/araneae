@@ -16,60 +16,15 @@ from araneae.settings import *
 from dto.sample import *
 
 
-class SamplesCollection:
-    def __init__(self):
-        self.content: List[Sample] = []
-
-    def add(self, new_sample: Sample):
-        self.content.append(new_sample)
-
-    def save_in_csv(self, csv_path, static_content: Dict = None):
-        if not static_content:
-            static_content = {}
-        data = []
-        for _sample in self.content:
-            row = _sample.to_dict()
-            row.update(static_content)
-            data.append(row)
-        df = pd.DataFrame(data=data)
-        df.to_csv(csv_path, encoding='utf-8')
-
-    def save_in_json(self, json_path):
-        data = []
-        for _sample in self.content:
-            row = _sample.to_dict()
-            data.append(row)
-        with open(json_path, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False)
-
-    def split_by_subtypes(self, query_type: QueryType, tgt_path: str):
-        data = []
-        for _sample in self.content:
-            row = {
-                'id': _sample.id,
-                'question': _sample.question,
-                'query': _sample.query
-            }
-            for _subtype in query_mapping[query_type]:
-                if not _sample.specifications[query_type]:
-                    continue
-                if query_type not in _sample.specifications.keys():
-                    continue
-                if _subtype in _sample.specifications[query_type]:
-                    row[_subtype.name] = 1
-                else:
-                    row[_subtype.name] = ""
-            data.append(row)
-        df = pd.DataFrame(data=data)
-        df.to_csv(tgt_path, encoding='utf-8')
-
-
 class Araneae:
     def __init__(self):
         self.samples: SamplesCollection = SamplesCollection()
         self.column_types = {}
         self.load_column_types()
         self.db_tokens = {
+            "all": {"ru": None, "en": None}
+        }
+        self.db_tokens_multiusing = {
             "all": {"ru": None, "en": None},
             "tables": {"ru": None, "en": None},
             "columns": {"ru": None, "en": None},
@@ -90,7 +45,6 @@ class Araneae:
             QueryType.DB: lambda sample: self._specifications_db(sample),
         }
 
-
     def load_column_types(self):
         for _column_type in QueryType:
             path = os.path.join(QUERY_TYPES_PATH, f"{_column_type.value}.json")
@@ -101,22 +55,26 @@ class Araneae:
                 self.column_types[_column_type] = json.load(column_file)
 
     def load_db_tokens(self):
-        with open(EN_MULTIUSING_ENTITIES, "r", encoding='utf-8') as in_file:
+        with open(EN_ENTITIES, "r", encoding='utf-8') as in_file:
             self.db_tokens["all"]["en"] = json.load(in_file)
+        with open(EN_MULTIUSING_ENTITIES, "r", encoding='utf-8') as in_file:
+            self.db_tokens_multiusing["all"]["en"] = json.load(in_file)
         with open(EN_MULTIUSING_TABLES, "r", encoding='utf-8') as in_file:
-            self.db_tokens["tables"]["en"] = json.load(in_file)
+            self.db_tokens_multiusing["tables"]["en"] = json.load(in_file)
         with open(EN_MULTIUSING_COLUMNS, "r", encoding='utf-8') as in_file:
-            self.db_tokens["columns"]["en"] = json.load(in_file)
+            self.db_tokens_multiusing["columns"]["en"] = json.load(in_file)
         with open(EN_MULTIUSING_VALUES, "r", encoding='utf-8') as in_file:
-            self.db_tokens["values"]["en"] = json.load(in_file)
-        with open(RU_MULTIUSING_ENTITIES, "r", encoding='utf-8') as in_file:
+            self.db_tokens_multiusing["values"]["en"] = json.load(in_file)
+        with open(RU_ENTITIES, "r", encoding='utf-8') as in_file:
             self.db_tokens["all"]["ru"] = json.load(in_file)
+        with open(RU_MULTIUSING_ENTITIES, "r", encoding='utf-8') as in_file:
+            self.db_tokens_multiusing["all"]["ru"] = json.load(in_file)
         with open(RU_MULTIUSING_TABLES, "r", encoding='utf-8') as in_file:
-            self.db_tokens["tables"]["ru"] = json.load(in_file)
+            self.db_tokens_multiusing["tables"]["ru"] = json.load(in_file)
         with open(RU_MULTIUSING_COLUMNS, "r", encoding='utf-8') as in_file:
-            self.db_tokens["columns"]["ru"] = json.load(in_file)
+            self.db_tokens_multiusing["columns"]["ru"] = json.load(in_file)
         with open(RU_MULTIUSING_VALUES, "r", encoding='utf-8') as in_file:
-            self.db_tokens["values"]["ru"] = json.load(in_file)
+            self.db_tokens_multiusing["values"]["ru"] = json.load(in_file)
 
     def load_from_json(self, filepath: str, source: Source) -> int:
         with open(filepath) as json_file:
@@ -142,7 +100,10 @@ class Araneae:
         return len(json_samples)
 
     def add_specifications(self, extraction_functions: List[QueryType]) -> NoReturn:
-        for _sample in self.samples.content:
+        samples_amount = len(self.samples.content)
+        for ind, _sample in enumerate(self.samples.content):
+            if ind % 10 == 0:
+                print(f"{ind} / {samples_amount}")
             _sample.specifications = self.extract_specifications(extraction_functions, _sample)
 
     def load_from_csv(self, filepath: str, source: Source):
@@ -384,28 +345,30 @@ class Araneae:
 
     def _specifications_db(self, sample: Sample) -> Optional[List[QuerySubtype]]:
         subtypes = []
+
         if contains_db_mentioned(sample, self.db_tokens, Language.EN):
             subtypes.append(QuerySubtype.DB_EN_MENTIONED_BUT_NOT_USED)
         if contains_db_mentioned(sample, self.db_tokens, Language.RU):
             subtypes.append(QuerySubtype.DB_RU_MENTIONED_BUT_NOT_USED)
-        # if contains_db_hetero(sample.question_toks, self.db_tokens["all"]["en"][db]):
-        #     subtypes.append(QuerySubtype.DB_EN_HETERO_AMBIGUITY)
-        # if contains_db_homo_tables(sample.question_toks, self.db_tokens["tables"]["en"][db]):
-        #     subtypes.append(QuerySubtype.DB_EN_TABLES_AMBIGUITY)
-        # if contains_db_homo_columns(sample.question_toks, self.db_tokens["columns"]["en"][db]):
-        #     subtypes.append(QuerySubtype.DB_EN_COLUMNS_AMBIGUITY)
-        # if contains_db_homo_values(sample.question_toks, self.db_tokens["values"]["en"][db]):
-        #     subtypes.append(QuerySubtype.DB_EN_VALUES_AMBIGUITY)
-        #
-        # if contains_db_mentioned(sample.russian_question_toks, self.db_tokens["all"]["ru"][db], sample.mentions):
-        #     subtypes.append(QuerySubtype.DB_RU_MENTIONED_BUT_NOT_USED)
-        # if contains_db_hetero(sample.russian_question_toks, self.db_tokens["all"]["ru"][db]):
-        #     subtypes.append(QuerySubtype.DB_RU_HETERO_AMBIGUITY)
-        # if contains_db_homo_tables(sample.russian_question_toks, self.db_tokens["tables"]["ru"][db]):
-        #     subtypes.append(QuerySubtype.DB_RU_TABLES_AMBIGUITY)
-        # if contains_db_homo_columns(sample.russian_question_toks, self.db_tokens["columns"]["ru"][db]):
-        #     subtypes.append(QuerySubtype.DB_RU_COLUMNS_AMBIGUITY)
-        # if contains_db_homo_values(sample.russian_question_toks, self.db_tokens["values"]["ru"][db]):
-        #     subtypes.append(QuerySubtype.DB_RU_VALUES_AMBIGUITY)
+
+        if contains_db_hetero(sample, self.db_tokens_multiusing, Language.EN):
+            subtypes.append(QuerySubtype.DB_EN_HETERO_AMBIGUITY)
+        if contains_db_hetero(sample, self.db_tokens_multiusing, Language.RU):
+            subtypes.append(QuerySubtype.DB_RU_HETERO_AMBIGUITY)
+
+        if contains_db_homo_tables(sample, self.db_tokens_multiusing, Language.EN):
+            subtypes.append(QuerySubtype.DB_EN_TABLES_AMBIGUITY)
+        if contains_db_homo_columns(sample, self.db_tokens_multiusing, Language.EN):
+            subtypes.append(QuerySubtype.DB_EN_COLUMNS_AMBIGUITY)
+        if contains_db_homo_values(sample, self.db_tokens_multiusing, Language.EN):
+            subtypes.append(QuerySubtype.DB_EN_VALUES_AMBIGUITY)
+
+        if contains_db_homo_tables(sample, self.db_tokens_multiusing, Language.RU):
+            subtypes.append(QuerySubtype.DB_RU_TABLES_AMBIGUITY)
+        if contains_db_homo_columns(sample, self.db_tokens_multiusing, Language.RU):
+            subtypes.append(QuerySubtype.DB_RU_COLUMNS_AMBIGUITY)
+        if contains_db_homo_values(sample, self.db_tokens_multiusing, Language.RU):
+            subtypes.append(QuerySubtype.DB_RU_VALUES_AMBIGUITY)
+
         return subtypes
 

@@ -25,6 +25,22 @@ def extract_multiusing_entities(path_from: str, path_to: str) -> NoReturn:
         json.dump(multiusing, file_from, ensure_ascii=True)
 
 
+def extract_entities(path_from: str, path_to: str) -> NoReturn:
+    with open(path_from, "r", encoding='utf-8') as file_from:
+        tokens = json.load(file_from)
+
+    multiusing = {}
+    for token, token_description in tokens.items():
+        db_desriptions = token_description['db']
+        for db, tokens_usings in db_desriptions.items():
+            multiusing[db] = multiusing.get(db, {})
+            different_usings = [_u for _u in tokens_usings if _u['type'] != 'DB']  # Excluding DB's
+            multiusing[db][token] = different_usings
+
+    with open(path_to, "w", encoding='utf-8') as file_from:
+        json.dump(multiusing, file_from, ensure_ascii=True)
+
+
 def extract_tables_entities(path_from: str, path_to: str) -> NoReturn:
     with open(path_from, "r", encoding='utf-8') as file_from:
         tokens = json.load(file_from)
@@ -77,6 +93,9 @@ def extract_values_entities(path_from: str, path_to: str) -> NoReturn:
 
 
 if __name__ == "__main__":
+    extract_entities(TOKENS_EN_PATH, EN_ENTITIES)
+    extract_entities(TOKENS_RU_PATH, RU_ENTITIES)
+
     extract_multiusing_entities(TOKENS_EN_PATH, EN_MULTIUSING_ENTITIES)
     extract_multiusing_entities(TOKENS_RU_PATH, RU_MULTIUSING_ENTITIES)
 
