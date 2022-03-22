@@ -384,9 +384,10 @@ class Araneae:
 
     def _specifications_db(self, sample: Sample) -> Optional[List[QuerySubtype]]:
         subtypes = []
-        db = sample.db_id
-        if contains_db_mentioned(sample.question_toks, self.db_tokens["all"]["en"][db], sample.mentions, Language.EN):
+        if contains_db_mentioned(sample, self.db_tokens, Language.EN):
             subtypes.append(QuerySubtype.DB_EN_MENTIONED_BUT_NOT_USED)
+        if contains_db_mentioned(sample, self.db_tokens, Language.RU):
+            subtypes.append(QuerySubtype.DB_RU_MENTIONED_BUT_NOT_USED)
         # if contains_db_hetero(sample.question_toks, self.db_tokens["all"]["en"][db]):
         #     subtypes.append(QuerySubtype.DB_EN_HETERO_AMBIGUITY)
         # if contains_db_homo_tables(sample.question_toks, self.db_tokens["tables"]["en"][db]):

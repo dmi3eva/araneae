@@ -158,13 +158,22 @@ def db_entity_correspond_to_mention(db_entity: Dict, mention: Mention) -> bool:
         return False
     if mention.column != db_entity["column"]:
         return False
-
     return True
 
 
-def contains_db_mentioned(sample_tokens: List[str], db_tokens: Dict, mentions: List[Mention], language: Language) -> bool:
+def contains_db_mentioned(sample: Sample, db_tokens: Dict, language: Language) -> bool:
+    mentions = sample.mentions
+    db = sample.db_id
+    if language is Language.EN:
+        sample_tokens = sample.question_toks
+        db_tokens = db_tokens["all"]["en"][db]
+    else:
+        sample_tokens = sample.russian_question_toks
+        db_tokens = db_tokens["all"]["ru"][db]
     for question_token in sample_tokens:
         processed = db_token_process(question_token, language)
+        if len(processed) < 4:  # TODO: take into frequency
+            continue
         db_entities = db_tokens.get(processed, [])
         used_mentions = []
         for _db_entity in db_entities:
@@ -176,8 +185,10 @@ def contains_db_mentioned(sample_tokens: List[str], db_tokens: Dict, mentions: L
             return True
     return False
 
+
 def contains_db_hetero(sample: Sample, info: Optional[Dict]) -> bool:
     pass
+
 
 def contains_db_homo_tables(sample: Sample, info: Optional[Dict]) -> bool:
     pass
