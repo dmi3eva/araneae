@@ -28,7 +28,7 @@ def handle(bot, controller, user: User, chat_id: str, reaction: Optional[str]) -
     sample = user.last_sample
 
     # Текст сообщения
-    text = current_position.generate_text(controller, user)
+    text, img = current_position.generate_text(controller, user)
 
     # Кнопки
     panel = current_position.panel(sample)
@@ -37,6 +37,8 @@ def handle(bot, controller, user: User, chat_id: str, reaction: Optional[str]) -
     sample = last_position.handle_error(user, sample, None)
 
     # Отправляем. Редактируем старые. Сохраняем.
+    if img:
+        bot.send_photo(user.id, img)
     sent_msg = bot.send_message(user.id, text, parse_mode="HTML", reply_markup=panel)
     if user.last_message:
         last_message_id = user.last_message.message_id
