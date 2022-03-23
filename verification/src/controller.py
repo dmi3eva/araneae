@@ -9,19 +9,19 @@ from configure import *
 
 class Status(Enum):
     READY = 0
-    IN_PROGRESS = 1
-    ERROR_DESCRIBING = 2
-    DB_EXPLORING = 3
-    INFO_READING = 4
-    IN_PROGRESS_FLUENCY_SOURCE = 5
-    IN_PROGRESS_FLUENCY_SUBSTITUTION = 6
-    IN_PROGRESS_EQUIVALENT = 7
-    IN_PROGRESS_SQL = 8
-    ERROR_DESCRIBING_FLUENCY_SOURCE = 9
-    ERROR_DESCRIBING_FLUENCY_SUBSTITUTION = 10
-    ERROR_DESCRIBING_EQUIVALENT = 11
-    ERROR_DESCRIBING_SQL = 12
-    LAST = 13
+    IN_PROGRESS_FLUENCY_SOURCE = 1
+    IN_PROGRESS_FLUENCY_SUBSTITUTION = 2
+    IN_PROGRESS_EQUIVALENT = 3
+    IN_PROGRESS_SQL = 4
+    ERROR_DESCRIBING_FLUENCY_SOURCE = 5
+    ERROR_DESCRIBING_FLUENCY_SUBSTITUTION = 6
+    ERROR_DESCRIBING_EQUIVALENT = 7
+    ERROR_DESCRIBING_SQL = 8
+    LAST = 9
+    CHOOSING_TABLE = 10
+    CHOOSING_COLUMN = 11
+    VIEW_TABLE = 12
+    INFO_READING = 13
 
 
 class State(Enum):
@@ -54,7 +54,9 @@ class User:
         self.last_message: Any = None
         self.state: State = State.SAMPLE
         self.status: Status = Status.READY
-        self.last_status: Status = None
+        self.last_status: Optional[Status] = None
+        self.last_reaction: Optional[str] = None
+        self.chosen_table: Optional[str] = None
 
     def save(self, sample: BotSample) -> NoReturn:
         print("I have saved")

@@ -1,11 +1,6 @@
 import telebot
 
 from verification.settings.config import *
-from verification.settings.content import *
-from verification.settings.panels_inline import *
-from verification.settings.status_map import *
-from verification.src.controller import *
-from verification.src.sender import *
 from verification.utils.common import *
 
 bot = telebot.TeleBot(API_TOKEN)
@@ -18,7 +13,7 @@ def start_message(message):
     user = get_user(controller, user_id)
     current_position = POSITIONS[user.status]
     text = current_position.generate_text(controller, user)
-    panel = current_position.panel
+    panel = current_position.panel(None)
     sent_msg = bot.send_message(user_id, text, parse_mode="HTML", reply_markup=panel)
     user.last_message = sent_msg
 

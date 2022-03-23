@@ -61,6 +61,12 @@ def generate_error_sql_msg(controller: Controller, user: User) -> str:
     return text
 
 
+def generate_choosing_table(controller: Controller, user: User) -> str:
+    sample = user.last_sample
+    text = TABLE_TITLE.format(db=sample.db)
+    return text
+
+
 def send_new_sample(bot, controller, user_id):
     user = controller.users.get(user_id, None)
     if user.status is Status.READY or not user.last_sample:

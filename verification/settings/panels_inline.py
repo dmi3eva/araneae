@@ -1,6 +1,10 @@
 from telebot import types
 from verification.settings.content import *
+from verification.src.controller import *
+from utils.spider_connectors import *
 
+MAX_MESSAGE_LEN = 32000
+en_spider = EnSpiderDB()
 
 # Request menu
 correct_btn = types.InlineKeyboardButton(text='\U0001F44D Все верно!', callback_data=CALL_OK)
@@ -46,7 +50,6 @@ sql_panel.add(sql_correct_btn, sql_incorrect_btn)
 sql_panel.add(skip_btn, db_btn)
 sql_panel.add(info_btn)
 
-
 # Correction fluency error
 error_fluency_source_panel = types.InlineKeyboardMarkup(row_width=2)
 error_fluency_source_panel.add(skip_btn, db_btn)
@@ -67,7 +70,6 @@ error_sql_panel = types.InlineKeyboardMarkup(row_width=2)
 error_sql_panel.add(skip_btn, db_btn)
 error_sql_panel.add(info_btn)
 
-
 # Info menu
 estimate_btn = types.InlineKeyboardButton(text='Перейти к оцениванию', callback_data=ESTIMATE)
 info_panel = types.InlineKeyboardMarkup(row_width=1)
@@ -87,6 +89,19 @@ error_panel.add(estimate_btn, info_btn)
 back_to_estimation_btn = types.InlineKeyboardButton(text='\U0001F519 Вернуться к оцениванию', callback_data='back_to_estimation')
 back_to_tables_btn = types.InlineKeyboardButton(text='\U0001F5C2 Список таблиц', callback_data='back_to_tables')
 
-
 # Empty
 empty_panel = types.InlineKeyboardMarkup()
+
+
+# Tables
+def generate_tables_panel(sample: BotSample) -> types.InlineKeyboardMarkup:
+    tables = en_spider.get_db_tables(sample.db)
+    buttons = []
+    for table_title in tables:
+        new_btn = types.InlineKeyboardButton(text=f'\U0001F4C3 {table_title}', callback_data=f'{TABLE}#{table_title}')
+        buttons.append(new_btn)
+    tables_panel = types.InlineKeyboardMarkup(row_width=2)
+    for left_btn, right_btn in zip(buttons[::2], buttons[1::2]):
+        tables_panel.add(left_btn, right_btn)
+    tables_panel.add(back_to_estimation_btn)
+    return tables_panel
