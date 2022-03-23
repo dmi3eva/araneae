@@ -138,9 +138,19 @@ POSITIONS = {
         panel=lambda sample: generate_tables_panel(sample),
         transitions={
             RETURN: Status.LAST,
-            TABLE: Status.CHOOSING_COLUMN
+            TABLE: Status.VIEW_TABLE
         },
         generate_text=lambda controller, user: generate_choosing_table(controller, user),
+        handle_error=lambda user, sample, correction: sample
+    ),
+    Status.VIEW_TABLE: Position(
+        current=Status.VIEW_TABLE,
+        panel=lambda sample: view_panel,
+        transitions={
+            RETURN_TO_TABLES: Status.CHOOSING_TABLE,
+            RETURN: Status.LAST
+        },
+        generate_text=lambda controller, user: generate_view_table_msg(controller, user),
         handle_error=lambda user, sample, correction: sample
     )
 }

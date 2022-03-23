@@ -76,7 +76,7 @@ info_panel = types.InlineKeyboardMarkup(row_width=1)
 info_panel.add(estimate_btn)
 
 # In progress info panel
-return_btn = types.InlineKeyboardButton(text='Вернуться к оцениванию', callback_data=RETURN)
+return_btn = types.InlineKeyboardButton(text='\U0001F519 Вернуться к оцениванию', callback_data=RETURN)
 in_progress_info_panel = types.InlineKeyboardMarkup(row_width=1)
 in_progress_info_panel.add(return_btn)
 
@@ -93,7 +93,7 @@ back_to_tables_btn = types.InlineKeyboardButton(text='\U0001F5C2 Список т
 empty_panel = types.InlineKeyboardMarkup()
 
 
-# Tables
+# Choosing tables
 def generate_tables_panel(sample: BotSample) -> types.InlineKeyboardMarkup:
     tables = en_spider.get_db_tables(sample.db)
     buttons = []
@@ -103,5 +103,13 @@ def generate_tables_panel(sample: BotSample) -> types.InlineKeyboardMarkup:
     tables_panel = types.InlineKeyboardMarkup(row_width=2)
     for left_btn, right_btn in zip(buttons[::2], buttons[1::2]):
         tables_panel.add(left_btn, right_btn)
-    tables_panel.add(back_to_estimation_btn)
+    tables_panel.add(return_btn)
     return tables_panel
+
+
+# Choosing columns
+return_to_main_btn = types.InlineKeyboardButton(text='\U0001F519 Вернуться к оцениванию', callback_data=RETURN)
+return_to_tables_btn = types.InlineKeyboardButton(text=f'\U0001F5C2 Список таблиц', callback_data=RETURN_TO_TABLES)
+view_panel = types.InlineKeyboardMarkup(row_width=1)
+view_panel.add(return_to_tables_btn)
+view_panel.add(return_to_main_btn)

@@ -19,9 +19,8 @@ class Status(Enum):
     ERROR_DESCRIBING_SQL = 8
     LAST = 9
     CHOOSING_TABLE = 10
-    CHOOSING_COLUMN = 11
-    VIEW_TABLE = 12
-    INFO_READING = 13
+    VIEW_TABLE = 11
+    INFO_READING = 12
 
 
 class State(Enum):

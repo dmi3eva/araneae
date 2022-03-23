@@ -111,12 +111,12 @@ SQL_CORRECTION = """
 
 OK_TO_FLUENCY_SOURCE = "Да, может"
 OK_TO_FLUENCY_SUBSTITUTION = "Да, может"
-OK_TO_EQV = "Да, это одно и то же'"
+OK_TO_EQV = "Да, это одно и то же"
 OK_TO_SQL = "Да, соответствует"
 
 WRONG_TO_FLUENCY_SOURCE = "Нет!"
 WRONG_TO_FLUENCY_SUBSTITUTION = "Нет!"
-WRONG_TO_EQV = "Нет, они не эквивалентны"
+WRONG_TO_EQV = "Нет, не значит"
 WRONG_TO_SQL = "Нет, не соответствует"
 
 DB = "Посмотреть БД"
@@ -135,6 +135,11 @@ CORRECTION_DONE = "Сохранить"
 CORRECTION_IMPOSSIBLE = "Не знаю, как поправить запрос"
 ANSWER_TO_IMPOSSIBLE = "Спасибо, что нашли ошибку! Мы рассмотрим этот запрос внимательнее."
 
+TABLE_VIEW = '''
+Содержимое таблицы <b>\"{table}\"</b>:
+
+<code>{view}</code>
+'''
 
 CALL_OK = 'correct'
 CALL_WRONG = 'incorrect'
@@ -144,5 +149,7 @@ CALL_INFO = "info"
 
 ESTIMATE = "estimate"
 RETURN = "return"
+RETURN_TO_TABLES = "return_to_tables"
 TEXT_TYPED = "text_typed"
 TABLE = "table"
+COLUMN = "column"

@@ -67,6 +67,17 @@ def generate_choosing_table(controller: Controller, user: User) -> str:
     return text
 
 
+def generate_view_table_msg(controller: Controller, user: User) -> str:
+    sample = user.last_sample
+    table = user.last_reaction
+    table_content = en_spider.show_table(sample.db, table)
+    view = prettify_table(table_content)
+    if len(view) > MAX_MESSAGE_LEN:
+        view = TOO_LONG + view[:MAX_MESSAGE_LEN]
+    text = TABLE_VIEW.format(table=table, view=view)
+    return text
+
+
 def send_new_sample(bot, controller, user_id):
     user = controller.users.get(user_id, None)
     if user.status is Status.READY or not user.last_sample:
