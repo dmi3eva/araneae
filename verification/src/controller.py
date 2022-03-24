@@ -57,6 +57,9 @@ class User:
         self.last_reaction: Optional[str] = None
         self.chosen_table: Optional[str] = None
 
+    def set_user(self, user_dict):
+        pass
+
     def save(self, sample: BotSample) -> NoReturn:
         print("I have saved")
 
@@ -66,6 +69,10 @@ class Controller:
         self.users: Dict[str, User] = {}
         self.samples = []
         self.load_samples()
+        self.load_users()
+
+    def load_users(self):
+        pass
 
     def load_samples(self):
         with open(SAMPLES_PARAPHRASED_PATH, 'r') as samples_file:
