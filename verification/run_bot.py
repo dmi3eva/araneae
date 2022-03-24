@@ -20,20 +20,26 @@ def start_message(message):
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_worker(call):
-    user_id = call.message.chat.id
-    user = get_user(controller, user_id)
-    chat_id = call.message.chat.id
-    reaction = call.data
-    handle(bot, controller, user, chat_id, reaction)
+    try:
+        user_id = call.message.chat.id
+        user = get_user(controller, user_id)
+        chat_id = call.message.chat.id
+        reaction = call.data
+        handle(bot, controller, user, chat_id, reaction)
+    except:
+        pass
 
 
 @bot.message_handler(content_types=['text'])
 def text(message):
-    user_id = message.chat.id
-    user = get_user(controller, user_id)
-    chat_id = message.chat.id
-    reaction = TEXT_TYPED
-    handle(bot, controller, user, chat_id, reaction)
+    try:
+        user_id = message.chat.id
+        user = get_user(controller, user_id)
+        chat_id = message.chat.id
+        reaction = TEXT_TYPED
+        handle(bot, controller, user, chat_id, reaction)
+    except:
+        pass
 
 
 bot.polling()

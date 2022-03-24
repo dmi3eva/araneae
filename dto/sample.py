@@ -66,6 +66,10 @@ class QueryType(Enum):
     NEGATION = "negation"
     NL = "nl"
     DB = "db"
+    SQL = "sql"
+    WHERE = "where"
+    GROUP_BY = "group_by"
+    ORDER_BY = "order_by"
 
 
 class QuerySubtype(Enum):
@@ -134,6 +138,23 @@ class QuerySubtype(Enum):
     DB_RU_TABLES_AMBIGUITY = "db-ru-tables-ambiguity"
     DB_RU_COLUMNS_AMBIGUITY = "db-ru-columns-ambiguity"
     DB_RU_VALUES_AMBIGUITY = "db-ru-values-ambiguity"
+    SQL_LIKE = "sql-like"
+    SQL_LIMIT = "sql-limit"
+    SQL_CAST = "sql-cast"
+    SQL_HAVING = "sql-having"
+    SQL_MULTI_WHERE = "sql-multi-where"
+    SQL_BETWEEN = "sql-between"
+    SQL_COMPARE = "sql-compare"
+    SQL_NULL = "sql-null"
+    SQL_EXCEPT = "sql-except"
+    SQL_DISCTINCT = "sql-distinct"
+    SQL_EXISTS = "sql-exists"
+    WHERE_MONO = "where-mono"
+    WHERE_MULTI = "where-multi"
+    GROUP_BY_EXISTS = "group-by-exists"
+    GROUP_BY_COUNT = "group-by-count"
+    ORDER_BY_EXISTS = "order-by-exists"
+    ORDER_BY_COUNT = "order-by-count"
 
 
 query_type_mapping = {_t.value: _t for _t in QueryType}
@@ -211,6 +232,31 @@ query_mapping = {
         QuerySubtype.DB_RU_TABLES_AMBIGUITY,
         QuerySubtype.DB_RU_COLUMNS_AMBIGUITY,
         QuerySubtype.DB_RU_VALUES_AMBIGUITY
+    ],
+    QueryType.SQL: [
+        QuerySubtype.SQL_LIKE,
+        QuerySubtype.SQL_LIMIT,
+        QuerySubtype.SQL_CAST,
+        QuerySubtype.SQL_HAVING,
+        QuerySubtype.SQL_MULTI_WHERE,
+        QuerySubtype.SQL_BETWEEN,
+        QuerySubtype.SQL_COMPARE,
+        QuerySubtype.SQL_NULL,
+        QuerySubtype.SQL_EXCEPT,
+        QuerySubtype.SQL_DISCTINCT,
+        QuerySubtype.SQL_EXISTS
+    ],
+    QueryType.WHERE: [
+        QuerySubtype.WHERE_MONO,
+        QuerySubtype.WHERE_MULTI
+    ],
+    QueryType.GROUP_BY: [
+        QuerySubtype.GROUP_BY_EXISTS,
+        QuerySubtype.GROUP_BY_COUNT
+    ],
+    QueryType.ORDER_BY: [
+        QuerySubtype.ORDER_BY_EXISTS,
+        QuerySubtype.ORDER_BY_COUNT
     ]
 }
 

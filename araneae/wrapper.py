@@ -43,6 +43,10 @@ class Araneae:
             QueryType.NL: lambda sample: self._specifications_nl(sample),
             QueryType.NEGATION: lambda sample: self._specifications_negation(sample),
             QueryType.DB: lambda sample: self._specifications_db(sample),
+            QueryType.SQL: lambda sample: self._specifications_sql(sample),
+            QueryType.WHERE: lambda sample: self._specifications_where(sample),
+            QueryType.GROUP_BY: lambda sample: self._specifications_group_by(sample),
+            QueryType.ORDER_BY: lambda sample: self._specifications_order_by(sample),
         }
 
     def load_column_types(self):
@@ -370,5 +374,42 @@ class Araneae:
         if contains_db_homo_values(sample, self.db_tokens_multiusing, Language.RU):
             subtypes.append(QuerySubtype.DB_RU_VALUES_AMBIGUITY)
 
+        return subtypes
+
+    def _specifications_sql(self, sample: Sample) -> Optional[List[QuerySubtype]]:
+        subtypes = []
+        sql = sample_token_processing(sample.query)
+        if "like" in sql:
+            subtypes.append(QuerySubtype.SQL_LIKE)
+        if "limit" in sql:
+            subtypes.append(QuerySubtype.SQL_LIMIT)
+        if "cast" in sql:
+            subtypes.append(QuerySubtype.SQL_CAST)
+        if "exist" in sql:
+            subtypes.append(QuerySubtype.SQL_EXISTS)
+        if "null" in sql:
+            subtypes.append(QuerySubtype.SQL_NULL)
+        if "between" in sql:
+            subtypes.append(QuerySubtype.SQL_BETWEEN)
+        if "except" in sql:
+            subtypes.append(QuerySubtype.SQL_EXCEPT)
+        if "having" in sql:
+            subtypes.append(QuerySubtype.SQL_HAVING)
+        if "distinct" in sql:
+            subtypes.append(QuerySubtype.SQL_DISCTINCT)
+        if "<" in sql or ">" in sql or "=" in sql or "between" in sql:
+            subtypes.append(QuerySubtype.SQL_COMPARE)
+        return subtypes
+
+    def _specifications_where(self, sample: Sample) -> Optional[List[QuerySubtype]]:
+        subtypes = []
+        return subtypes
+
+    def _specifications_group_by(self, sample: Sample) -> Optional[List[QuerySubtype]]:
+        subtypes = []
+        return subtypes
+
+    def _specifications_order_by(self, sample: Sample) -> Optional[List[QuerySubtype]]:
+        subtypes = []
         return subtypes
 
