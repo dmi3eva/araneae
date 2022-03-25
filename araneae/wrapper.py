@@ -403,6 +403,11 @@ class Araneae:
 
     def _specifications_where(self, sample: Sample) -> Optional[List[QuerySubtype]]:
         subtypes = []
+        where_mentions = [_m for _m in sample.mentions if _m.type is Subquery.WHERE]
+        if len(where_mentions) == 1:
+            subtypes.append(QuerySubtype.WHERE_MONO)
+        if len(where_mentions) == 2:
+            subtypes.append(QuerySubtype.WHERE_MULTI)
         return subtypes
 
     def _specifications_group_by(self, sample: Sample) -> Optional[List[QuerySubtype]]:
