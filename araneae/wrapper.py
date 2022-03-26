@@ -412,6 +412,9 @@ class Araneae:
 
     def _specifications_group_by(self, sample: Sample) -> Optional[List[QuerySubtype]]:
         subtypes = []
+        group_by_mentions = [_m for _m in sample.mentions if _m.type is Subquery.GROUP_BY]
+        if len(group_by_mentions) > 0:
+            subtypes.append(QuerySubtype.GROUP_BY_EXISTS)
         return subtypes
 
     def _specifications_order_by(self, sample: Sample) -> Optional[List[QuerySubtype]]:
