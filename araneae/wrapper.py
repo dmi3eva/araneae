@@ -419,5 +419,8 @@ class Araneae:
 
     def _specifications_order_by(self, sample: Sample) -> Optional[List[QuerySubtype]]:
         subtypes = []
+        order_by_mentions = [_m for _m in sample.mentions if _m.type is Subquery.ORDER_BY]
+        if len(order_by_mentions) > 0:
+            subtypes.append(QuerySubtype.ORDER_BY_EXISTS)
         return subtypes
 
