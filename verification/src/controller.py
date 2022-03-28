@@ -33,6 +33,7 @@ class State(Enum):
 
 @dataclass
 class BotSample:
+    id: Optional[int] = None
     db: Optional[str] = None
     source_nl: Optional[str] = None
     source_sql: Optional[str] = None
@@ -85,6 +86,7 @@ class Controller:
         # generated_sample = Sample()
         json_sample = choice(self.samples)
         generated_sample = BotSample(
+            id=json_sample['id'],
             db=json_sample['db_id'],
             source_nl=json_sample['question'],
             source_sql=json_sample['query'],
