@@ -58,7 +58,13 @@ class User:
         self.last_reaction: Optional[str] = None
         self.chosen_table: Optional[str] = None
 
-    def set_user(self, user_dict):
+    def create(self):  # ToDo
+        pass
+
+    def update(self):  # ToDo
+        pass
+
+    def load(self):  # ToDo
         pass
 
     def save(self, sample: BotSample) -> NoReturn:
@@ -68,11 +74,17 @@ class User:
 class Controller:
     def __init__(self):
         self.users: Dict[str, User] = {}
-        self.samples = []
-        self.load_samples()
-        self.load_users()
+        self.load_statuses()
+        self.calculate_statistics()
+        self.update_users()
 
-    def load_users(self):
+    def load_statuses(self):  # ToDo
+        pass
+
+    def calculate_statistics(self):  # ToDo
+        pass
+
+    def update_users(self):  # ToDo
         pass
 
     def load_samples(self):
@@ -82,7 +94,7 @@ class Controller:
     def add_new_user(self, user_id):
         self.users[user_id] = User(user_id)
 
-    def generate_sample_for_user(self, user_id) -> BotSample:  # TODO
+    def generate_sample_for_user(self, user_id) -> BotSample:  # ToDo
         # generated_sample = Sample()
         json_sample = choice(self.samples)
         generated_sample = BotSample(
