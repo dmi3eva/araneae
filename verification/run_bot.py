@@ -27,6 +27,7 @@ def callback_worker(call):
         chat_id = call.message.chat.id
         reaction = call.data
         handle(bot, controller, user, chat_id, reaction)
+        controller.save()
     except:
         pass
 
@@ -39,6 +40,7 @@ def text(message):
         chat_id = message.chat.id
         reaction = TEXT_TYPED
         handle(bot, controller, user, chat_id, reaction)
+        controller.save()
     except:
         pass
 

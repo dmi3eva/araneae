@@ -17,7 +17,7 @@ MAX_ROWS_AMOUNT = 10
 
 def generate_fluency_source_msg(controller: Controller, user: User) -> Tuple[str, Optional[bytearray]]:
     if not user.last_sample:
-        user.last_sample = controller.generate_sample_for_user(user.id)
+        user.last_sample = controller.generate_sample_for_user(user)
     sample = user.last_sample
     text = FLUENCY_SOURCE_DESCRIPTION.format(nl=sample.source_nl)
     return text, None

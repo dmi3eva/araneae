@@ -70,15 +70,20 @@ class Controller:
         with open(SAMPLES_PARAPHRASED_PATH, 'r', encoding="utf-8") as samples_file:
             self.samples = json.load(samples_file)
 
-    def add_new_user(self, user_id):
+    def add_new_user(self, user_id: int) -> NoReturn:
         self.users[user_id] = User(user_id)
 
-    def update_statistics(self, sample_id):
+    def update_statistics(self, user: User) -> NoReturn:
+        sample_id = user.last_sample.id
         self.statistics[sample_id] = self.statistics.get(sample_id, 0) + 1
 
-    def generate_sample_for_user(self, user_id) -> BotSample:  # ToDo
+    def generate_sample_for_user(self, user: User) -> BotSample:  # ToDo
         # generated_sample = Sample()
-        json_sample = choice(self.samples)
+        self.update_statistics(user)
+        user_id = user.id
+        json_sample = None
+        while not json_sample or self.statistics.get(json_sample['id'], 0) >= OVERLAPPING:
+            json_sample = choice(self.samples)
         generated_sample = BotSample(
             id=json_sample['id'],
             db=json_sample['db_id'],
@@ -89,5 +94,4 @@ class Controller:
             paraphrased_nl=json_sample['paraphrased_question'],
          )
         self.users[user_id].last_sample = deepcopy(generated_sample)
-        self.samples.remove(json_sample)
         return generated_sample
