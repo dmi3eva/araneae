@@ -1,5 +1,6 @@
 import os
 import json
+import dill as pickle
 from random import choice, shuffle
 from copy import deepcopy
 
@@ -20,55 +21,49 @@ class User:
         self.last_status: Optional[Status] = None
         self.last_reaction: Optional[str] = None
         self.chosen_table: Optional[str] = None
+        self.dir_path = os.path.join(USERS_FOLDER, f"{self.id}")
+        self.results: Optional[Dict[int, Optional[Dict]]] = {}
 
     def create(self):  # ToDo
-        user_dir_path = os.path.join(USERS_FOLDER, f"{self.id}")
-        if not os.path.exists(user_dir_path):
-            os.mkdir(user_dir_path)
+        if not os.path.exists(self.dir_path):
+            os.mkdir(self.dir_path)
 
-    def save(self, sample: BotSample) -> NoReturn:
-        print("I have saved")
+    def save(self) -> NoReturn:
+        sample_id = self.last_sample.id
+        self.results[sample_id] = self.last_sample
+        user_result_path = os.path.join(self.dir_path, f'{self.id}_results.json')
+        with open(user_result_path, 'w', encoding='utf-8'):
+            json.dump(self.results)
 
 
 class Controller:
     def __init__(self):
         self.users: Dict[str, User] = {}
         self.statistics: Dict[str, int] = {}
-        self.load_statuses()
+        self.load_statistics()
+        self.load_users()
         self.load_samples()
 
-    def load_statuses(self):
+    def load_statistics(self):
+        with open(STATISTICS_PATH, "r", encoding="utf-8") as controller_file:
+            self.statistics = json.load(controller_file)
+
+    def load_users(self):
         with open(CONTROLLER_PATH, "r", encoding="utf-8") as controller_file:
-            self.user = json.load(controller_file)
-
-    def calculate_statistics(self):
-        with open(STATISTICS_PATH, 'r', encoding="utf-8") as statistics_file:
-            statistics = json.load(statistics_file)
-        for user_id in self.users.keys():
-            user_result_file = os.path.join(USERS_FOLDER, f"{user_id}", "results.json")
-            samples = []
-            with open(user_result_file, 'r') as samples_file:
-                samples = json.load(samples_file)
-            for _sample in samples:
-                id = _sample['id']
-                statistics[id] = statistics.get(id, 0) + 1
-        with open(STATISTICS_PATH, "w", encoding="utf-8") as statistics_file:
-            json.dump(statistics, statistics_file)
-
-    def update_users(self):
-        for _user in self.users.values():
-            _user.update()
+            self.users = pickle.load(controller_file)
 
     def save(self):
-        self.save_statuses()
+        for _user in self.users.values():
+            _user.save()
+        self.save_users()
         self.save_statistics()
 
-    def save_statuses(self):
+    def save_users(self):
         with open(CONTROLLER_PATH, "w", encoding="utf-8") as controller_file:
             json.dump(self.users, controller_file)
 
     def save_statistics(self):
-        with open(CONTROLLER_PATH, "w", encoding="utf-8") as statistics_file:
+        with open(STATISTICS_PATH, "w", encoding="utf-8") as statistics_file:
             json.dump(self.users, statistics_file)
 
     def load_samples(self):
@@ -77,6 +72,9 @@ class Controller:
 
     def add_new_user(self, user_id):
         self.users[user_id] = User(user_id)
+
+    def update_statistics(self, sample_id):
+        self.statistics[sample_id] = self.statistics.get(sample_id, 0) + 1
 
     def generate_sample_for_user(self, user_id) -> BotSample:  # ToDo
         # generated_sample = Sample()
