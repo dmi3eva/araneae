@@ -406,7 +406,7 @@ class Araneae:
         where_mentions = [_m for _m in sample.mentions if _m.type is Subquery.WHERE]
         if len(where_mentions) == 1:
             subtypes.append(QuerySubtype.WHERE_MONO)
-        if len(where_mentions) == 2:
+        if len(where_mentions) >= 2:
             subtypes.append(QuerySubtype.WHERE_MULTI)
         return subtypes
 
@@ -415,6 +415,14 @@ class Araneae:
         group_by_mentions = [_m for _m in sample.mentions if _m.type is Subquery.GROUP_BY]
         if len(group_by_mentions) > 0:
             subtypes.append(QuerySubtype.GROUP_BY_EXISTS)
+        """
+        The idea was to extract something like this:
+            SELECT count(*) ,  country_code FROM players GROUP BY country_code
+            SELECT count(*) ,  YEAR FROM matches GROUP BY YEAR
+            SELECT Nationality ,  COUNT(*) FROM people GROUP BY Nationality 
+        """
+        if len(group_by_mentions) > 0 and 'count(' in sample.query.lower():
+            subtypes.append(QuerySubtype.GROUP_BY_COUNT)
         return subtypes
 
     def _specifications_order_by(self, sample: Sample) -> Optional[List[QuerySubtype]]:
@@ -422,5 +430,7 @@ class Araneae:
         order_by_mentions = [_m for _m in sample.mentions if _m.type is Subquery.ORDER_BY]
         if len(order_by_mentions) > 0:
             subtypes.append(QuerySubtype.ORDER_BY_EXISTS)
+        if len(order_by_mentions) > 0 and 'order by count(' in sample.query.lower():
+            subtypes.append(QuerySubtype.ORDER_BY_COUNT)
         return subtypes
 

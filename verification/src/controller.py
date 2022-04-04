@@ -1,50 +1,13 @@
+import os
 import json
-from random import choice
+from random import choice, shuffle
 from copy import deepcopy
-from dataclasses import dataclass
-from enum import Enum
+
 from typing import *
 from configure import *
 
-
-class Status(Enum):
-    READY = 0
-    IN_PROGRESS_FLUENCY_SOURCE = 1
-    IN_PROGRESS_FLUENCY_SUBSTITUTION = 2
-    IN_PROGRESS_EQUIVALENT = 3
-    IN_PROGRESS_SQL = 4
-    ERROR_DESCRIBING_FLUENCY_SOURCE = 5
-    ERROR_DESCRIBING_FLUENCY_SUBSTITUTION = 6
-    ERROR_DESCRIBING_EQUIVALENT = 7
-    ERROR_DESCRIBING_SQL = 8
-    LAST = 9
-    CHOOSING_TABLE = 10
-    VIEW_TABLE = 11
-    INFO_READING = 12
-
-
-class State(Enum):
-    SAMPLE = 0
-    TABLES = 1
-    VIEW = 2
-    INFO = 3
-    ERROR = 4
-
-
-@dataclass
-class BotSample:
-    id: Optional[int] = None
-    db: Optional[str] = None
-    source_nl: Optional[str] = None
-    source_sql: Optional[str] = None
-    substituted_nl: Optional[str] = None
-    substituted_sql: Optional[str] = None
-    paraphrased_nl: Optional[str] = None
-    result: Optional[str] = None
-    ok_fluency_source: bool = True
-    ok_fluency_substitution: bool = True
-    ok_equivalent: bool = True
-    ok_sql: bool = True
+from verification.settings.config import *
+from verification.src.dto import *
 
 
 class User:
@@ -59,13 +22,9 @@ class User:
         self.chosen_table: Optional[str] = None
 
     def create(self):  # ToDo
-        pass
-
-    def update(self):  # ToDo
-        pass
-
-    def load(self):  # ToDo
-        pass
+        user_dir_path = os.path.join(USERS_FOLDER, f"{self.id}")
+        if not os.path.exists(user_dir_path):
+            os.mkdir(user_dir_path)
 
     def save(self, sample: BotSample) -> NoReturn:
         print("I have saved")
@@ -74,21 +33,46 @@ class User:
 class Controller:
     def __init__(self):
         self.users: Dict[str, User] = {}
+        self.statistics: Dict[str, int] = {}
         self.load_statuses()
-        self.calculate_statistics()
-        self.update_users()
+        self.load_samples()
 
-    def load_statuses(self):  # ToDo
-        pass
+    def load_statuses(self):
+        with open(CONTROLLER_PATH, "r", encoding="utf-8") as controller_file:
+            self.user = json.load(controller_file)
 
-    def calculate_statistics(self):  # ToDo
-        pass
+    def calculate_statistics(self):
+        with open(STATISTICS_PATH, 'r', encoding="utf-8") as statistics_file:
+            statistics = json.load(statistics_file)
+        for user_id in self.users.keys():
+            user_result_file = os.path.join(USERS_FOLDER, f"{user_id}", "results.json")
+            samples = []
+            with open(user_result_file, 'r') as samples_file:
+                samples = json.load(samples_file)
+            for _sample in samples:
+                id = _sample['id']
+                statistics[id] = statistics.get(id, 0) + 1
+        with open(STATISTICS_PATH, "w", encoding="utf-8") as statistics_file:
+            json.dump(statistics, statistics_file)
 
-    def update_users(self):  # ToDo
-        pass
+    def update_users(self):
+        for _user in self.users.values():
+            _user.update()
+
+    def save(self):
+        self.save_statuses()
+        self.save_statistics()
+
+    def save_statuses(self):
+        with open(CONTROLLER_PATH, "w", encoding="utf-8") as controller_file:
+            json.dump(self.users, controller_file)
+
+    def save_statistics(self):
+        with open(CONTROLLER_PATH, "w", encoding="utf-8") as statistics_file:
+            json.dump(self.users, statistics_file)
 
     def load_samples(self):
-        with open(SAMPLES_PARAPHRASED_PATH, 'r') as samples_file:
+        with open(SAMPLES_PARAPHRASED_PATH, 'r', encoding="utf-8") as samples_file:
             self.samples = json.load(samples_file)
 
     def add_new_user(self, user_id):

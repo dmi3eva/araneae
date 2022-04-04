@@ -2,6 +2,7 @@ import telebot
 
 from verification.settings.config import *
 from verification.utils.common import *
+from verification.src.dto import *
 
 bot = telebot.TeleBot(API_TOKEN)
 controller = Controller()
