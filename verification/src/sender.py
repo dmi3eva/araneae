@@ -6,6 +6,7 @@ from verification.settings.content import *
 from verification.settings.panels_inline import *
 from verification.utils import *
 from verification.src.controller import *
+from verification.src.storage import *
 from verification.src.render import *
 
 from utils.spider_connectors import *
@@ -16,8 +17,7 @@ MAX_ROWS_AMOUNT = 10
 
 
 def generate_fluency_source_msg(controller: Controller, user: User) -> Tuple[str, Optional[bytearray]]:
-    if not user.last_sample:
-        user.last_sample = controller.generate_sample_for_user(user)
+    user.last_sample = controller.generate_sample_for_user(user)
     sample = user.last_sample
     text = FLUENCY_SOURCE_DESCRIPTION.format(nl=sample.source_nl)
     return text, None

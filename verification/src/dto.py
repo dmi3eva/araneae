@@ -37,7 +37,7 @@ class BotSample:
     substituted_sql: Optional[str] = None
     paraphrased_nl: Optional[str] = None
     result: Optional[str] = None
-    ok_fluency_source: bool = True
-    ok_fluency_substitution: bool = True
-    ok_equivalent: bool = True
-    ok_sql: bool = True
+    ok_fluency_source: Optional[bool] = None
+    ok_fluency_substitution: Optional[bool] = None
+    ok_equivalent: Optional[bool] = None
+    ok_sql: Optional[bool] = True

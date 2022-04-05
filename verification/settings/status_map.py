@@ -26,7 +26,7 @@ POSITIONS = {
             ESTIMATE: Status.IN_PROGRESS_FLUENCY_SOURCE,
         },
         generate_text=lambda controller, user: INSTRUCTIONS,
-        handle_error=lambda user, sample, correction: sample
+        handle_error=lambda user, sample, correction: save_sql_correct(user, sample, correction)
     ),
     Status.IN_PROGRESS_FLUENCY_SOURCE: Position(
         current=Status.IN_PROGRESS_FLUENCY_SOURCE,
@@ -52,7 +52,7 @@ POSITIONS = {
             CALL_INFO: Status.INFO_READING
         },
         generate_text=lambda controller, user: generate_fluency_substitution_msg(controller, user),
-        handle_error=lambda user, sample, correction: sample
+        handle_error=lambda user, sample, correction: save_fluency_source_correct(user, sample, correction)
     ),
     Status.IN_PROGRESS_EQUIVALENT: Position(
         current=Status.IN_PROGRESS_EQUIVALENT,
@@ -65,7 +65,7 @@ POSITIONS = {
             CALL_INFO: Status.INFO_READING
         },
         generate_text=lambda controller, user: generate_equivalent_msg(controller, user),
-        handle_error=lambda user, sample, correction: sample
+        handle_error=lambda user, sample, correction: save_fluency_substitution_correct(user, sample, correction)
     ),
     Status.IN_PROGRESS_SQL: Position(
         current=Status.IN_PROGRESS_SQL,
@@ -78,7 +78,7 @@ POSITIONS = {
             CALL_INFO: Status.INFO_READING
         },
         generate_text=lambda controller, user: generate_sql_msg(controller, user),
-        handle_error=lambda user, sample, correction: sample
+        handle_error=lambda user, sample, correction: save_equivalent_correct(user, sample, correction)
     ),
     Status.ERROR_DESCRIBING_FLUENCY_SOURCE: Position(
         current=Status.ERROR_DESCRIBING_FLUENCY_SOURCE,

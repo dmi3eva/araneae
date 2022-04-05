@@ -1,6 +1,8 @@
+
 from verification.src.sender import *
 from verification.utils.common import *
 from verification.settings.status_map import *
+from verification.src.storage import *
 
 
 def get_user(controller, user_id):
@@ -26,6 +28,7 @@ def handle(bot, controller, user: User, chat_id: str, reaction: Optional[str]) -
         user.status = user.last_status
     current_position = POSITIONS[user.status]
     sample = user.last_sample
+    logger.info(f"{user.id}: {last_position.current.name} -> {current_position.current.name}")
 
     # Текст сообщения
     text, img = current_position.generate_text(controller, user)
