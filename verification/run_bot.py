@@ -24,8 +24,8 @@ def start_message(message):
     except RanOutError:
         bot.send_message(user.id, RAN_OUT)
         logger.info(f"{user_id}: There is no requests for user.")
-    except:
-        pass
+    except Exception as e:
+        logger.exception(f"Exception: {e.__traceback__}")
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -41,7 +41,7 @@ def callback_worker(call):
         bot.send_message(user.id, RAN_OUT)
         logger.info(f"{user_id}: There is no requests for user.")
     except Exception as e:
-        logger.exception(f"{user_id}: Exception: {e.__traceback__}")
+        logger.exception(f"Exception: {e.__traceback__}")
 
 
 @bot.message_handler(content_types=['text'])
@@ -54,11 +54,13 @@ def text(message):
         handle(bot, controller, user, chat_id, reaction, typed=message.text)
         controller.save()
         logger.info(f"{user_id}: inputted \"{message.text}\"")
+        a = 7 // 0
+        print(a)
     except RanOutError:
         bot.send_message(user.id, RAN_OUT)
         logger.info(f"{user_id}: There is no requests for user.")
-    except:
-        pass
+    except Exception as e:
+        logger.exception(f"Exception: {e.__traceback__}")
 
 
 bot.polling()
