@@ -14,7 +14,7 @@ def get_user(controller, user_id):
     return user
 
 
-def handle(bot, controller, user: User, chat_id: str, reaction: Optional[str]) -> NoReturn:
+def handle(bot, controller, user: User, chat_id: str, reaction: Optional[str], typed=None) -> NoReturn:
     # Разбираемся со статусом
     last_position = POSITIONS[user.status]
     reaction_description = reaction.split('#')
@@ -37,7 +37,7 @@ def handle(bot, controller, user: User, chat_id: str, reaction: Optional[str]) -
     panel = current_position.panel(sample)
 
     # Обрабатываем ошибки
-    sample = last_position.handle_error(user, sample, None)
+    sample = last_position.handle_error(user, sample, typed)
 
     # Отправляем. Редактируем старые. Сохраняем.
     if img:

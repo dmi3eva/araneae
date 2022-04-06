@@ -57,8 +57,8 @@ error_fluency_source_panel.add(info_btn)
 
 # Correction fluency substitution error
 error_fluency_substitution_panel = types.InlineKeyboardMarkup(row_width=2)
-error_fluency_source_panel.add(skip_btn, db_btn)
-error_fluency_source_panel.add(info_btn)
+error_fluency_substitution_panel.add(skip_btn, db_btn)
+error_fluency_substitution_panel.add(info_btn)
 
 # Correction equivalent error
 error_equivalent_panel = types.InlineKeyboardMarkup(row_width=2)

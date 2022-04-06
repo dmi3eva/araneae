@@ -153,3 +153,5 @@ RETURN_TO_TABLES = "return_to_tables"
 TEXT_TYPED = "text_typed"
 TABLE = "table"
 COLUMN = "column"
+
+RAN_OUT = "Sorry, but we don't have any new samples for you! Thank you very much!"

@@ -22,7 +22,7 @@ def start_message(message):
         sent_msg = bot.send_message(user_id, text, parse_mode="HTML", reply_markup=panel)
         user.last_message = sent_msg
     except RanOutError:
-        bot.send_message(user.id, "Sorry, but we don't have any new samples for you!")
+        bot.send_message(user.id, RAN_OUT)
         logger.info(f"{user_id}: There is no requests for user.")
     except:
         pass
@@ -35,13 +35,13 @@ def callback_worker(call):
         user = get_user(controller, user_id)
         chat_id = call.message.chat.id
         reaction = call.data
-        handle(bot, controller, user, chat_id, reaction, logger)
+        handle(bot, controller, user, chat_id, reaction)
         controller.save()
     except RanOutError:
-        bot.send_message(user.id, "Sorry, but we don't have any new samples for you!")
+        bot.send_message(user.id, RAN_OUT)
         logger.info(f"{user_id}: There is no requests for user.")
-    except:
-        pass
+    except Exception as e:
+        logger.exception(f"{user_id}: Exception: {e.__traceback__}")
 
 
 @bot.message_handler(content_types=['text'])
@@ -51,11 +51,11 @@ def text(message):
         user = get_user(controller, user_id)
         chat_id = message.chat.id
         reaction = TEXT_TYPED
-        handle(bot, controller, user, chat_id, reaction, logger)
+        handle(bot, controller, user, chat_id, reaction, typed=message.text)
         controller.save()
         logger.info(f"{user_id}: inputted \"{message.text}\"")
     except RanOutError:
-        bot.send_message(user.id, "Sorry, but we don't have any new samples for you!")
+        bot.send_message(user.id, RAN_OUT)
         logger.info(f"{user_id}: There is no requests for user.")
     except:
         pass
