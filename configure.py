@@ -28,6 +28,7 @@ PROF_PATH = path.join(ROOT_PATH, "log", "profiling")
 # Verification
 SAMPLES_JSON = path.join(ROOT_PATH, "resources", "datasets", "araneae", "araneae.json")
 SAMPLES_PARAPHRASED_PATH = path.join(ROOT_PATH, "resources", "datasets", "araneae", "paraphrased.json")
+DUMMY_PARAPHRASED_PATH = path.join(ROOT_PATH, "resources", "datasets", "araneae", "paraphrased_dummy.json")
 
 # Tokens exploring
 MIN_TOKEN_LENGTH = 3
