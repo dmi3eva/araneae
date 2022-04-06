@@ -154,4 +154,6 @@ TEXT_TYPED = "text_typed"
 TABLE = "table"
 COLUMN = "column"
 
-RAN_OUT = "Sorry, but we don't have any new samples for you! Thank you very much!"
+# RAN_OUT = "Sorry, but we don't have any new samples for you! Thank you very much!"
+RAN_OUT = "Вы отсмотрели все доступные запросы. Разметка на данный момент закончена. Большое спасибо вам за помощь!"
+KEY_DOESNT_EXIST = "Пожалуйста, выберите один из предложенных вариантов и нажмите соответствующую кнопку. Если вам не было ничего предложено, то введите /start."

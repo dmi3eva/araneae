@@ -24,6 +24,9 @@ def start_message(message):
     except RanOutError:
         bot.send_message(user.id, RAN_OUT)
         logger.info(f"{user_id}: There is no requests for user.")
+    except KeyError:
+        bot.send_message(user.id, KEY_DOESNT_EXIST)
+        logger.info(f"{user_id}: There is no such key in positions.")
     except Exception as e:
         logger.exception(f"Exception: {e.__traceback__}")
 
@@ -40,6 +43,9 @@ def callback_worker(call):
     except RanOutError:
         bot.send_message(user.id, RAN_OUT)
         logger.info(f"{user_id}: There is no requests for user.")
+    except KeyError:
+        bot.send_message(user.id, KEY_DOESNT_EXIST)
+        logger.info(f"{user_id}: There is no such key in positions.")
     except Exception as e:
         logger.exception(f"Exception: {e.__traceback__}")
 
@@ -54,11 +60,12 @@ def text(message):
         handle(bot, controller, user, chat_id, reaction, typed=message.text)
         controller.save()
         logger.info(f"{user_id}: inputted \"{message.text}\"")
-        a = 7 // 0
-        print(a)
     except RanOutError:
         bot.send_message(user.id, RAN_OUT)
         logger.info(f"{user_id}: There is no requests for user.")
+    except KeyError:
+        bot.send_message(user.id, KEY_DOESNT_EXIST)
+        logger.info(f"{user_id}: There is no such key in positions.")
     except Exception as e:
         logger.exception(f"Exception: {e.__traceback__}")
 
