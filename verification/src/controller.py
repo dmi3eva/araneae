@@ -80,7 +80,7 @@ class Controller:
             json.dump(self.statistics, statistics_file)
 
     def load_samples(self):
-        with open(SAMPLES_PARAPHRASED_PATH, 'r', encoding="utf-8") as samples_file:
+        with open(SOURCE_SAMPLES_PATH, 'r', encoding="utf-8") as samples_file:
             self.samples = json.load(samples_file)
 
     def add_new_user(self, user_id: int) -> NoReturn:

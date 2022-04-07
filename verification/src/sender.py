@@ -19,13 +19,13 @@ MAX_ROWS_AMOUNT = 10
 def generate_fluency_source_msg(controller: Controller, user: User) -> Tuple[str, Optional[bytearray]]:
     user.last_sample = controller.generate_sample_for_user(user)
     sample = user.last_sample
-    text = FLUENCY_SOURCE_DESCRIPTION.format(nl=sample.source_nl)
+    text = FLUENCY_SOURCE_DESCRIPTION.format(nl=sample.substituted_nl)
     return text, None
 
 
 def generate_fluency_substitution_msg(controller: Controller, user: User) -> Tuple[str, Optional[bytearray]]:
     sample = user.last_sample
-    text = FLUENCY_SUBSTITUTION_DESCRIPTION.format(nl=sample.substituted_nl)
+    text = FLUENCY_SUBSTITUTION_DESCRIPTION.format(nl=sample.paraphrased_nl)
     return text, None
 
 
