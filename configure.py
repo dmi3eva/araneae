@@ -14,6 +14,7 @@ SCHEMES_PATH = path.join(ROOT_PATH, 'resources', 'datasets', 'spider', 'tables.j
 # Wrapper
 SPIDER_PATH = path.join(ROOT_PATH, "resources", "datasets", "spider")
 RUSSOCAMPUS_PATH = path.join(ROOT_PATH, "resources", "datasets", "russocampus")
+RUSSOCAMPUS_NEW_PATH = path.join(ROOT_PATH, "resources", "datasets", "russocampus_new")
 
 QUERY_TYPES_PATH = path.join(ROOT_PATH, "resources", "query_types")
 ARANEAE_PATH = path.join(ROOT_PATH, "resources", "dump", "araneae")
