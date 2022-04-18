@@ -317,8 +317,10 @@ class Mention:
     distinct: bool = False
     limit: Optional[int] = None
     details: List[str] = field(default_factory=lambda: [])
-    text: Optional[str] = None
-    mask: Optional[List[bool]] = None
+    db_tokens: Optional[List[str]] = None
+    query_text: Optional[str] = None
+    query_mask: Optional[List[bool]] = None
+
 
 class SamplesCollection:
     def __init__(self):
@@ -366,5 +368,3 @@ class SamplesCollection:
             data.append(row)
         df = pd.DataFrame(data=data)
         df.to_csv(tgt_path, encoding='utf-8')
-
-
