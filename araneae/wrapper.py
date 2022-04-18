@@ -32,6 +32,7 @@ class Araneae:
         }
         self.load_db_tokens()
         self.mention_extractor = MentionExtractor()
+        self.russian__mention_extractor = None
         self.start_indices = None
         self.EXTRACTION_FUNCTIONS = {
             QueryType.BINARY: lambda sample: self._specifications_from_mentions(QueryType.BINARY, sample),

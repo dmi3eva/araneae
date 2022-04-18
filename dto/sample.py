@@ -270,6 +270,7 @@ class Sample:
         self.query: Optional[str] = None
         self.sql: Optional[Dict] = None
         self.mentions: Optional[List[Mention]] = None
+        self.russian_mentions: Optional[List[Mention]] = None
         self.specifications: Optional[Dict] = None
         self.question_toks: Optional[List] = None
         self.query_toks: Optional[List] = None
@@ -316,7 +317,8 @@ class Mention:
     distinct: bool = False
     limit: Optional[int] = None
     details: List[str] = field(default_factory=lambda: [])
-
+    text: Optional[str] = None
+    mask: Optional[List[bool]] = None
 
 class SamplesCollection:
     def __init__(self):
