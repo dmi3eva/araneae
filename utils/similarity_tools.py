@@ -1,7 +1,12 @@
-from typing import *
+
+import os
 import gensim
+from typing import *
 import pymorphy2
+import wget
+import tarfile
 from nltk.stem.porter import *
+from configure import *
 
 
 from dto.sample import Language
@@ -9,12 +14,29 @@ from dto.sample import Language
 
 class SimilarityDefiner:
     def __init__(self):
-        self.russian_embedder = gensim.models.KeyedVectors.load_word2vec_format("ruwikiruscorpora_0_300_20.bin.gz", binary=True)
+        self.load_models()
+        self.russian_embedder = gensim.models.KeyedVectors.load_word2vec_format(RU_EMBEDDING_MODEL_PATH, binary=True)
         self.russian_embedder.init_sims(replace=True)
-        self.english_embedder = gensim.models.KeyedVectors.load_word2vec_format("ruwikiruscorpora_0_300_20.bin.gz", binary=True)
-        self.english_embedder.init_sims(replace=True)
+        # self.english_embedder = gensim.models.KeyedVectors.load_word2vec_format("ruwikiruscorpora_0_300_20.bin.gz", binary=True)
+        # self.english_embedder.init_sims(replace=True)
         self.russian_morpher = pymorphy2.MorphAnalyzer()
         self.english_stemmer = PorterStemmer()
+
+    def load_models(self):
+        self.load_russian_model()
+
+    def load_russian_model(self):
+        if not os.path.exists(RU_EMBEDDING_MODEL_DIR):
+            os.mkdir(RU_EMBEDDING_MODEL_DIR)
+        if not os.path.exists(RU_EMBEDDING_MODEL_ARCHIVE):
+            _ = wget.download(RU_EMBEDDING_MODEL_URL, out=RU_EMBEDDING_MODEL_ARCHIVE)
+        if not os.path.exists(RU_EMBEDDING_MODEL_PATH):
+            file = tarfile.open(RU_EMBEDDING_MODEL_ARCHIVE)
+            file.extractall(RU_EMBEDDING_MODEL_DIR)
+            file.close()
+
+
+
 
     def get_edit_distance(self, token_1: str, token_2: str, language: Language) -> float:
         pass

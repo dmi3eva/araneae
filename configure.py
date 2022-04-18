@@ -52,3 +52,12 @@ EN_MULTIUSING_VALUES = path.join(ROOT_PATH, "resources", "results", "tokens", "m
 SPIDER_DB_PATH = path.join(ROOT_PATH, "resources", "datasets", "spider", "database")
 RUSSOCAMPUS_DB_PATH = path.join(ROOT_PATH, "resources", "datasets", "russocampus", "merged_database")
 SPIDER_SCHEMES_PATH = path.join(ROOT_PATH, "resources", "datasets", "spider", "tables.json")
+
+
+# Similarity tools
+RU_EMBEDDING_MODEL = path.join("araneum_none_fasttextcbow_300_5_2018")
+EN_EMBEDDING_MODEL_DIR = path.join(ROOT_PATH, "resources", "models", "embedders", "en")
+RU_EMBEDDING_MODEL_DIR = path.join(ROOT_PATH, "resources", "models", "embedders", "ru")
+RU_EMBEDDING_MODEL_ARCHIVE = path.join(RU_EMBEDDING_MODEL_DIR, f"{RU_EMBEDDING_MODEL}.tgz")
+RU_EMBEDDING_MODEL_PATH = path.join(RU_EMBEDDING_MODEL_DIR, f"{RU_EMBEDDING_MODEL}.model")
+RU_EMBEDDING_MODEL_URL = f"https://rusvectores.org/static/models/rusvectores4/fasttext/{RU_EMBEDDING_MODEL}.tgz"
