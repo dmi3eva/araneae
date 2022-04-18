@@ -7,6 +7,7 @@ import wget
 import tarfile
 from nltk.stem.porter import *
 from configure import *
+# from gensim.models.wrappers import FastText
 
 
 from dto.sample import Language
@@ -15,7 +16,8 @@ from dto.sample import Language
 class SimilarityDefiner:
     def __init__(self):
         self.load_models()
-        self.russian_embedder = gensim.models.KeyedVectors.load_word2vec_format(RU_EMBEDDING_MODEL_PATH, binary=True)
+        self.russian_embedder = gensim.models.KeyedVectors.load(RU_EMBEDDING_MODEL_PATH)
+        # self.russian_embedder = FastText.load_fasttext_format(RU_EMBEDDING_MODEL_PATH)
         self.russian_embedder.init_sims(replace=True)
         # self.english_embedder = gensim.models.KeyedVectors.load_word2vec_format("ruwikiruscorpora_0_300_20.bin.gz", binary=True)
         # self.english_embedder.init_sims(replace=True)
