@@ -68,13 +68,14 @@ class SimilarityDefiner:
     def get_edit_distance(self, token_1: str, token_2: str) -> float:
         pass
 
-
-    def get_semantic_distance(self, language: Language, token_1: str, token_2: str) -> float:
+    def get_semantic_similarity(self, language: Language, token_1: str, token_2: str) -> float:
         embedder = self.embedders[language]
-        vector_1 = embedder.get_word_vector(token_1)
-        vector_2 = embedder.get_word_vector(token_2)
-        d = distance.euclidean(vector_1, vector_2)
-        return d
+        initial_1 = self.english_stemmer.stem(token_1)
+        initial_2 = self.english_stemmer.stem(token_2)
+        vector_1 = embedder.get_word_vector(initial_1)
+        vector_2 = embedder.get_word_vector(initial_2)
+        similarity = 1 - distance.cosine(vector_1, vector_2)
+        return similarity
 
 
 
@@ -85,14 +86,14 @@ if __name__ == "__main__":
     en_word_1 = "profit"
     en_candidates_1 = ["profit", "profi", "income", "earning", "money", "company", "cat", "of", "blups"]
     for candidate in en_candidates_1:
-        sim_d = definer.get_semantic_distance(Language.EN, en_word_1, candidate)
+        sim_d = definer.get_semantic_similarity(Language.EN, en_word_1, candidate)
         edit_d = 0
         # edit_d = definer.get_edit_distance(en_word_1, candidate)
         print(f"{en_word_1} : {candidate} = {sim_d} | {edit_d}")
 
     en_word_2 = "profits"
     for candidate in en_candidates_1:
-        sim_d = definer.get_semantic_distance(Language.EN, en_word_2, candidate)
+        sim_d = definer.get_semantic_similarity(Language.EN, en_word_2, candidate)
         # edit_d = definer.get_edit_distance(en_word_2, candidate)
         edit_d = 0
         print(f"{en_word_2} : {candidate} = {sim_d} | {edit_d}")

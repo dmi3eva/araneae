@@ -21,10 +21,10 @@ class SimilarityDefiner:
     def __init__(self):
         self.load_models()
         self.embedders = {
-            Language.EN: fasttext.load_model(EN_EMBEDDING_MODEL_PATH),
-            Language.RU: fasttext
+            # Language.EN: fasttext.load_model(EN_EMBEDDING_MODEL_PATH),
+            Language.RU: gensim.models.KeyedVectors.load_word2vec_format(RU_EMBEDDING_MODEL_PATH)
         }
-        fasttext.load_model(EN_EMBEDDING_MODEL_PATH)
+        # fasttext.load_model(EN_EMBEDDING_MODEL_PATH)
         # self.russian_embedder = gensim.models.KeyedVectors.load(RU_EMBEDDING_MODEL_PATH)
         # self.russian_embedder = FastText.load_fasttext_format(RU_EMBEDDING_MODEL_PATH)
         # self.russian_embedder.init_sims(replace=True)
@@ -34,8 +34,8 @@ class SimilarityDefiner:
         self.english_stemmer = PorterStemmer()
 
     def load_models(self):
-        self.load_english_model()
-        # self.load_russian_model()
+        # self.load_english_model()
+        self.load_russian_model()
 
 
     def load_russian_model(self):
@@ -52,7 +52,6 @@ class SimilarityDefiner:
         if not os.path.exists(EN_EMBEDDING_MODEL_DIR):
             os.mkdir(EN_EMBEDDING_MODEL_DIR)
         if not os.path.exists(EN_EMBEDDING_MODEL_PATH):
-            print("H i")
             fasttext.util.download_model('en', if_exists='ignore')
             model = fasttext.load_model(EN_EMBEDDING_MODEL)
             model.save_model(EN_EMBEDDING_MODEL_PATH)
