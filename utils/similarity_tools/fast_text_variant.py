@@ -8,7 +8,7 @@ import tarfile
 from nltk.stem.porter import *
 import fasttext.util
 from scipy.spatial import distance
-
+from utils.preprocessing.text import *
 from configure import *
 # from gensim.models.wrappers import FastText
 
@@ -51,7 +51,7 @@ class SimilarityDefiner:
         if not os.path.exists(EN_EMBEDDING_MODEL_DIR):
             os.mkdir(EN_EMBEDDING_MODEL_DIR)
         if not os.path.exists(EN_EMBEDDING_MODEL_PATH):
-            print("H i")
+            print("Hi")
             fasttext.util.download_model('en', if_exists='ignore')
             model = fasttext.load_model(EN_EMBEDDING_MODEL)
             model.save_model(EN_EMBEDDING_MODEL_PATH)
