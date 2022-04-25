@@ -17,3 +17,4 @@ resources/
 venv/
 spider_analysis/db/.ipynb_checkpoints/
 utils/preprocessing/spider/
+configure.py
