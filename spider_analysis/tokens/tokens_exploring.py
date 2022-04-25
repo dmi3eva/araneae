@@ -65,7 +65,7 @@ def extract_tokens_info(dataset: Araneae, language: Language):
 def extract_db_info(info: Dict[str, Token], language: Language) -> Dict[str, Token]:
     spider = None
     if language is Language.RU:
-        spider = RuSpiderDB()
+        spider = RuSpiderDBOld()
     else:
         spider = EnSpiderDB()
     columns = spider.extract_columns()

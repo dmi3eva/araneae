@@ -127,10 +127,10 @@ class EnSpiderDB(SpiderDB):
         return columns
 
 
-class RuSpiderDB(SpiderDB):
+class RuSpiderDBOld(SpiderDB):
     def __init__(self):
         super().__init__()
-        self.db_path =RUSSOCAMPUS_DB_PATH
+        self.db_path =RUSSOCAMPUS_DB_PATH_OLD
 
     def extract_dbs(self):
         return os.listdir(self.db_path)
@@ -151,3 +151,9 @@ class RuSpiderDB(SpiderDB):
                 extracted_columns = self.execute_request(_db, COLUMNS_REQUEST.format(_table))
                 columns[_db][_table] = [_c[1] for _c in extracted_columns]
         return columns
+
+
+class RuSpiderDB(RuSpiderDBOld):
+    def __init__(self):
+        super().__init__()
+        self.db_path =RUSSOCAMPUS_DB_PATH_NEW
