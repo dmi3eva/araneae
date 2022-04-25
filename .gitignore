@@ -12,6 +12,7 @@
 *.css
 *.idea
 *.xml
+*.ipynb_checkpoints
 resources/
 venv/
 spider_analysis/db/.ipynb_checkpoints/
