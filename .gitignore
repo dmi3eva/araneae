@@ -1,0 +1,18 @@
+*.vec
+*.gz
+*.sqlite
+*.json
+*.prof
+*.log
+*.png
+*.iml
+*.html
+*.Без названия
+.gitignore
+*.css
+*.idea
+*.xml
+resources/
+venv/
+spider_analysis/db/.ipynb_checkpoints/
+utils/preprocessing/spider/
