@@ -21,12 +21,14 @@ TABLES_REQUEST = f"SELECT name FROM sqlite_master WHERE type='table'"
 #         </progress>
 #     """.format(value=value, max=max))
 
+
 class SpiderDB:
     def __init__(self):
         self.db_path = None
-        self.__dbs: Union[List[str], None] = None
-        self.__tables: Union[Dict, None] = None
-        self.__columns: Union[Dict, None] = None
+        self.__dbs: Optional[List[str]] = None
+        self.__tables: Optional[Dict] = None
+        self.__columns: Optional[Dict] = None
+        self.__triples: Optional[List[Tuple]] = None
 
     def extract_dbs(self) -> List[str]:
         pass
@@ -54,6 +56,14 @@ class SpiderDB:
         if not self.__columns:
             self.__columns = self.extract_columns()
         return self.__columns
+
+    @property
+    def triples(self) -> Dict:
+        if not self.__columns:
+            self.__columns = self.extract_columns()
+        if not self.__triples:
+            self.__triples = self.extract_triples()
+        return self.__triples
 
     def execute_request(self, db_id: str, sql: str):
         db = os.path.join(self.db_path, db_id, db_id + ".sqlite")
@@ -90,6 +100,15 @@ class SpiderDB:
         values = self.execute_request(db, values_request)
         column_names = tuple(self.get_db_columns(db, table))
         return column_names, values
+
+    def extract_triples(self) -> Optional[List[Tuple]]:
+        triples = []
+        for _db, tables in self.columns.items():
+            for _table, columns in tables.items():
+                for _column in columns:
+                    _triple = (_db, _table, _column)
+                    triples.append(_triple)
+        return triples
 
 
 class EnSpiderDB(SpiderDB):
