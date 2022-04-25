@@ -51,6 +51,8 @@ EN_MULTIUSING_VALUES = path.join(ROOT_PATH, "resources", "results", "tokens", "m
 # Spider connectors
 SPIDER_DB_PATH = path.join(ROOT_PATH, "resources", "datasets", "spider", "database")
 RUSSOCAMPUS_DB_PATH = path.join(ROOT_PATH, "resources", "datasets", "russocampus", "merged_database")
+RUSSOCAMPUS_DB_PATH_NEW = path.join(ROOT_PATH, "resources", "datasets", "russocampus_new", "merged_database")
+RUSSOCAMPUS_DB_PATH_OLD = path.join(ROOT_PATH, "resources", "datasets", "russocampus_old", "merged_database")
 SPIDER_SCHEMES_PATH = path.join(ROOT_PATH, "resources", "datasets", "spider", "tables.json")
 
 
@@ -63,7 +65,7 @@ RU_EMBEDDING_MODEL_DIR = path.join(ROOT_PATH, "resources", "models", "embedders"
 EN_EMBEDDING_MODEL_DIR = path.join(ROOT_PATH, "resources", "models", "embedders", "en")
 
 
-RU_EMBEDDING_MODEL_PATH = path.join(RU_EMBEDDING_MODEL_DIR, f"{RU_EMBEDDING_MODEL}.model")
+RU_EMBEDDING_MODEL_PATH = path.join(RU_EMBEDDING_MODEL_DIR, f"{RU_EMBEDDING_MODEL}.vec")
 EN_EMBEDDING_MODEL_PATH = path.join(EN_EMBEDDING_MODEL_DIR, f"{EN_EMBEDDING_MODEL}")
 
 RU_EMBEDDING_MODEL_ARCHIVE = path.join(RU_EMBEDDING_MODEL_DIR, f"{RU_EMBEDDING_MODEL}.vec.gz")
