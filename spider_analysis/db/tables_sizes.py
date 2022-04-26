@@ -99,6 +99,7 @@ def get_russian_entities_sizes_statistics(connector: SpiderDB) -> Tuple[Numerica
     tokens_counter = Counter(token_sizes)
     return NumericalStatistics(symbols_counter), NumericalStatistics(tokens_counter)
 
+
 def is_russian(text: str) -> bool:
     ru_alphabet = 'абвгдеёжзиклмнопрстуфхцчшщъыьэюя'
     size = len(text)
@@ -107,3 +108,20 @@ def is_russian(text: str) -> bool:
     if text[0] in ru_alphabet or text[-1] in ru_alphabet or text[size // 2] in ru_alphabet:
         return True
     return False
+
+
+def extract_russians(connector: SpiderDB) -> List[Tuple]:
+    """
+    Returns sizes of values in symbols and in tokens
+    """
+    russian_fours = []
+    total = len(connector.triples)
+    for ind, _triple in enumerate(connector.triples):
+        if ind % 500 == 0:
+            print(f"{ind} / {total}")
+        db, table, column = _triple
+        values = connector.get_values(db, table, column)
+        russian_values = [_v for _v in values if is_russian(_v)]
+        if len(russian_values) > 0:
+            russian_fours.append((db, table, column, russian_values))
+    return russian_fours
