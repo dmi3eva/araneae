@@ -6,6 +6,8 @@ import pandas as pd
 from configure import *
 from copy import deepcopy
 from typing import *
+from nltk import word_tokenize
+from utils.preprocessing.spider.process_sql import tokenize
 
 from utils.common import *
 from utils.preprocessing.text import *
@@ -104,15 +106,34 @@ class Araneae:
             current_ind += 1
         return len(json_samples)
 
+    def load_russian_from_csv(self, filepath: str, id_start: int) -> int:
+        data_df = pd.read_csv(filepath)
+        current_ind = id_start
+        samples_json = []
+        for ind, row in data_df.iterrows():
+            current_sample = self.samples.content[current_ind]
+            self._verify_translation(current_sample, row)
+            current_sample.russian_query = row['sql_ru']
+            if row["sql_ru_corrected"] or len(row["sql_ru_corrected"]) > 0:
+                current_sample.russian_query = row['sql_ru_corrected']
+            current_sample.russian_question = row['ru']
+            if row["sql_ru_corrected"] or len(row["ru_corrected"]) > 0:
+                current_sample.russian_question = row['ru_corrected']
+
+            current_sample.russian_query_toks = tokenize(current_sample.russian_query)
+            current_sample.russian_query_toks_no_values = tokenize(current_sample.russian_query)
+
+            current_sample.russian_question_toks = word_tokenize(current_sample.russian_query)
+            current_sample.id = row["id"]
+            current_ind += 1
+        return len(samples_json)
+
     def add_specifications(self, extraction_functions: List[QueryType]) -> NoReturn:
         samples_amount = len(self.samples.content)
         for ind, _sample in enumerate(self.samples.content):
             if ind % 10 == 0:
                 print(f"{ind} / {samples_amount}")
             _sample.specifications = self.extract_specifications(extraction_functions, _sample)
-
-    def load_russian_from_csv(self, filepath: str, id_start: int) -> int:
-        pass
 
     def import_spider(self):
         dev_path = os.path.join(SPIDER_PATH, 'dev.json')
@@ -128,12 +149,21 @@ class Araneae:
         }
 
     def import_russocampus(self):
-        ru_dev_path = os.path.join(RUSSOCAMPUS_PATH, 'rusp_dev.json')
-        ru_train_path = os.path.join(RUSSOCAMPUS_PATH, 'rusp_train.json')
-        ru_train_others_path = os.path.join(RUSSOCAMPUS_PATH, 'rusp_train_others.json')
-        dev_size = self.load_russian_from_json(ru_dev_path, 0)
-        train_size = self.load_russian_from_json(ru_train_path, dev_size)
-        _ = self.load_russian_from_json(ru_train_others_path, dev_size + train_size)
+        # Old:
+        # ru_dev_path = os.path.join(RUSSOCAMPUS_PATH, 'rusp_dev.json')
+        # ru_train_path = os.path.join(RUSSOCAMPUS_PATH, 'rusp_train.json')
+        # ru_train_others_path = os.path.join(RUSSOCAMPUS_PATH, 'rusp_train_others.json')
+
+        # dev_size = self.load_russian_from_json(ru_dev_path, 0)
+        # train_size = self.load_russian_from_json(ru_train_path, dev_size)
+        # _ = self.load_russian_from_json(ru_train_others_path, dev_size + train_size)
+
+        # New:
+        ru_dev_path = os.path.join(RUSSOCAMPUS_NEW_PATH, 'dev.csv')
+        ru_train_path = os.path.join(RUSSOCAMPUS_NEW_PATH, 'train.csv')
+
+        dev_size = self.load_russian_from_csv(ru_dev_path, 0)
+        _ = self.load_russian_from_csv(ru_train_path, dev_size)
 
 
     def load(self):
