@@ -33,6 +33,6 @@ def save_nl_statistics(statistics, filename):
 if __name__ == "__main__":
     araneae = Araneae()
     araneae.load()
-    nl_frequency = make_nl_frequency_statistics(araneae.samples.content, Language.EN, ignore_agg=False)
-    save_nl_statistics(nl_frequency, "22_04_28_nl_frequency_en")
+    nl_frequency = make_nl_frequency_statistics(araneae.samples.content, Language.RU, ignore_agg=False)
+    save_nl_statistics(nl_frequency, "22_04_28_nl_frequency_ru_old")
     a = 7
