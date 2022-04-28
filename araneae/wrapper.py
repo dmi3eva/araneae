@@ -107,26 +107,28 @@ class Araneae:
         return len(json_samples)
 
     def load_russian_from_csv(self, filepath: str, id_start: int) -> int:
-        data_df = pd.read_csv(filepath)
+        data_df = pd.read_csv(filepath, sep=',', encoding='utf-8')
         current_ind = id_start
         samples_json = []
         for ind, row in data_df.iterrows():
             current_sample = self.samples.content[current_ind]
             self._verify_translation(current_sample, row)
             current_sample.russian_query = row['sql_ru']
-            if row["sql_ru_corrected"] or len(row["sql_ru_corrected"]) > 0:
+            corrected = row["sql_ru_corrected"]
+            if not pd.isna(corrected) and corrected and len(corrected) > 0:
                 current_sample.russian_query = row['sql_ru_corrected']
             current_sample.russian_question = row['ru']
-            if row["sql_ru_corrected"] or len(row["ru_corrected"]) > 0:
+            corrected = row["ru_corrected"]
+            if not pd.isna(corrected) and corrected and len(corrected) > 0:
                 current_sample.russian_question = row['ru_corrected']
 
             current_sample.russian_query_toks = tokenize(current_sample.russian_query)
             current_sample.russian_query_toks_no_values = tokenize(current_sample.russian_query)
 
-            current_sample.russian_question_toks = word_tokenize(current_sample.russian_query)
+            current_sample.russian_question_toks = word_tokenize(current_sample.russian_question)
             current_sample.id = row["id"]
             current_ind += 1
-        return len(samples_json)
+        return len(data_df)
 
     def add_specifications(self, extraction_functions: List[QueryType]) -> NoReturn:
         samples_amount = len(self.samples.content)
@@ -213,7 +215,12 @@ class Araneae:
 
     def _verify_translation(self, sample: Sample, translation_json: Dict):
         if sample.db_id != translation_json['db_id']:
-            raise ValueError(f"Translation problem: {sample.id} = {sample.question} ({translation_json['question']})")
+            if 'question' in translation_json.keys():
+                raise ValueError(
+                    f"Translation problem: {sample.id} = {sample.question} ({translation_json['question']})")
+            else:
+                raise ValueError(
+                    f"Translation problem: {sample.id} = {sample.question} ({translation_json['id']})")
 
     def _specifications_from_mentions(self, query_type: QueryType, sample: Sample) -> Optional[List[QuerySubtype]]:
         specifications = None

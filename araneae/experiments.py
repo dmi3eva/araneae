@@ -18,14 +18,15 @@ def save(test_sets_collections: Dict[str, SamplesCollection]):
 ########################################################
 
 # First start
-# araneae = Araneae()
-# araneae.import_spider()
-# araneae.import_russocampus()
+araneae = Araneae()
+araneae.import_spider()
+araneae.import_russocampus()
+araneae.save()
 
 
 # Other starts
-araneae = Araneae()
-araneae.load()
+# araneae = Araneae()
+# araneae.load()
 
 ########################################################
 #############  Experiments   ##############################
