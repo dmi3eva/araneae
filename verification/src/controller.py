@@ -82,6 +82,7 @@ class Controller:
     def load_samples(self):
         with open(SOURCE_SAMPLES_PATH, 'r', encoding="utf-8") as samples_file:
             self.samples = json.load(samples_file)
+            print(len(self.samples))
 
     def add_new_user(self, user_id: int) -> NoReturn:
         self.users[user_id] = User(user_id)

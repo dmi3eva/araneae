@@ -15,4 +15,4 @@ DONE_PATH = path.join(ROOT_PATH, "verification", "data", "done.json")
 USERS_FOLDER = path.join(ROOT_PATH, "verification", "data", "users")
 
 OVERLAPPING = 7
-
+SIGNAL_ID = "-1001650536881"

@@ -1,25 +1,26 @@
-INSTRUCTIONS = """
+
+VERY_START = """
 \U0001F600 Здравствуйте! 
 
 Мы занимаемся расширением существующего датасета SQL-запросов искусственными методами. Будем очень благодарны, если вы поможете оценить корректность новых примеров.
 <i>Сейчас вы можете пропустить инструкцию и вернуться к ней, когда у вас возникнут вопросы.</i>
 Главное, помните, что, если вы сомневаетесь, то лучше лишний раз сообщить об ошибке.
+"""
 
-- - - - - - - - - - - - - - - - - - - - - - - - -
-
+INSTRUCTIONS = """
 Оценка корректности каждого примера разбита на 4 последовательных шага. 
 
-1️⃣ <b>ШАГ</b>: 
+1️⃣<b>-ый шаг</b>: 
 <i>Звучит ли запрос к базе данных естественно и адекватно?</i>
 
-Примеры:
+<b>Примеры</b>:
 \U00002796 What ID has the most surnames? \U00002192 <i>Звучит неестественно. Да и каждому ID, скорее всего, соответствует одно имя. </i>
 \U00002795 Which command has the most wins?
 
-2️⃣ <b>ШАГ</b>: 
+2️⃣<b>-ой шаг</b>: 
 <i>Похож ли вообще данный текст на запрос к БД?</i>
 
-Примеры:
+<b>Примеры</b>:
 \U00002796 Any country in the world have five singers. \U00002192 <i>Это просто повествовательное предложение, не запрос.</i>
 \U00002795 List all countries in the world that have five singers.
 
@@ -32,10 +33,10 @@ INSTRUCTIONS = """
 \U00002796 All the broadcasting TV Channels don't working today. List the number of different channels by their owners. \U00002192 <i>Многовато лишней информации :)</i>
 \U00002795 List the number of different channels by their owners.
 
-3️⃣ <b>ШАГ</b>: 
+3️⃣<b>-ий шаг</b>:  
 <i>Значат ли одно и то же два данных вопроса?</i>
 
-Примеры:
+<b>Примеры</b>:
 \U00002796 
 Give the language that is spoken in the most countries.
 What is the most spoken language in the world?
@@ -43,10 +44,10 @@ What is the most spoken language in the world?
 What are the type codes and descriptions for all template types?	
 What are types of templates? What are their descriptions?
 
-4️⃣ <b>ШАГ</b>: 
+4️⃣<b>-ый шаг</b>:  
 <i>Самое сложное: соответствует ли запрос данному SQL?</i>
 
-Примеры:
+<b>Примеры</b>:
 \U00002796 
 Show descriptions of simple properties.
 <code>SELECT description FROM Properties WHERE type='Simple'</code>

@@ -15,7 +15,10 @@ controller = Controller()
 def start_message(message):
     try:
         user_id = message.chat.id
+        if user_id not in controller.users.keys():
+            bot.send_message(SIGNAL_ID, f"New user {user_id} was added.", parse_mode="HTML")
         user = get_user(controller, user_id)
+        bot.send_message(user_id, VERY_START, parse_mode="HTML")
         current_position = POSITIONS[user.status]
         text = current_position.generate_text(controller, user)
         panel = current_position.panel(None)
@@ -38,10 +41,12 @@ def callback_worker(call):
         user = get_user(controller, user_id)
         chat_id = call.message.chat.id
         reaction = call.data
+        bot.send_message(SIGNAL_ID, f"User {user_id} send {reaction}.")
         handle(bot, controller, user, chat_id, reaction)
         controller.save()
     except RanOutError:
         bot.send_message(user.id, RAN_OUT)
+        bot.send_message(SIGNAL_ID, f"There is no requests for user {user_id}.")
         logger.info(f"{user_id}: There is no requests for user.")
     except KeyError:
         bot.send_message(user.id, KEY_DOESNT_EXIST)
@@ -54,6 +59,9 @@ def callback_worker(call):
 def text(message):
     try:
         user_id = message.chat.id
+        if user_id not in controller.users.keys():
+            bot.send_message(SIGNAL_ID, f"New user {user_id} was added.")
+        bot.send_message(SIGNAL_ID, f"User {user_id} inputted \"{message.text}\".")
         user = get_user(controller, user_id)
         chat_id = message.chat.id
         reaction = TEXT_TYPED
@@ -62,6 +70,7 @@ def text(message):
         logger.info(f"{user_id}: inputted \"{message.text}\"")
     except RanOutError:
         bot.send_message(user.id, RAN_OUT)
+        bot.send_message(SIGNAL_ID, f"There is no requests for user {user_id}.")
         logger.info(f"{user_id}: There is no requests for user.")
     except KeyError:
         bot.send_message(user.id, KEY_DOESNT_EXIST)

@@ -111,7 +111,7 @@ class Araneae:
                 print(f"{ind} / {samples_amount}")
             _sample.specifications = self.extract_specifications(extraction_functions, _sample)
 
-    def load_from_csv(self, filepath: str, source: Source):
+    def load_russian_from_csv(self, filepath: str, id_start: int) -> int:
         pass
 
     def import_spider(self):
@@ -332,8 +332,6 @@ class Araneae:
         return subtypes
 
     def _specifications_nl(self, sample: Sample) -> Optional[List[QuerySubtype]]:
-        if sample.id == "4467":
-            a = 7
         subtypes = []
         sentences_amount = get_sentences_amount(sample.question)
         sql_tokens = len(sample.query_toks)

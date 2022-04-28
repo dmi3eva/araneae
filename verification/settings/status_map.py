@@ -130,7 +130,7 @@ POSITIONS = {
         transitions={
             RETURN: Status.LAST,
         },
-        generate_text=lambda controller, user: INSTRUCTIONS,
+        generate_text=lambda controller, user: (INSTRUCTIONS, None),
         handle_error=lambda user, sample, correction: sample
     ),
     Status.CHOOSING_TABLE: Position(
