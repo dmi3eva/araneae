@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import *
 
+
 @dataclass
 class NumericalItem:
     key: Union[int, str]

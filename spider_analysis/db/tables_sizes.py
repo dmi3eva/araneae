@@ -3,7 +3,6 @@ from utils.spider_connectors import *
 from utils.spider_analysis import *
 
 
-
 def get_tables_sizes_statistics(connector: SpiderDB) -> Tuple[NumericalStatistics, NumericalStatistics]:
     """
     Returns sizes of tables, amount of unique values in the tables
