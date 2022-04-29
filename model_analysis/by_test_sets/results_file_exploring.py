@@ -55,10 +55,16 @@ def enumerate_samples(araneae: Araneae, source: Source, samples: List[dict]):
 
 def make_mapping(araneae: Araneae, source: Source, samples: List[dict]) -> dict:
     mapping = {}
+    PREFIX = {
+        Source.SPIDER_DEV: 'D',
+        Source.SPIDER_TRAIN: "TS",
+        Source.SPIDER_TRAIN_OTHERS: "TO"
+    }
     start_index = araneae.start_indices[source]
     for ind, sample in enumerate(samples):
         id = start_index + ind
-        mapping[id] = sample
+        mapping[f"{PREFIX[source]}_{str(id).zfill(4)}"] = sample
+        # mapping[id] = sample
     return mapping
 
 
@@ -85,4 +91,4 @@ if __name__ == "__main__":
     araneae = Araneae()
     araneae.load()
     report = make_test_set_report(araneae, Source.SPIDER_DEV)
-    save_sql_statistics(report, "2022-04-04")
+    save_sql_statistics(report, "2022-04-29")

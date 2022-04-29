@@ -6,6 +6,7 @@ from typing import *
 from enum import Enum
 import json
 from configure import *
+from spider_analysis.db.tables_sizes import is_russian
 
 
 def extract_multiusing_entities(path_from: str, path_to: str) -> NoReturn:
@@ -87,10 +88,24 @@ def extract_values_entities(path_from: str, path_to: str) -> NoReturn:
             multiusing[db] = multiusing.get(db, {})  # TODO
             if len(different_usings) > 1:
                 multiusing[db][token] = different_usings
-
+    make_analysis(multiusing)
     with open(path_to, "w", encoding='utf-8') as file_from:
         json.dump(multiusing, file_from, ensure_ascii=True)
 
+
+def make_analysis(multiusing):
+    amounts_in_db = []
+    tokens_amounts = []
+    russian_amounts = []
+    for db, content in multiusing.items():
+        amounts_in_db.append(len(content))
+        russian_values = [_v for _v in content if is_russian(_v)]
+        russian_amounts.append(len(russian_values))
+        tokens_amounts += [len(_v) for _v in content]
+    print(f'There are condfused {sum(tokens_amounts)} tokens')
+    print(f'... russian tokens: {sum(russian_amounts)} ot them.')
+    print(f'Every token is encountering  {sum(tokens_amounts) / len(tokens_amounts)} ones in average.')
+    print(f'Every database contains {sum(amounts_in_db) / len(amounts_in_db)} tokens in average.')
 
 if __name__ == "__main__":
     extract_entities(TOKENS_EN_PATH, EN_ENTITIES)

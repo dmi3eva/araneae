@@ -18,22 +18,22 @@ def save(test_sets_collections: Dict[str, SamplesCollection]):
 ########################################################
 
 # First start
-araneae = Araneae()
-araneae.import_spider()
-araneae.import_russocampus()
-araneae.save()
+# araneae = Araneae()
+# araneae.import_spider()
+# araneae.import_russocampus()
+# araneae.save()
 
 
 # Other starts
-# araneae = Araneae()
-# araneae.load()
+araneae = Araneae()
+araneae.load()
 
 ########################################################
 #############  Experiments   ##############################
 ########################################################
 
 #########################################################################################
-# DB
+# # DB
 # db_pipeline = [QueryType.DB]
 # araneae.add_specifications(db_pipeline)
 #
@@ -64,16 +64,16 @@ araneae.save()
 
 #########################################################################################
 # BINARY
-# binary_pipeline = [QueryType.BINARY]
-# araneae.add_specifications(binary_pipeline)
-#
-# binary_with_values = araneae.find_all_with_type(QueryType.BINARY, subtypes=[QuerySubtype.WITH_VALUES])
-# binary_without_values = araneae.find_all_with_type(QueryType.BINARY, subtypes=[QuerySubtype.WITHOUT_VALUES])
-#
-# save({
-#     "binary_with_values": binary_with_values,
-#     "binary_without_values": binary_without_values
-# })
+binary_pipeline = [QueryType.BINARY]
+araneae.add_specifications(binary_pipeline)
+
+binary_with_values = araneae.find_all_with_type(QueryType.BINARY, subtypes=[QuerySubtype.WITH_VALUES])
+binary_without_values = araneae.find_all_with_type(QueryType.BINARY, subtypes=[QuerySubtype.WITHOUT_VALUES])
+
+save({
+    "binary_with_values": binary_with_values,
+    "binary_without_values": binary_without_values
+})
 
 #########################################################################################
 # DATETIME
@@ -168,45 +168,45 @@ araneae.save()
 
 ########################################################################################
 # NL
-# nl_pipeline = [QueryType.NL]
-# araneae.add_specifications(nl_pipeline)
-#
-# nl_several_sentences = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_SEVERAL_SENTENCES])
-# nl_short_sql_long = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_SHORT_SQL_LONG])
-# nl_long_sql_short = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_LONG_SQL_SHORT])
-# nl_long = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_LONG])
-#
-# save({
-#     "nl_several_sentences": nl_several_sentences,
-#     "nl_short_sql_long": nl_short_sql_long,
-#     "nl_long_sql_short": nl_long_sql_short,
-#     "nl_long": nl_long
-# })
+nl_pipeline = [QueryType.NL]
+araneae.add_specifications(nl_pipeline)
+
+nl_several_sentences = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_SEVERAL_SENTENCES])
+nl_short_sql_long = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_SHORT_SQL_LONG])
+nl_long_sql_short = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_LONG_SQL_SHORT])
+nl_long = araneae.find_all_with_type(QueryType.NL, subtypes=[QuerySubtype.NL_LONG])
+
+save({
+    "nl_several_sentences": nl_several_sentences,
+    "nl_short_sql_long": nl_short_sql_long,
+    "nl_long_sql_short": nl_long_sql_short,
+    "nl_long": nl_long
+})
 
 #########################################################################################
 # LOGIC
-# logic_pipeline = [QueryType.LOGIC, QueryType.NEGATION]
-# araneae.add_specifications(logic_pipeline)
-#
-# logic_vice_versa = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_VS])
-# logic_all_nl_sql = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SQL_ALL, QuerySubtype.LOGIC_NL_ALL])
-# logic_andor_nl_sql = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SQL_AND_OR, QuerySubtype.LOGIC_NL_AND_OR_OR])
-# logic_sql = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SQL_ALL])
-# logic_and_with_or_nl = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_NL_AND_AND_OR])
-# logic_set_phrase = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SET_PHRASE])
-# negation = araneae.find_all_with_type(QueryType.NEGATION)
-# negation_any_all = araneae.find_all_with_type(QueryType.NEGATION, subtypes=[QuerySubtype.NEGATION_ANY_ALL])
-#
-# save({
-#     "logic_vice_versa": logic_vice_versa,
-#     "logic_all_nl_sql": logic_all_nl_sql,
-#     "logic_andor_nl_sql": logic_andor_nl_sql,
-#     "logic_sql": logic_sql,
-#     "logic_and_with_or_nl": logic_and_with_or_nl,
-#     "logic_set_phrase": logic_set_phrase,
-#     "negation": negation,
-#     "negation_any_all": negation_any_all
-# })
+logic_pipeline = [QueryType.LOGIC, QueryType.NEGATION]
+araneae.add_specifications(logic_pipeline)
+
+logic_vice_versa = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_VS])
+logic_all_nl_sql = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SQL_ALL, QuerySubtype.LOGIC_NL_ALL])
+logic_andor_nl_sql = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SQL_AND_OR, QuerySubtype.LOGIC_NL_AND_OR_OR])
+logic_sql = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SQL_ALL])
+logic_and_with_or_nl = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_NL_AND_AND_OR])
+logic_set_phrase = araneae.find_all_with_type(QueryType.LOGIC, subtypes=[QuerySubtype.LOGIC_SET_PHRASE])
+negation = araneae.find_all_with_type(QueryType.NEGATION)
+negation_any_all = araneae.find_all_with_type(QueryType.NEGATION, subtypes=[QuerySubtype.NEGATION_ANY_ALL])
+
+save({
+    "logic_vice_versa": logic_vice_versa,
+    "logic_all_nl_sql": logic_all_nl_sql,
+    "logic_andor_nl_sql": logic_andor_nl_sql,
+    "logic_sql": logic_sql,
+    "logic_and_with_or_nl": logic_and_with_or_nl,
+    "logic_set_phrase": logic_set_phrase,
+    "negation": negation,
+    "negation_any_all": negation_any_all
+})
 
 
 

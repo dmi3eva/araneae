@@ -109,7 +109,7 @@ class Araneae:
     def add_specifications(self, extraction_functions: List[QueryType]) -> NoReturn:
         samples_amount = len(self.samples.content)
         for ind, _sample in enumerate(self.samples.content):
-            if ind % 10 == 0:
+            if ind % 200 == 0:
                 print(f"{ind} / {samples_amount}")
             _sample.specifications = self.extract_specifications(extraction_functions, _sample)
 
