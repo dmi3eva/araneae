@@ -14,8 +14,8 @@ from utils.preprocessing.text import *
 from utils.mention_extractor import MentionExtractor
 from araneae.settings import *
 
-from utils.preprocessing.spider.preprocess.parse_sql_one import get_schemas_from_json
-from utils.preprocessing.spider.process_sql import get_sql
+from utils.preprocessing.spider.preprocess.parse_sql_one import get_schemas_from_json, Schema
+from utils.preprocessing.spider.process_sql_russian import get_sql
 from dto.sample import *
 
 # nltk.download('punkt')
@@ -56,6 +56,7 @@ class Araneae:
         }
         schemas, db_names, tables = get_schemas_from_json(SCHEMES_PATH)
         self.schemas = schemas
+        self.tables = tables
 
     def load_column_types(self):
         for _column_type in QueryType:
@@ -119,8 +120,10 @@ class Araneae:
             if current_sample.russian_question.lower().startswith("select"):
                 raise KeyError("SQL in NL")
             schema = self.schemas[current_sample.db_id]
-            current_sample.russian_sql = get_sql(schema, current_sample.russian_query)
-            current_sample.mentions = self.mention_extractor.get_mentions_from_sample({
+            table = self.tables[current_sample.db_id]
+            schema_obj = Schema(schema, table)
+            current_sample.russian_sql = get_sql(schema_obj, current_sample.russian_query)
+            current_sample.russian_mentions = self.mention_extractor.get_mentions_from_sample({
                 "db_id": current_sample.db_id,
                 "sql": current_sample.russian_sql
             })
@@ -129,7 +132,7 @@ class Araneae:
             for _mention in current_sample.russian_mentions:
                 if _mention.type is Subquery.WHERE and _mention.values is not None:
                     values_mentions += _mention.values
-            values_mentions = [_v.replace('\"', "") for _v in values_mentions]
+            values_mentions = [_v.replace('\"', "") if isinstance(_v, str) else _v for _v in values_mentions]
             for _tok in current_sample.russian_query_toks:
                 if _tok not in values_mentions:
                     current_sample.russian_query_toks_no_values.append(_tok)

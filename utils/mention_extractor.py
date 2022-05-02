@@ -192,7 +192,11 @@ class MentionExtractor:
     def get_mentions_from_sample(self, sample: Dict) -> List[Mention]:
         db = sample['db_id']
         sql = sample['sql']
-        mentions = self.get_mentions_from_sql(db, sql)
+        # mentions = self.get_mentions_from_sql(db, sql)
+        try:
+            mentions = self.get_mentions_from_sql(db, sql)
+        except:
+            raise ValueError()
         return mentions
 
     def _add_values_to_mentions(self, mentions, val, scheme, type, details):
