@@ -271,6 +271,7 @@ class Sample:
         self.sql: Optional[Dict] = None
         self.mentions: Optional[List[Mention]] = None
         self.russian_mentions: Optional[List[Mention]] = None
+        self.russian_mentions: Optional[List[Mention]] = None
         self.specifications: Optional[Dict] = None
         self.question_toks: Optional[List] = None
         self.query_toks: Optional[List] = None
@@ -280,10 +281,13 @@ class Sample:
         self.russian_query_toks: Optional[str] = None
         self.russian_question_toks: Optional[List] = None
         self.russian_query_toks_no_values: Optional[List] = None
-
+        self.sql: Optional[Dict] = None
+        self.russian_sql: Optional[Dict] = None
 
     def to_json(self) -> Dict:
-        pass
+        jsoned = {}
+
+
 
     def to_dict(self) -> Dict:
         dicted = deepcopy(self.__dict__)

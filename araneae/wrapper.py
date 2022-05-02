@@ -13,9 +13,12 @@ from utils.common import *
 from utils.preprocessing.text import *
 from utils.mention_extractor import MentionExtractor
 from araneae.settings import *
-# from utils.preprocessing.custom_sql import *
-# from utils.preprocessing.spider.process_sql import *
+
+from utils.preprocessing.spider.preprocess.parse_sql_one import get_schemas_from_json
+from utils.preprocessing.spider.process_sql import get_sql
 from dto.sample import *
+
+# nltk.download('punkt')
 
 
 class Araneae:
@@ -51,6 +54,8 @@ class Araneae:
             QueryType.GROUP_BY: lambda sample: self._specifications_group_by(sample),
             QueryType.ORDER_BY: lambda sample: self._specifications_order_by(sample),
         }
+        schemas, db_names, tables = get_schemas_from_json(SCHEMES_PATH)
+        self.schemas = schemas
 
     def load_column_types(self):
         for _column_type in QueryType:
@@ -108,10 +113,28 @@ class Araneae:
                 current_sample.russian_question = row['ru_corrected']
 
             current_sample.russian_query_toks = tokenize(current_sample.russian_query)
-            current_sample.russian_query_toks_no_values = tokenize(current_sample.russian_query)
 
-            current_sample.russian_question_toks = word_tokenize(current_sample.russian_question)
+            current_sample.russian_question_toks = word_tokenize(current_sample.russian_question, language="russian")
             current_sample.id = row["id"]
+            if current_sample.russian_question.lower().startswith("select"):
+                raise KeyError("SQL in NL")
+            schema = self.schemas[current_sample.db_id]
+            current_sample.russian_sql = get_sql(schema, current_sample.russian_query)
+            current_sample.mentions = self.mention_extractor.get_mentions_from_sample({
+                "db_id": current_sample.db_id,
+                "sql": current_sample.russian_sql
+            })
+            current_sample.russian_query_toks_no_values = []
+            values_mentions = []
+            for _mention in current_sample.russian_mentions:
+                if _mention.type is Subquery.WHERE and _mention.values is not None:
+                    values_mentions += _mention.values
+            values_mentions = [_v.replace('\"', "") for _v in values_mentions]
+            for _tok in current_sample.russian_query_toks:
+                if _tok not in values_mentions:
+                    current_sample.russian_query_toks_no_values.append(_tok)
+                else:
+                    current_sample.russian_query_toks_no_values.append(VALUE)
             current_ind += 1
         return len(data_df)
 
@@ -196,6 +219,7 @@ class Araneae:
         generated_sample.query_toks = sample_json.get('query_toks', None)
         generated_sample.query_toks_no_values = sample_json.get('query_toks_no_value', None)
         generated_sample.question_toks = sample_json.get('question_toks', None)
+        generated_sample.sql = sample_json.get('sql', None)
         generated_sample.mentions = self.mention_extractor.get_mentions_from_sample(sample_json)
         return generated_sample
 
