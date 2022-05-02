@@ -22,7 +22,7 @@ araneae = Araneae()
 araneae.import_spider()
 araneae.import_russocampus()
 araneae.save()
-
+araneae.save_in_json()
 
 # # Other starts
 # araneae = Araneae()

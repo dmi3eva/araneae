@@ -91,7 +91,6 @@ class Araneae:
             self.samples.content.append(sample)
         return len(json_samples)
 
-
     def load_russian_from_csv(self, filepath: str, id_start: int) -> int:
         data_df = pd.read_csv(filepath, sep=',', encoding='utf-8')
         current_ind = id_start
@@ -182,6 +181,9 @@ class Araneae:
             pickle.dump(self.column_types, column_type_file)
         with open(INDICES_PATH, 'wb') as indices_file:
             pickle.dump(self.start_indices, indices_file)
+
+    def save_in_json(self):
+        pass
 
     def create_sample_from_json(self, sample_json: Dict, source: Source) -> Sample:
         generated_sample = Sample()
@@ -328,8 +330,10 @@ class Araneae:
         VALUES_IDS = {1993, 5660, 5664}  # ID of samples in which "No" is part of value
         if len(negations_in_nl) > 0 and sample.id not in VALUES_IDS:
             subtypes.append(QuerySubtype.NEGATION_NL)
-        STRUCTURE_IDS = {5516, 5517, 9081, 9082, 9083, 9084, 9085, 9148,
-                         1230, 1558, 3520, 3521, 3522, 3523, 4027, 8830}  # Samples with complex structure, not negations
+        STRUCTURE_IDS = {
+            5516, 5517, 9081, 9082, 9083, 9084, 9085, 9148,
+            1230, 1558, 3520, 3521, 3522, 3523, 4027, 8830
+        }  # Samples with complex structure, not negations
         NULL_IDS = {4460, 4467, 4468, 4480, 4487, 3494, 3526}
         TOKENIZATION_IDS = {609, 610}
         sql_condition_1 = len(negations_in_sql) > 0 or "!=" in sql

@@ -281,6 +281,10 @@ class Sample:
         self.russian_question_toks: Optional[List] = None
         self.russian_query_toks_no_values: Optional[List] = None
 
+
+    def to_json(self) -> Dict:
+        pass
+
     def to_dict(self) -> Dict:
         dicted = deepcopy(self.__dict__)
         del dicted['mentions']
