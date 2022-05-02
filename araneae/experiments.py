@@ -21,8 +21,8 @@ def save(test_sets_collections: Dict[str, SamplesCollection]):
 araneae = Araneae()
 araneae.import_spider()
 araneae.import_russocampus()
-araneae.save()
 araneae.save_in_json()
+araneae.save()
 
 # # Other starts
 # araneae = Araneae()

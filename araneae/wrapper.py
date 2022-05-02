@@ -209,7 +209,18 @@ class Araneae:
             pickle.dump(self.start_indices, indices_file)
 
     def save_in_json(self):
-        pass
+        all_in_json = [_s.to_json() for _s in self.samples.content]
+        train_spider = [_s.to_json() for _s in self.samples.content if _s.source is Source.SPIDER_TRAIN]
+        train_others = [_s.to_json() for _s in self.samples.content if _s.source is Source.SPIDER_TRAIN_OTHERS]
+        dev = [_s.to_json() for _s in self.samples.content if _s.source is Source.SPIDER_DEV]
+        with open(JSON_ALL, "w", encoding='utf-8') as outp:
+            json.dump(all_in_json, outp, ensure_ascii=False)
+        with open(JSON_TRAIN_SPIDER, "w", encoding='utf-8') as outp:
+            json.dump(train_spider, outp, ensure_ascii=False)
+        with open(JSON_TRAIN_OTHERS, "w", encoding='utf-8') as outp:
+            json.dump(train_others, outp, ensure_ascii=False)
+        with open(JSON_DEV, "w", encoding='utf-8') as outp:
+            json.dump(dev, outp, ensure_ascii=False)
 
     def create_sample_from_json(self, sample_json: Dict, source: Source) -> Sample:
         generated_sample = Sample()

@@ -285,7 +285,36 @@ class Sample:
         self.russian_sql: Optional[Dict] = None
 
     def to_json(self) -> Dict:
-        jsoned = {}
+        jsoned = {
+            'id': self.id,
+            'db_id': self.db_id,
+            'source': self.source.value,
+            'query': {
+                'en': self.query,
+                'ru': self.russian_query
+            },
+            'question': {
+                'en': self.question,
+                'ru': self.russian_question
+            },
+            'sql': {
+                'en': self.sql,
+                'ru': self.russian_sql
+            },
+            'question_toks': {
+                'en': self.question_toks,
+                'ru': self.russian_question_toks
+            },
+            'query_toks': {
+                'en': self.query_toks,
+                'ru': self.russian_query_toks
+            },
+            'query_toks_no_values':{
+                'en': self.query_toks_no_values,
+                'ru': self.russian_query_toks_no_values
+            }
+        }
+        return jsoned
 
 
 
