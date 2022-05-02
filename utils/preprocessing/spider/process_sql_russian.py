@@ -211,7 +211,7 @@ def parse_col_unit(toks, start_idx, tables_with_alias, schema, default_tables=No
         idx, col_id = parse_col(toks, idx, tables_with_alias, schema, default_tables)
         assert idx < len_ and toks[idx] == ')'
         idx += 1
-        return idx, (agg_id, col_id, isDistinct)
+        return idx, [agg_id, col_id, isDistinct]
 
     if toks[idx] == "distinct":
         idx += 1
@@ -223,7 +223,7 @@ def parse_col_unit(toks, start_idx, tables_with_alias, schema, default_tables=No
         assert toks[idx] == ')'
         idx += 1  # skip ')'
 
-    return idx, (agg_id, col_id, isDistinct)
+    return idx, [agg_id, col_id, isDistinct]
 
 
 def parse_val_unit(toks, start_idx, tables_with_alias, schema, default_tables=None):
@@ -248,7 +248,7 @@ def parse_val_unit(toks, start_idx, tables_with_alias, schema, default_tables=No
         assert toks[idx] == ')'
         idx += 1  # skip ')'
 
-    return idx, (unit_op, col_unit1, col_unit2)
+    return idx, [unit_op, col_unit1, col_unit2]
 
 
 def parse_table_unit(toks, start_idx, tables_with_alias, schema):
@@ -326,7 +326,7 @@ def parse_condition(toks, start_idx, tables_with_alias, schema, default_tables=N
             idx, val1 = parse_value(toks, idx, tables_with_alias, schema, default_tables)
             val2 = None
 
-        conds.append((not_op, op_id, val_unit, val1, val2))
+        conds.append([not_op, op_id, val_unit, val1, val2])
 
         if idx < len_ and (toks[idx] in CLAUSE_KEYWORDS or toks[idx] in (")", ";") or toks[idx] in JOIN_KEYWORDS):
             break
@@ -356,11 +356,11 @@ def parse_select(toks, start_idx, tables_with_alias, schema, default_tables=None
             agg_id = AGG_OPS.index(toks[idx])
             idx += 1
         idx, val_unit = parse_val_unit(toks, idx, tables_with_alias, schema, default_tables)
-        val_units.append((agg_id, val_unit))
+        val_units.append([agg_id, val_unit])
         if idx < len_ and toks[idx] == ',':
             idx += 1  # skip ','
 
-    return idx, (isDistinct, val_units)
+    return idx, [isDistinct, val_units]
 
 
 def parse_from(toks, start_idx, tables_with_alias, schema):
@@ -383,12 +383,12 @@ def parse_from(toks, start_idx, tables_with_alias, schema):
 
         if toks[idx] == 'select':
             idx, sql = parse_sql(toks, idx, tables_with_alias, schema)
-            table_units.append((TABLE_TYPE['sql'], sql))
+            table_units.append([TABLE_TYPE['sql'], sql])
         else:
             if idx < len_ and toks[idx] == 'join':
                 idx += 1  # skip join
             idx, table_unit, table_name = parse_table_unit(toks, idx, tables_with_alias, schema)
-            table_units.append((TABLE_TYPE['table_unit'],table_unit))
+            table_units.append([TABLE_TYPE['table_unit'],table_unit])
             default_tables.append(table_name)
         if idx < len_ and toks[idx] == "on":
             idx += 1  # skip on
@@ -465,7 +465,7 @@ def parse_order_by(toks, start_idx, tables_with_alias, schema, default_tables):
         else:
             break
 
-    return idx, (order_type, val_units)
+    return idx, [order_type, val_units]
 
 
 def parse_having(toks, start_idx, tables_with_alias, schema, default_tables):

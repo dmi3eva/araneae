@@ -132,7 +132,7 @@ class Araneae:
             for _mention in current_sample.russian_mentions:
                 if _mention.type is Subquery.WHERE and _mention.values is not None:
                     values_mentions += _mention.values
-            values_mentions = [_v.replace('\"', "") if isinstance(_v, str) else _v for _v in values_mentions]
+            values_mentions = [_v if isinstance(_v, str) else _v for _v in values_mentions]
             for _tok in current_sample.russian_query_toks:
                 if _tok not in values_mentions:
                     current_sample.russian_query_toks_no_values.append(_tok)
