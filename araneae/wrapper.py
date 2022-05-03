@@ -222,6 +222,9 @@ class Araneae:
         with open(JSON_DEV, "w", encoding='utf-8') as outp:
             json.dump(dev, outp, ensure_ascii=False)
 
+        def save_araneae_in_json(self):
+            pass
+
     def create_sample_from_json(self, sample_json: Dict, source: Source) -> Sample:
         generated_sample = Sample()
         generated_sample.id = len(self.samples.content)
