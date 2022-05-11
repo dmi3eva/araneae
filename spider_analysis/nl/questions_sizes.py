@@ -70,6 +70,7 @@ def get_nl_sizes_statistics(araneae) -> Tuple[NumericalStatistics, NumericalStat
            NumericalStatistics(ru_tokens_counter)
 
 
-araneae = Araneae()
-araneae.load()
-en_symbols, ru_symbols, en_tokens, ru_tokens = get_nl_sizes_statistics(araneae)
+if __name__ == "__main__":
+    araneae = Araneae()
+    araneae.load()
+    en_symbols, ru_symbols, en_tokens, ru_tokens = get_nl_sizes_statistics(araneae)
