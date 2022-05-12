@@ -175,4 +175,4 @@ class RuSpiderDBOld(SpiderDB):
 class RuSpiderDB(RuSpiderDBOld):
     def __init__(self):
         super().__init__()
-        self.db_path =RUSSOCAMPUS_DB_PATH_NEW
+        self.db_path = RUSSOCAMPUS_DB_PATH_NEW

@@ -4,7 +4,6 @@ from utils.spider_analysis import *
 from araneae.wrapper import Araneae
 
 
-
 def get_nl_sizes_statistics(araneae) -> Tuple[NumericalStatistics, NumericalStatistics, NumericalStatistics, NumericalStatistics]:
     """
     Returns sizes of qestions in symbols and in tokens
