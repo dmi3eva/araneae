@@ -107,6 +107,7 @@ def make_analysis(multiusing):
     print(f'Every token is encountering  {sum(tokens_amounts) / len(tokens_amounts)} ones in average.')
     print(f'Every database contains {sum(amounts_in_db) / len(amounts_in_db)} tokens in average.')
 
+
 if __name__ == "__main__":
     extract_entities(TOKENS_EN_PATH, EN_ENTITIES)
     extract_entities(TOKENS_RU_PATH, RU_ENTITIES)
