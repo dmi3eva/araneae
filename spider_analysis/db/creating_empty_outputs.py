@@ -17,7 +17,9 @@ def get_inds(araneae: Araneae) -> Tuple[List[int], List[int], List[int]]:
     return train_inds, train_others_inds, test_inds
 
 
-def sample_with_values(araneae: Araneae, inds: List[int], amount: int, spider: SpiderDB) -> List[Dict]:
+def sample_with_values(araneae: Araneae, inds: List[int], amount: int) -> List[Dict]:
+    en_spider = EnSpiderDB()
+    ru_spider = RuSpiderDB()
     chosen_inds = []
     samples = araneae.samples.content
     chosen_samples = []
@@ -28,7 +30,8 @@ def sample_with_values(araneae: Araneae, inds: List[int], amount: int, spider: S
         if ind not in chosen_inds and len(mentions_where) > 0:
             mention = mentions_where[0]
             chosen_inds.append(ind)
-            all_values = spider.get_values(mention.db, mention.table, mention.column)
+            en_all_values = en_spider.get_values(mention.db, mention.table, mention.column)
+            ru_all_values = ru_spider.get_values(mention.db, mention.table, mention.column)
             sample_json = {
                 "id": sample.id,
                 "en": sample.question,
@@ -44,19 +47,18 @@ def sample_with_values(araneae: Araneae, inds: List[int], amount: int, spider: S
                 "db": mention.db,
                 "table": mention.table,
                 "column": mention.column,
-                "values": str(all_values)
+                "en_values": str(sorted(list(set(en_all_values)))),
+                "ru_values": str(sorted(list(set(ru_all_values))))
             }
             chosen_samples.append(sample_json)
     return chosen_samples
 
 
 def generate_random_samples(araneae: Araneae, filename: str, amount: int) -> NoReturn:
-    en_spider = EnSpiderDB()
-    ru_spider = RuSpiderDB()
     train_inds, train_others_inds, test_inds = get_inds(araneae)
-    train_inds_sample = sample_with_values(araneae, train_inds, amount, en_spider)
-    train_others_inds_sample = sample_with_values(araneae, train_others_inds, amount, en_spider)
-    test_inds_sample = sample_with_values(araneae, test_inds, amount, en_spider)
+    train_inds_sample = sample_with_values(araneae, train_inds, amount)
+    train_others_inds_sample = sample_with_values(araneae, train_others_inds, amount)
+    test_inds_sample = sample_with_values(araneae, test_inds, amount)
     data = train_inds_sample + train_others_inds_sample + test_inds_sample
     df = pd.DataFrame(data=data)
     df.to_csv(filename, encoding='utf-8')
