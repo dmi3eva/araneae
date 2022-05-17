@@ -46,12 +46,14 @@ def make_dict(long_values: List[Value]) -> Dict[str, Dict[str, Dict[str, List[st
         if long.column not in values_dict[long.db][long.table].keys():
             values_dict[long.db][long.table][long.column] = []
         values_dict[long.db][long.table][long.column].append(long.value)
+        values_dict[long.db][long.table][long.column] = list(set(values_dict[long.db][long.table][long.column]))
     return values_dict
 
 
 def extract_requests(araneae: Araneae, long_dict: Dict, filename: str, language: Language) -> NoReturn:
     samples = araneae.samples.content
     chosen_samples = []
+    chosen_ids = set()
     for _sample in samples:
         if language is Language.EN:
             mentions = _sample.mentions
@@ -76,6 +78,8 @@ def extract_requests(araneae: Araneae, long_dict: Dict, filename: str, language:
                     "columns_and_values": str(long_dict[_mention.db][_mention.table])
                 }
                 chosen_samples.append(sample_json)
+                chosen_ids.add(_sample.id)
+                break
     df = pd.DataFrame(data=chosen_samples)
     df.to_csv(filename, encoding='utf-8')
     return chosen_samples
@@ -92,9 +96,9 @@ if __name__ == "__main__":
     long_en_dict = make_dict(long_en_values)
     long_ru_dict = make_dict(long_ru_values)
 
-    with open(LONG_EN_SAMPLES_JSON, "w") as out_json:
+    with open(LONG_EN_SAMPLES_JSON, "w", encoding='utf-8') as out_json:
         json.dump(long_en_dict, out_json)
-    with open(LONG_RU_SAMPLES_JSON, "w") as out_json:
+    with open(LONG_RU_SAMPLES_JSON, "w", encoding='utf-8') as out_json:
         json.dump(long_ru_dict, out_json)
 
     extract_requests(araneae, long_en_dict, LONG_EN_SAMPLES_CSV, Language.EN)
