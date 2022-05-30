@@ -261,6 +261,13 @@ query_mapping = {
 }
 
 
+@dataclass
+class Triple:
+    db: str
+    table: str
+    column: str
+
+
 class Sample:
     def __init__(self):
         self.id: Optional[int] = None

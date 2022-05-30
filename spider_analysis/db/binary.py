@@ -3,13 +3,8 @@ import json
 from araneae.wrapper import Araneae
 from utils.spider_connectors import *
 from configure import *
-from dataclasses import dataclass
+from dto.sample import *
 
-@dataclass
-class Triple:
-    db: str
-    table: str
-    column: str
 
 CURRENT_TYPE = 'binary-antonyms'
 BINARY_PATH = os.path.join(QUERY_TYPES_PATH, 'binary.json')
