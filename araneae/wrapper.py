@@ -223,7 +223,15 @@ class Araneae:
             json.dump(dev, outp, ensure_ascii=False)
 
     def find_triples(self, triples: List[Triple]) -> List[Sample]:
-        pass
+        desired = []
+        for _sample in self.samples.content:
+            for _mention in _sample.mentions:
+                if _mention.type is not Subquery.WHERE:
+                    continue
+                mention_triple = Triple(_mention.db, _mention.table, _mention.column)
+                if mention_triple in triples:
+                    desired.append(_sample)
+        return desired
 
     def create_sample_from_json(self, sample_json: Dict, source: Source) -> Sample:
         generated_sample = Sample()

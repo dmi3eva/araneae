@@ -157,8 +157,11 @@ class RuSpiderDBOld(SpiderDB):
     def extract_tables(self) -> Dict:
         tables = {}
         for _db in self.dbs:
-            extracted_tables = self.execute_request(_db, TABLES_REQUEST)
-            tables[_db] = [_t[0] for _t in extracted_tables]
+            try:
+                extracted_tables = self.execute_request(_db, TABLES_REQUEST)
+                tables[_db] = [_t[0] for _t in extracted_tables]
+            except:
+                print(f"Problem with db={_db}")
         return tables
 
     def extract_columns(self) -> Dict:

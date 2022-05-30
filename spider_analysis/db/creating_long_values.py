@@ -55,6 +55,8 @@ def extract_requests(araneae: Araneae, long_dict: Dict, filename: str, language:
     chosen_samples = []
     chosen_ids = set()
     for _sample in samples:
+        # if _sample.source is not Source.SPIDER_DEV:
+        #     continue
         if language is Language.EN:
             mentions = _sample.mentions
         else:
@@ -90,16 +92,18 @@ if __name__ == "__main__":
     araneae.load()
     en_spider = EnSpiderDB()
     ru_spider = RuSpiderDB()
-    long_en_values = extract_long_value(20, en_spider, Language.EN)
-    long_ru_values = extract_long_value(9, ru_spider, Language.RU)
+    # long_en_values = extract_long_value(20, en_spider, Language.EN)
+    # long_ru_values = extract_long_value(9, ru_spider, Language.RU)
+    long_en_values = extract_long_value(4, en_spider, Language.EN)
+    long_ru_values = extract_long_value(4, ru_spider, Language.RU)
 
     long_en_dict = make_dict(long_en_values)
     long_ru_dict = make_dict(long_ru_values)
 
     with open(LONG_EN_SAMPLES_JSON, "w", encoding='utf-8') as out_json:
-        json.dump(long_en_dict, out_json)
+        json.dump(long_en_dict, out_json, ensure_ascii=False)
     with open(LONG_RU_SAMPLES_JSON, "w", encoding='utf-8') as out_json:
-        json.dump(long_ru_dict, out_json)
+        json.dump(long_ru_dict, out_json, ensure_ascii=False)
 
     extract_requests(araneae, long_en_dict, LONG_EN_SAMPLES_CSV, Language.EN)
     extract_requests(araneae, long_ru_dict, LONG_RU_SAMPLES_CSV, Language.RU)
