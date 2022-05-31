@@ -139,47 +139,56 @@ class Araneae:
             current_ind += 1
         return len(data_df)
 
-    def load_russian_from_csv(self, filepath: str, prefx: str, id_start: int) -> int:
+    def load_russian_from_csv(self, filepath: str) -> int:
         data_df = pd.read_csv(filepath, sep=',', encoding='utf-8')
-        current_ind = id_start
-        samples_json = []
         for ind, row in data_df.iterrows():
-            current_sample = self.samples.content[current_ind]
-            self._verify_translation(current_sample, row)
-            current_sample.russian_query = row['sql_ru']
-            corrected = row["sql_ru_corrected"]
-            if not pd.isna(corrected) and corrected and len(corrected) > 0:
-                current_sample.russian_query = row['sql_ru_corrected']
-            current_sample.russian_question = row['ru']
-            corrected = row["ru_corrected"]
-            if not pd.isna(corrected) and corrected and len(corrected) > 0:
-                current_sample.russian_question = row['ru_corrected']
-            current_sample.russian_query_toks = tokenize(current_sample.russian_query)
-            current_sample.russian_question_toks = word_tokenize(current_sample.russian_question, language="russian")
-            current_sample.id = row["id"]
-            if current_sample.russian_question.lower().startswith("select"):
-                raise KeyError("SQL in NL")
-            schema = self.schemas[current_sample.db_id]
-            table = self.tables[current_sample.db_id]
-            schema_obj = Schema(schema, table)
-            current_sample.russian_sql = get_sql(schema_obj, current_sample.russian_query)
-            current_sample.russian_mentions = self.mention_extractor.get_mentions_from_sample({
-                "db_id": current_sample.db_id,
-                "sql": current_sample.russian_sql
-            })
-            current_sample.russian_query_toks_no_values = []
-            values_mentions = []
-            for _mention in current_sample.russian_mentions:
-                if _mention.type is Subquery.WHERE and _mention.values is not None:
-                    values_mentions += _mention.values
-            values_mentions = [_v if isinstance(_v, str) else _v for _v in values_mentions]
-            for _tok in current_sample.russian_query_toks:
-                if _tok not in values_mentions:
-                    current_sample.russian_query_toks_no_values.append(_tok)
-                else:
-                    current_sample.russian_query_toks_no_values.append(VALUE)
-            current_ind += 1
-        return len(data_df)
+            generated_sample = Sample()
+            generated_sample.id = row['id']
+            generated_sample.db_id = row['db_id']
+            generated_sample.source = row['source']
+            # generated_sample.question = sample_json.get('question', None)
+            # generated_sample.query = sample_json.get('query', None)
+            # generated_sample.sql = sample_json.get('question', None)
+            # generated_sample.query_toks = sample_json.get('query_toks', None)
+            # generated_sample.query_toks_no_values = sample_json.get('query_toks_no_value', None)
+            # generated_sample.question_toks = sample_json.get('question_toks', None)
+            # generated_sample.sql = sample_json.get('sql', None)
+            # generated_sample.mentions = self.mention_extractor.get_mentions_from_sample(sample_json)
+            # self._verify_translation(current_sample, row)
+            # current_sample.russian_query = row['sql_ru']
+            # corrected = row["sql_ru_corrected"]
+            # if not pd.isna(corrected) and corrected and len(corrected) > 0:
+            #     current_sample.russian_query = row['sql_ru_corrected']
+            # current_sample.russian_question = row['ru']
+            # corrected = row["ru_corrected"]
+            # if not pd.isna(corrected) and corrected and len(corrected) > 0:
+            #     current_sample.russian_question = row['ru_corrected']
+            # current_sample.russian_query_toks = tokenize(current_sample.russian_query)
+            # current_sample.russian_question_toks = word_tokenize(current_sample.russian_question, language="russian")
+            # current_sample.id = row["id"]
+            # if current_sample.russian_question.lower().startswith("select"):
+            #     raise KeyError("SQL in NL")
+            # schema = self.schemas[current_sample.db_id]
+            # table = self.tables[current_sample.db_id]
+            # schema_obj = Schema(schema, table)
+            # current_sample.russian_sql = get_sql(schema_obj, current_sample.russian_query)
+            # current_sample.russian_mentions = self.mention_extractor.get_mentions_from_sample({
+            #     "db_id": current_sample.db_id,
+            #     "sql": current_sample.russian_sql
+            # })
+            # current_sample.russian_query_toks_no_values = []
+            # values_mentions = []
+            # for _mention in current_sample.russian_mentions:
+            #     if _mention.type is Subquery.WHERE and _mention.values is not None:
+            #         values_mentions += _mention.values
+            # values_mentions = [_v if isinstance(_v, str) else _v for _v in values_mentions]
+            # for _tok in current_sample.russian_query_toks:
+            #     if _tok not in values_mentions:
+            #         current_sample.russian_query_toks_no_values.append(_tok)
+            #     else:
+            #         current_sample.russian_query_toks_no_values.append(VALUE)
+            # current_ind += 1
+
 
     def load_russian_from_json(self, filepath: str, id_start: int) -> int:
         with open(filepath) as json_file:
