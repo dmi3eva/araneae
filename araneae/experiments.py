@@ -19,8 +19,10 @@ def save(test_sets_collections: Dict[str, SamplesCollection]):
 
 # First start
 araneae = Araneae()
-araneae.import_spider()
+
+# araneae.import_spider()
 araneae.import_russocampus()
+
 araneae.save_in_json()
 araneae.save()
 
