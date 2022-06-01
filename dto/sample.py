@@ -48,6 +48,7 @@ class Source(Enum):
     SPIDER_DEV = "spider-dev"
     SPIDER_TRAIN = "spider-train"
     SPIDER_TRAIN_OTHERS = "spider-train-others"
+    ADDITION = "addition"
     ARANEAE_BINARY_TRAIN = "araneae-binary-train"
     ARANEAE_BINARY_DEV = "araneae-binary-dev"
     ARANEAE_DATES_TRAIN = "araneae-dates-train"

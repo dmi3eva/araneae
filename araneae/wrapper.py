@@ -139,20 +139,28 @@ class Araneae:
             current_ind += 1
         return len(data_df)
 
-    def load_russian_from_csv(self, filepath: str) -> int:
+    def load_russian_from_csv(self, filepath: str, source: Source) -> int:
         data_df = pd.read_csv(filepath, sep=',', encoding='utf-8')
         for ind, row in data_df.iterrows():
             generated_sample = Sample()
             generated_sample.id = row['id']
             generated_sample.db_id = row['db_id']
-            generated_sample.source = row['source']
-            # generated_sample.question = sample_json.get('question', None)
-            # generated_sample.query = sample_json.get('query', None)
-            # generated_sample.sql = sample_json.get('question', None)
+            generated_sample.source = source
+            generated_sample.question = row['en']
+            generated_sample.russian_question = row['ru']
+            question_corrected = row["ru_corrected"]
+            if not pd.isna(question_corrected) and question_corrected and len(question_corrected) > 0:
+                 generated_sample.russian_question = question_corrected
+            generated_sample.query = row['sql_en']
+            generated_sample.russian_query = row['sql_ru']
+            query_corrected = row["sql_ru_corrected"]
+            if not pd.isna(query_corrected) and query_corrected and len(query_corrected) > 0:
+                 generated_sample.russian_query = query_corrected
+
+            # Processed part
             # generated_sample.query_toks = sample_json.get('query_toks', None)
             # generated_sample.query_toks_no_values = sample_json.get('query_toks_no_value', None)
             # generated_sample.question_toks = sample_json.get('question_toks', None)
-            # generated_sample.sql = sample_json.get('sql', None)
             # generated_sample.mentions = self.mention_extractor.get_mentions_from_sample(sample_json)
             # self._verify_translation(current_sample, row)
             # current_sample.russian_query = row['sql_ru']
@@ -225,34 +233,34 @@ class Araneae:
             Source.SPIDER_TRAIN_OTHERS: dev_size + train_size
         }
 
+    def import_russocampus_in_english_from_json(self):
+        ru_dev_path = os.path.join(RUSSOCAMPUS_PATH, 'rusp_dev.json')
+        ru_train_path = os.path.join(RUSSOCAMPUS_PATH, 'rusp_train.json')
+        ru_train_others_path = os.path.join(RUSSOCAMPUS_PATH, 'rusp_train_others.json')
+
+        dev_size = self.load_russian_from_json(ru_dev_path, 0)
+        train_size = self.load_russian_from_json(ru_train_path, dev_size)
+        _ = self.load_russian_from_json(ru_train_others_path, dev_size + train_size)
+
+    def import_russocampus_in_english_from_csv(self):
+        ru_dev_path = os.path.join(RUSSOCAMPUS_NEW_PATH, 'dev.csv')
+        ru_train_path = os.path.join(RUSSOCAMPUS_NEW_PATH, 'train.csv')
+
+        dev_size = self.load_russian_in_english_from_csv(ru_dev_path, 0)
+        _ = self.load_russian_in_english_from_csv(ru_train_path, dev_size)
+
     def import_russocampus(self):
-        # LEGACY: Reading from CSV:
-        # ru_dev_path = os.path.join(RUSSOCAMPUS_PATH, 'rusp_dev.json')
-        # ru_train_path = os.path.join(RUSSOCAMPUS_PATH, 'rusp_train.json')
-        # ru_train_others_path = os.path.join(RUSSOCAMPUS_PATH, 'rusp_train_others.json')
-
-        # dev_size = self.load_russian_from_json(ru_dev_path, 0)
-        # train_size = self.load_russian_from_json(ru_train_path, dev_size)
-        # _ = self.load_russian_from_json(ru_train_others_path, dev_size + train_size)
-
-        # LEGACY: Reading in existing English from CSV:
-        # ru_dev_path = os.path.join(RUSSOCAMPUS_NEW_PATH, 'dev.csv')
-        # ru_train_path = os.path.join(RUSSOCAMPUS_NEW_PATH, 'train.csv')
-        #
-        # dev_size = self.load_russian_in_english_from_csv(ru_dev_path, 0)
-        # _ = self.load_russian_in_english_from_csv(ru_train_path, dev_size)
-
         ru_dev_path = os.path.join(RUSSOCAMPUS_NEW_PATH, 'dev.csv')
         ru_train_path = os.path.join(RUSSOCAMPUS_NEW_PATH, 'train_spider.csv')
         ru_others_path = os.path.join(RUSSOCAMPUS_NEW_PATH, 'train_others.csv')
         additional_path = [os.path.join(RUSSOCAMPUS_NEW_PATH, _p) for _p in os.listdir(ADDITIONAL_DIR_PATH)]
 
-        self.load_russian_from_csv(ru_dev_path)
-        self.load_russian_from_csv(ru_train_path)
-        self.load_russian_from_csv(ru_others_path)
+        self.load_russian_from_csv(ru_dev_path, Source.SPIDER_DEV)
+        self.load_russian_from_csv(ru_train_path, Source.SPIDER_TRAIN)
+        self.load_russian_from_csv(ru_others_path, Source.SPIDER_TRAIN_OTHERS)
 
         for _additional in additional_path:
-            self.load_russian_from_csv(_additional)
+            self.load_russian_from_csv(_additional, Source.ADDITION)
 
 
     def load(self):
