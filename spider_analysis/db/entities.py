@@ -1,11 +1,8 @@
-import os
-import json
 from copy import deepcopy
-from configure import *
-from typing import *
 from utils.spider_connectors import *
 
 DB_FILE = os.path.join(INFO_DIR, 'db_by_sources.json')
+
 
 def calculate_entites(spider: SpiderDB, info_file) -> NoReturn:
     content = {
