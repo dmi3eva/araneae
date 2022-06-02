@@ -6,9 +6,6 @@ from typing import *
 from utils.spider_connectors import *
 
 DB_FILE = os.path.join(INFO_DIR, 'db_by_sources.json')
-EN_FILE = os.path.join(INFO_DIR, 'en_entities.json')
-RU_FILE = os.path.join(INFO_DIR, 'ru_entities.json')
-
 
 def calculate_entites(spider: SpiderDB, info_file) -> NoReturn:
     content = {
@@ -41,6 +38,10 @@ def calculate_entites(spider: SpiderDB, info_file) -> NoReturn:
     with open(info_file, "w") as info_file:
         json.dump(info, info_file, indent=4)
 
+
+
+EN_FILE = os.path.join(INFO_DIR, 'en_entities.json')
+RU_FILE = os.path.join(INFO_DIR, 'ru_entities.json')
 
 en_spider = EnSpiderDB()
 ru_spider = RuSpiderDB()
