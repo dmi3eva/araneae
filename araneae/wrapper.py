@@ -275,9 +275,9 @@ class Araneae:
         additional_files = filter(lambda x: x.endswith('.csv'), os.listdir(ADDITIONAL_DIR_PATH))
         additional_path = [os.path.join(ADDITIONAL_DIR_PATH, _p) for _p in additional_files]
 
-        # self.load_russian_from_csv(ru_dev_path, Source.SPIDER_DEV)
-        # self.load_russian_from_csv(ru_train_path, Source.SPIDER_TRAIN)
-        # self.load_russian_from_csv(ru_others_path, Source.SPIDER_TRAIN_OTHERS)
+        self.load_russian_from_csv(ru_dev_path, Source.SPIDER_DEV)
+        self.load_russian_from_csv(ru_train_path, Source.SPIDER_TRAIN)
+        self.load_russian_from_csv(ru_others_path, Source.SPIDER_TRAIN_OTHERS)
 
         for _additional in additional_path:
             self.load_russian_from_csv(_additional, Source.ADDITION)
