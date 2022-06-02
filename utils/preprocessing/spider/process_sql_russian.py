@@ -116,6 +116,7 @@ def get_schema_from_json(fpath):
 def tokenize(string):
     string = str(string)
     string = string.replace("\'", "\"")  # ensures all string values wrapped by "" problem??
+    string = string.replace('=', ' = ').replace('  ', ' ')
     quote_idxs = [idx for idx, char in enumerate(string) if char == '"']
     assert len(quote_idxs) % 2 == 0, "Unexpected quote"
 
@@ -217,7 +218,10 @@ def parse_col_unit(toks, start_idx, tables_with_alias, schema, default_tables=No
         idx += 1
         isDistinct = True
     agg_id = AGG_OPS.index("none")
-    idx, col_id = parse_col(toks, idx, tables_with_alias, schema, default_tables)
+    try:
+        idx, col_id = parse_col(toks, idx, tables_with_alias, schema, default_tables)
+    except:
+        a = 7
 
     if isBlock:
         assert toks[idx] == ')'

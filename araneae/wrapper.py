@@ -139,7 +139,7 @@ class Araneae:
             current_ind += 1
         return len(data_df)
 
-    def load_russian_from_csv(self, filepath: str, source: Source) -> int:
+    def load_russian_from_csv(self, filepath: str, source: Source) -> NoReturn:
         data_df = pd.read_csv(filepath, sep=',', encoding='utf-8')
         for ind, row in data_df.iterrows():
             generated_sample = Sample()
@@ -157,46 +157,71 @@ class Araneae:
             if not pd.isna(query_corrected) and query_corrected and len(query_corrected) > 0:
                  generated_sample.russian_query = query_corrected
 
-            # Processed part
-            # generated_sample.query_toks = sample_json.get('query_toks', None)
-            # generated_sample.query_toks_no_values = sample_json.get('query_toks_no_value', None)
-            # generated_sample.question_toks = sample_json.get('question_toks', None)
-            # generated_sample.mentions = self.mention_extractor.get_mentions_from_sample(sample_json)
-            # self._verify_translation(current_sample, row)
-            # current_sample.russian_query = row['sql_ru']
-            # corrected = row["sql_ru_corrected"]
-            # if not pd.isna(corrected) and corrected and len(corrected) > 0:
-            #     current_sample.russian_query = row['sql_ru_corrected']
-            # current_sample.russian_question = row['ru']
-            # corrected = row["ru_corrected"]
-            # if not pd.isna(corrected) and corrected and len(corrected) > 0:
-            #     current_sample.russian_question = row['ru_corrected']
-            # current_sample.russian_query_toks = tokenize(current_sample.russian_query)
-            # current_sample.russian_question_toks = word_tokenize(current_sample.russian_question, language="russian")
-            # current_sample.id = row["id"]
-            # if current_sample.russian_question.lower().startswith("select"):
-            #     raise KeyError("SQL in NL")
-            # schema = self.schemas[current_sample.db_id]
-            # table = self.tables[current_sample.db_id]
-            # schema_obj = Schema(schema, table)
-            # current_sample.russian_sql = get_sql(schema_obj, current_sample.russian_query)
-            # current_sample.russian_mentions = self.mention_extractor.get_mentions_from_sample({
-            #     "db_id": current_sample.db_id,
-            #     "sql": current_sample.russian_sql
-            # })
-            # current_sample.russian_query_toks_no_values = []
-            # values_mentions = []
-            # for _mention in current_sample.russian_mentions:
-            #     if _mention.type is Subquery.WHERE and _mention.values is not None:
-            #         values_mentions += _mention.values
-            # values_mentions = [_v if isinstance(_v, str) else _v for _v in values_mentions]
-            # for _tok in current_sample.russian_query_toks:
-            #     if _tok not in values_mentions:
-            #         current_sample.russian_query_toks_no_values.append(_tok)
-            #     else:
-            #         current_sample.russian_query_toks_no_values.append(VALUE)
-            # current_ind += 1
+            ##################
+            # Processed part #
+            ##################
 
+            # SQL
+            schema = self.schemas[generated_sample.db_id]
+            table = self.tables[generated_sample.db_id]
+            schema_obj = Schema(schema, table)
+            # try:
+            #     generated_sample.sql = get_sql(schema_obj, generated_sample.query)
+            #     generated_sample.russian_sql = get_sql(schema_obj, generated_sample.russian_query)
+            # except:
+            #     raise ValueError()
+            if generated_sample.id == 'T_0003':
+                a = 7
+            try:
+                generated_sample.sql = get_sql(schema_obj, generated_sample.query)
+                generated_sample.russian_sql = get_sql(schema_obj, generated_sample.russian_query)
+            except:
+                a = 7
+
+            # Mentions
+            try:
+                generated_sample.mentions = self.mention_extractor.get_mentions_from_sample({
+                    "db_id": generated_sample.db_id,
+                    "sql": generated_sample.sql
+                })
+                generated_sample.russian_mentions = self.mention_extractor.get_mentions_from_sample({
+                    "db_id": generated_sample.db_id,
+                    "sql": generated_sample.russian_sql
+                })
+            except:
+                a = 7
+
+            # Tokens
+            generated_sample.query_toks = tokenize(generated_sample.query)
+            generated_sample.question_toks = word_tokenize(generated_sample.question, language="english")
+            generated_sample.russian_query_toks = tokenize(generated_sample.russian_query)
+            generated_sample.russian_question_toks = word_tokenize(generated_sample.russian_question, language="russian")
+
+            # Tokens with no values
+            generated_sample.query_toks_no_values = self.extract_toks_with_no_values(generated_sample.mentions, generated_sample.query_toks)
+            generated_sample.russian_query_toks_no_values = self.extract_toks_with_no_values(generated_sample.russian_mentions,
+                                                                           generated_sample.russian_query_toks)
+
+            # Checkings
+            if generated_sample.russian_question.lower().startswith("select"):
+                raise KeyError("SQL in NL")
+
+            self.samples.content.append(generated_sample)
+
+
+    def extract_toks_with_no_values(self, mentions: List[Mention], query_toks: List[str]) -> List[str]:
+        toks_no_values = []
+        values_mentions = []
+        for _mention in mentions:
+            if _mention.type is Subquery.WHERE and _mention.values is not None:
+                values_mentions += _mention.values
+        values_mentions = [_v if isinstance(_v, str) else _v for _v in values_mentions]
+        for _token in query_toks:
+            if _token not in values_mentions:
+                toks_no_values.append(_token)
+            else:
+                toks_no_values.append(VALUE)
+        return toks_no_values
 
     def load_russian_from_json(self, filepath: str, id_start: int) -> int:
         with open(filepath) as json_file:
@@ -253,7 +278,8 @@ class Araneae:
         ru_dev_path = os.path.join(RUSSOCAMPUS_NEW_PATH, 'dev.csv')
         ru_train_path = os.path.join(RUSSOCAMPUS_NEW_PATH, 'train_spider.csv')
         ru_others_path = os.path.join(RUSSOCAMPUS_NEW_PATH, 'train_others.csv')
-        additional_path = [os.path.join(RUSSOCAMPUS_NEW_PATH, _p) for _p in os.listdir(ADDITIONAL_DIR_PATH)]
+        additional_files = filter(lambda x: x.endswith('.csv'), os.listdir(ADDITIONAL_DIR_PATH))
+        additional_path = [os.path.join(ADDITIONAL_DIR_PATH, _p) for _p in additional_files]
 
         self.load_russian_from_csv(ru_dev_path, Source.SPIDER_DEV)
         self.load_russian_from_csv(ru_train_path, Source.SPIDER_TRAIN)
@@ -261,7 +287,6 @@ class Araneae:
 
         for _additional in additional_path:
             self.load_russian_from_csv(_additional, Source.ADDITION)
-
 
     def load(self):
         with open(SAMPLES_PATH, 'rb') as sample_file:

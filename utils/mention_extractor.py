@@ -196,7 +196,7 @@ class MentionExtractor:
         try:
             mentions = self.get_mentions_from_sql(db, sql)
         except:
-            raise ValueError()
+            raise ValueError(sample['sql'])
         return mentions
 
     def _add_values_to_mentions(self, mentions, val, scheme, type, details):
