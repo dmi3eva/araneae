@@ -41,9 +41,9 @@ def calculate_coverage(araneae: Araneae, language: Language, info_file:str, db_i
         for mention in mentions:
             if mention.type is Subquery.FROM:
                 info[source]['tables'].add(f"{mention.db}_{mention.table}")
-            if mention.type is Subquery.SELECT:
+            if mention.type is Subquery.SELECT and mention.column != '*':
                 info[source]['columns'].add(f"{mention.db}_{mention.table}_{mention.column}")
-            if mention.type is Subquery.WHERE:
+            if mention.type is Subquery.WHERE and mention.values is not None:
                 for value in mention.values:
                     info[source]['values'].add(f"{mention.db}_{mention.table}_{mention.column}_{value}")
     for source, content in info.items():
@@ -57,4 +57,6 @@ EN_FILE = os.path.join(INFO_DIR, 'en_coverage.json')
 RU_FILE = os.path.join(INFO_DIR, 'ru_coverage.json')
 
 araneae = Araneae()
-calculate_coverage(araneae, Language.EN, EN_FILE, DB_MAPPING)
+araneae.load()
+# calculate_coverage(araneae, Language.EN, EN_FILE, DB_MAPPING)
+calculate_coverage(araneae, Language.RU, RU_FILE, DB_MAPPING)
