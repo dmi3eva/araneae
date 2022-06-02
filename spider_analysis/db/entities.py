@@ -29,6 +29,12 @@ for source, dbs in db_by_sources.items():
         info[source]['dbs'] += 1
         tables = en_spider.get_db_tables(db)
         info[source]['tables'] += len(tables)
+        for table in tables:
+            columns = en_spider.get_db_columns(db, table)
+            info[source]['columns'] += len(columns)
+            for column in columns:
+                values = en_spider.get_values(db, table, column)
+                info[source]['values'] += len(values)
 
 with open(INFO_FILE, "w") as info_file:
     json.dump(info, info_file, indent=4)
