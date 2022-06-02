@@ -218,10 +218,9 @@ def parse_col_unit(toks, start_idx, tables_with_alias, schema, default_tables=No
         idx += 1
         isDistinct = True
     agg_id = AGG_OPS.index("none")
-    try:
-        idx, col_id = parse_col(toks, idx, tables_with_alias, schema, default_tables)
-    except:
-        a = 7
+
+    idx, col_id = parse_col(toks, idx, tables_with_alias, schema, default_tables)
+
 
     if isBlock:
         assert toks[idx] == ')'

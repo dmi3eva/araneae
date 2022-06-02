@@ -170,26 +170,21 @@ class Araneae:
             #     generated_sample.russian_sql = get_sql(schema_obj, generated_sample.russian_query)
             # except:
             #     raise ValueError()
-            if generated_sample.id == 'T_0003':
-                a = 7
-            try:
-                generated_sample.sql = get_sql(schema_obj, generated_sample.query)
-                generated_sample.russian_sql = get_sql(schema_obj, generated_sample.russian_query)
-            except:
-                a = 7
+
+            generated_sample.sql = get_sql(schema_obj, generated_sample.query)
+            generated_sample.russian_sql = get_sql(schema_obj, generated_sample.russian_query)
 
             # Mentions
-            try:
-                generated_sample.mentions = self.mention_extractor.get_mentions_from_sample({
-                    "db_id": generated_sample.db_id,
-                    "sql": generated_sample.sql
-                })
-                generated_sample.russian_mentions = self.mention_extractor.get_mentions_from_sample({
-                    "db_id": generated_sample.db_id,
-                    "sql": generated_sample.russian_sql
-                })
-            except:
-                a = 7
+
+            generated_sample.mentions = self.mention_extractor.get_mentions_from_sample({
+                "db_id": generated_sample.db_id,
+                "sql": generated_sample.sql
+            })
+            generated_sample.russian_mentions = self.mention_extractor.get_mentions_from_sample({
+                "db_id": generated_sample.db_id,
+                "sql": generated_sample.russian_sql
+            })
+
 
             # Tokens
             generated_sample.query_toks = tokenize(generated_sample.query)
@@ -201,7 +196,6 @@ class Araneae:
             generated_sample.query_toks_no_values = self.extract_toks_with_no_values(generated_sample.mentions, generated_sample.query_toks)
             generated_sample.russian_query_toks_no_values = self.extract_toks_with_no_values(generated_sample.russian_mentions,
                                                                            generated_sample.russian_query_toks)
-
             # Checkings
             if generated_sample.russian_question.lower().startswith("select"):
                 raise KeyError("SQL in NL")
@@ -281,9 +275,9 @@ class Araneae:
         additional_files = filter(lambda x: x.endswith('.csv'), os.listdir(ADDITIONAL_DIR_PATH))
         additional_path = [os.path.join(ADDITIONAL_DIR_PATH, _p) for _p in additional_files]
 
-        self.load_russian_from_csv(ru_dev_path, Source.SPIDER_DEV)
-        self.load_russian_from_csv(ru_train_path, Source.SPIDER_TRAIN)
-        self.load_russian_from_csv(ru_others_path, Source.SPIDER_TRAIN_OTHERS)
+        # self.load_russian_from_csv(ru_dev_path, Source.SPIDER_DEV)
+        # self.load_russian_from_csv(ru_train_path, Source.SPIDER_TRAIN)
+        # self.load_russian_from_csv(ru_others_path, Source.SPIDER_TRAIN_OTHERS)
 
         for _additional in additional_path:
             self.load_russian_from_csv(_additional, Source.ADDITION)
@@ -457,8 +451,6 @@ class Araneae:
 
     def _specifications_negation(self, sample: Sample) -> Optional[List[QuerySubtype]]:
         subtypes = []
-        if sample.id == 4467:
-            a = 7
         nl = sample_token_processing(sample.question)
         sql = sample_token_processing(sample.query)
         sql_tokens = set([sample_token_processing(_t) for _t in sample.query_toks])
