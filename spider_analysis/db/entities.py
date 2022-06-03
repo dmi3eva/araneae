@@ -36,7 +36,6 @@ def calculate_entites(spider: SpiderDB, info_file) -> NoReturn:
         json.dump(info, info_file, indent=4)
 
 
-
 EN_FILE = os.path.join(INFO_DIR, 'en_entities.json')
 RU_FILE = os.path.join(INFO_DIR, 'ru_entities.json')
 

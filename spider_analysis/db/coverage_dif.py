@@ -33,13 +33,13 @@ def calculate_coverage(araneae: Araneae, language: Language, info_file:str, db_i
         info[source]['dbs'].add(sample.db_id)
         for mention in mentions:
             if mention.type is Subquery.FROM:
-                info[source]['tables'].add(f"{mention.db}_{mention.table}")
+                info[source]['tables'].add(f"{mention.db}#{mention.table}")
             if mention.type is Subquery.SELECT and mention.column != '*':
-                info[source]['columns'].add(f"{mention.db}_{mention.table}_{mention.column}")
+                info[source]['columns'].add(f"{mention.db}#{mention.table}#{mention.column}")
             if mention.type is Subquery.WHERE and mention.values is not None:
                 for value in mention.values:
                     processed = str(value).replace("'", "").replace('"', "")
-                    info[source]['values'].add(f"{mention.db}_{mention.table}_{mention.column}_{processed}")
+                    info[source]['values'].add(f"{mention.db}#{mention.table}#{mention.column}#{processed}")
     for source, content in info.items():
         for entity, values_set in content.items():
             content[entity] = list(values_set)
