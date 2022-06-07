@@ -165,14 +165,14 @@ class Araneae:
             schema = self.schemas[generated_sample.db_id]
             table = self.tables[generated_sample.db_id]
             schema_obj = Schema(schema, table)
-            # try:
-            #     generated_sample.sql = get_sql(schema_obj, generated_sample.query)
-            #     generated_sample.russian_sql = get_sql(schema_obj, generated_sample.russian_query)
-            # except:
-            #     raise ValueError()
+            try:
+                generated_sample.sql = get_sql(schema_obj, generated_sample.query)
+                generated_sample.russian_sql = get_sql(schema_obj, generated_sample.russian_query)
+            except:
+                raise ValueError()
 
-            generated_sample.sql = get_sql(schema_obj, generated_sample.query)
-            generated_sample.russian_sql = get_sql(schema_obj, generated_sample.russian_query)
+            # generated_sample.sql = get_sql(schema_obj, generated_sample.query)
+            # generated_sample.russian_sql = get_sql(schema_obj, generated_sample.russian_query)
 
             # Mentions
 
