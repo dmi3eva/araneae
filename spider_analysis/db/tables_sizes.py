@@ -3,7 +3,7 @@ from utils.spider_connectors import *
 from utils.spider_analysis import *
 
 
-def get_column_sizes_statistics(connector: SpiderDB, verbose=False) -> Tuple[NumericalStatistics, NumericalStatistics]:
+def get_columns_sizes_statistics(connector: SpiderDB, verbose=False) -> Tuple[NumericalStatistics, NumericalStatistics]:
     """
     Returns sizes of tables, amount of unique values in the tables
     """
@@ -36,7 +36,7 @@ def get_tables_sizes_statistics(connector: SpiderDB, verbose=False) -> Numerical
     for db in connector.dbs:
         for table in connector.get_db_tables(db):
             size = 0
-            for column in connector.get_db_columns(db):
+            for column in connector.get_db_columns(db, table):
                 values = connector.get_values(db, table, column)
                 size = max(size, len(values))
             all_sizes.append(size)
