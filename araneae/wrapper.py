@@ -149,20 +149,20 @@ class Araneae:
         source_mapping = {
             "train-spider": TrainDevType.TRAIN,
             "train-others": TrainDevType.TRAIN,
-            "dev": TrainDevType.Dev
+            "dev": TrainDevType.DEV
         }
         db_mapping = {}
-        for source, dbs in db_division.items():
-            for db in dbs:
-                db_mapping[db] = source_mapping[source]
+        for source_name, dbs in db_division.items():
+            for db_name in dbs:
+                db_mapping[db_name] = source_mapping[source_name]
 
         # Iteration
         for ind, row in data_df.iterrows():
             generated_sample = Sample()
             generated_sample.id = row['id']
             generated_sample.db_id = row['db_id']
-            generated_sample.source = db_mapping[generated_sample.db_id]
-            generated_sample.type = source_mapping
+            generated_sample.source = source
+            generated_sample.type = db_mapping[generated_sample.db_id]
             generated_sample.question = row['en']
             generated_sample.russian_question = row['ru']
             question_corrected = row["ru_corrected"]
