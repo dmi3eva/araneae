@@ -331,8 +331,6 @@ class Sample:
         }
         return jsoned
 
-
-
     def to_dict(self) -> Dict:
         dicted = deepcopy(self.__dict__)
         del dicted['mentions']
