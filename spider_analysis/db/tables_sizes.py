@@ -3,21 +3,45 @@ from utils.spider_connectors import *
 from utils.spider_analysis import *
 
 
-def get_tables_sizes_statistics(connector: SpiderDB) -> Tuple[NumericalStatistics, NumericalStatistics]:
+def get_column_sizes_statistics(connector: SpiderDB, verbose=False) -> Tuple[NumericalStatistics, NumericalStatistics]:
     """
     Returns sizes of tables, amount of unique values in the tables
     """
     all_sizes = []
     unique_sizes = []
+    nan_amount = 0
     for _triple in connector.triples:
         db, table, column = _triple
         values = connector.get_values(db, table, column)
-        unique_values = set(values)
         all_sizes.append(len(values))
+        if len(values) == 0 and verbose:
+            print(f"Zero values: {db} {table} {column}")
+        unique_values = set(values)
+        if len(unique_values) == 1 and str(values[0]).lower() == 'none':
+            if verbose:
+                print(f"One unique values: {db} {table} {column} -> {values[0]}")
+            nan_amount += 1
         unique_sizes.append(len(unique_values))
     all_counter = Counter(all_sizes)
     unique_counter = Counter(unique_sizes)
+    print(f"Only nan: {nan_amount}")
     return NumericalStatistics(all_counter), NumericalStatistics(unique_counter)
+
+
+def get_tables_sizes_statistics(connector: SpiderDB, verbose=False) -> NumericalStatistics:
+    """
+    Returns sizes of tables, amount of unique values in the tables
+    """
+    all_sizes = []
+    for db in connector.dbs:
+        for table in connector.get_db_tables(db):
+            size = 0
+            for column in connector.get_db_columns(db):
+                values = connector.get_values(db, table, column)
+                size = max(size, len(values))
+            all_sizes.append(size)
+    all_counter = Counter(all_sizes)
+    return NumericalStatistics(all_counter)
 
 
 def get_entities_sizes_statistics(connector: SpiderDB) -> Tuple[NumericalStatistics, NumericalStatistics]:
