@@ -6,7 +6,7 @@ from configure import *
 from dto.sample import *
 
 
-CURRENT_TYPE = 'binary-true-false'
+CURRENT_TYPE = 'binary-gender'
 BINARY_PATH = os.path.join(QUERY_TYPES_PATH, 'binary.json')
 ANALYSIS_PATH = os.path.join(ROOT_PATH, 'resources', 'results', 'reports', 'binary', f"{CURRENT_TYPE}.txt")
 

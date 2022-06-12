@@ -28,14 +28,18 @@ def get_entities_sizes_statistics(connector: SpiderDB) -> Tuple[NumericalStatist
     unique_sizes = []
     all_values = set()
     total = len(connector.triples)
+    nans_amount = 0
     for ind, _triple in enumerate(connector.triples):
         if ind % 500 == 0:
             print(f"{ind} / {total}")
         db, table, column = _triple
         values = connector.get_values(db, table, column)
+        current_nan = len(list(filter(lambda x: len(str(x)) == 0 or str(x).lower() == 'nan', values)))
+        nans_amount += current_nan
         unique_values = set(values)
         all_values = all_values.union(unique_values)
     all_values_list = list(all_values)
+    print(f"NaN's amount is {nans_amount}")
     print(f"Amount of unique values is {len(all_values_list)}")
 
     symbol_sizes = [len(entity) for entity in all_values_list]
