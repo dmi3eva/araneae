@@ -57,6 +57,11 @@ class Source(Enum):
     ARANEAE_FUZZY_DEV = "araneae-fuzzy-dev"
 
 
+class TrainDevType(Enum):
+    TRAIN = "train"
+    DEV = "dev"
+
+
 class QueryType(Enum):
     BINARY = "binary"
     DATETIME = "datetime"
@@ -274,6 +279,7 @@ class Sample:
         self.id: Optional[int] = None
         self.db_id: Optional[str] = None
         self.source: Optional[Source] = None
+        self.type: Optional[TrainDevType] = None
         self.question: Optional[str] = None
         self.query: Optional[str] = None
         self.sql: Optional[Dict] = None
@@ -297,6 +303,7 @@ class Sample:
             'id': self.id,
             'db_id': self.db_id,
             'source': self.source.value,
+            'type': self.type.value,
             'query': {
                 'en': self.query,
                 'ru': self.russian_query

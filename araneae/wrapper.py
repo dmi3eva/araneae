@@ -141,11 +141,28 @@ class Araneae:
 
     def load_russian_from_csv(self, filepath: str, source: Source) -> NoReturn:
         data_df = pd.read_csv(filepath, sep=',', encoding='utf-8')
+
+        # Preparing for typing
+        with open(DB_DIVISION, "r") as db_file:
+            db_division = json.load(db_file)
+
+        source_mapping = {
+            "train-spider": TrainDevType.TRAIN,
+            "train-others": TrainDevType.TRAIN,
+            "dev": TrainDevType.Dev
+        }
+        db_mapping = {}
+        for source, dbs in db_division.items():
+            for db in dbs:
+                db_mapping[db] = source_mapping[source]
+
+        # Iteration
         for ind, row in data_df.iterrows():
             generated_sample = Sample()
             generated_sample.id = row['id']
             generated_sample.db_id = row['db_id']
-            generated_sample.source = source
+            generated_sample.source = db_mapping[generated_sample.db_id]
+            generated_sample.type = source_mapping
             generated_sample.question = row['en']
             generated_sample.russian_question = row['ru']
             question_corrected = row["ru_corrected"]
@@ -184,7 +201,6 @@ class Araneae:
                 "db_id": generated_sample.db_id,
                 "sql": generated_sample.russian_sql
             })
-
 
             # Tokens
             generated_sample.query_toks = tokenize(generated_sample.query)
@@ -300,7 +316,15 @@ class Araneae:
         all_in_json = [_s.to_json() for _s in self.samples.content]
         train_spider = [_s.to_json() for _s in self.samples.content if _s.source is Source.SPIDER_TRAIN]
         train_others = [_s.to_json() for _s in self.samples.content if _s.source is Source.SPIDER_TRAIN_OTHERS]
-        dev = [_s.to_json() for _s in self.samples.content if _s.source is Source.SPIDER_DEV]
+        dev = [_s.to_json() for _s in self.samples.content if _s.source is Source.SPIDER_DEV] # To remove
+
+        all_train = [_s.to_json() for _s in self.samples.content if _s.type is TrainDevType.TRAIN]
+        all_dev = [_s.to_json() for _s in self.samples.content if _s.type is TrainDevType.DEV]
+
+        just_new_all = [_s.to_json() for _s in self.samples.content if _s.source is Source.ADDITION]
+        just_new_train = [_s.to_json() for _s in self.samples.content if _s.source is Source.ADDITION and _s.type is TrainDevType.TRAIN]
+        just_new_dev = [_s.to_json() for _s in self.samples.content if _s.source is Source.ADDITION and _s.type is TrainDevType.DEV]
+
         with open(JSON_ALL, "w", encoding='utf-8') as outp:
             json.dump(all_in_json, outp, ensure_ascii=False)
         with open(JSON_TRAIN_SPIDER, "w", encoding='utf-8') as outp:
@@ -309,6 +333,17 @@ class Araneae:
             json.dump(train_others, outp, ensure_ascii=False)
         with open(JSON_DEV, "w", encoding='utf-8') as outp:
             json.dump(dev, outp, ensure_ascii=False)
+
+        with open(JSON_ALL_TRAIN, "w", encoding='utf-8') as outp:
+            json.dump(all_train, outp, ensure_ascii=False)
+        with open(JSON_ALL_DEV, "w", encoding='utf-8') as outp:
+            json.dump(all_dev, outp, ensure_ascii=False)
+        with open(JSON_NEW_ALL, "w", encoding='utf-8') as outp:
+            json.dump(just_new_all, outp, ensure_ascii=False)
+        with open(JSON_NEW_TRAIN, "w", encoding='utf-8') as outp:
+            json.dump(just_new_train, outp, ensure_ascii=False)
+        with open(JSON_NEW_DEV, "w", encoding='utf-8') as outp:
+            json.dump(just_new_dev, outp, ensure_ascii=False)
 
     def find_triples(self, triples: List[Triple]) -> List[Sample]:
         desired = []
