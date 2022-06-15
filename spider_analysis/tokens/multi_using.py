@@ -102,7 +102,7 @@ def make_analysis(multiusing):
         russian_values = [_v for _v in content if is_russian(_v)]
         russian_amounts.append(len(russian_values))
         tokens_amounts += [len(_v) for _v in content]
-    print(f'There are condfused {sum(tokens_amounts)} tokens')
+    print(f'There are confused {sum(tokens_amounts)} tokens')
     print(f'... russian tokens: {sum(russian_amounts)} ot them.')
     print(f'Every token is encountering  {sum(tokens_amounts) / len(tokens_amounts)} ones in average.')
     print(f'Every database contains {sum(amounts_in_db) / len(amounts_in_db)} tokens in average.')

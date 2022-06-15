@@ -19,9 +19,12 @@ def calculate_statistics(filepath: str) -> Dict:
         ru_amounts.append(len(ru_tokens))
         en_amounts.append(len(en_tokens))
     stat = {
-        'all': sum(all_amounts) / len(all_amounts),
-        'ru': sum(ru_amounts) / len(ru_amounts),
-        'en': sum(en_amounts) / len(en_amounts)
+        'all_total': sum(all_amounts),
+        'ru_total': sum(ru_amounts),
+        'en_total': sum(en_amounts),
+        'all_avg': sum(all_amounts) / len(all_amounts),
+        'ru_avg': sum(ru_amounts) / len(ru_amounts),
+        'en_avg': sum(en_amounts) / len(en_amounts)
     }
     return stat
 
