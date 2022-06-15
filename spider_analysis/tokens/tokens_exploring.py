@@ -65,9 +65,9 @@ class QueryDescription:
 
 @dataclass
 class Token:
-    db: Optional[Dict[str, DBDescription]] = None
-    question: Optional[Dict[str, QuestionDescription]] = None
-    query: Optional[Dict[str, QueryDescription]] = None
+    db: Optional[Dict[str, List[DBDescription]]] = None
+    question: Optional[Dict[str, List[QuestionDescription]]] = None
+    query: Optional[Dict[str, List[QueryDescription]]] = None
 
 
 def extract_tokens_info(dataset: Araneae, language: Language):
@@ -286,14 +286,115 @@ def save_tokens_info(statistics, filename) -> NoReturn:
         json.dump(tokens_info, f, ensure_ascii=False)
 
 
+def make_using_analysis(info: Dict, language: Language) -> NoReturn:
+    all_analyze(info, language)
+    table_analyze(info, language)
+    column_analyze(info, language)
+    value_analyze(info, language)
+
+
+def all_analyze(info: Dict[str, Token], language: Language) -> NoReturn:
+    filepath = os.path.join(TOKENS_EN_PATH, RU_MULTIUSING_ENTITIES)
+    if language is Language.EN:
+        filepath = os.path.join(TOKENS_EN_PATH, EN_MULTIUSING_ENTITIES)
+    with open(filepath, "r", encoding="utf-8") as tokens_file:
+        all_multiusing = json.load(tokens_file)
+    used = []
+    for _token, _description in info.items():
+        if not _description.db:
+            continue
+        if not _description.question:
+            continue
+        for _db in _description.db.keys():
+            if _db not in _description.question.keys():
+                continue
+            if _token in all_multiusing[_db].keys():
+                used.append((_token, _db, _description))
+    print(f"В {language.name} {len(used)} all entities")
+
+
+def table_analyze(info: Dict[str, Token], language: Language) -> NoReturn:
+    filepath = os.path.join(TOKENS_EN_PATH, RU_MULTIUSING_TABLES)
+    if language is Language.EN:
+        filepath = os.path.join(TOKENS_EN_PATH, EN_MULTIUSING_TABLES)
+    with open(filepath, "r", encoding="utf-8") as tokens_file:
+        all_multiusing = json.load(tokens_file)
+    used = []
+    _description: Token
+    for _token, _description in info.items():
+        if not _description.db:
+            continue
+        if not _description.query:
+            continue
+        for _db in _description.db.keys():
+            if _db not in _description.query.keys():
+                continue
+            types = [_q.type for _q in _description.query[_db]]
+            if 'FROM' not in types:
+                continue
+            if _token in all_multiusing[_db].keys():
+                used.append((_token, _db, _description))
+    print(f"В {language.name} {len(used)} tables")
+
+
+def column_analyze(info: Dict[str, Token], language: Language) -> NoReturn:
+    filepath = os.path.join(TOKENS_EN_PATH, RU_MULTIUSING_COLUMNS)
+    if language is Language.EN:
+        filepath = os.path.join(TOKENS_EN_PATH, EN_MULTIUSING_COLUMNS)
+    with open(filepath, "r", encoding="utf-8") as tokens_file:
+        all_multiusing = json.load(tokens_file)
+    used = []
+    _description: Token
+    for _token, _description in info.items():
+        if not _description.db:
+            continue
+        if not _description.query:
+            continue
+        for _db in _description.db.keys():
+            if _db not in _description.query.keys():
+                continue
+            types = [_q.type for _q in _description.query[_db]]
+            if 'SELECT' not in types:
+                continue
+            if _token in all_multiusing[_db].keys():
+                used.append((_token, _db, _description))
+    print(f"В {language.name} {len(used)} columns")
+
+
+def value_analyze(info: Dict[str, Token], language: Language) -> NoReturn:
+    filepath = os.path.join(TOKENS_EN_PATH, RU_MULTIUSING_VALUES)
+    if language is Language.EN:
+        filepath = os.path.join(TOKENS_EN_PATH, EN_MULTIUSING_VALUES)
+    with open(filepath, "r", encoding="utf-8") as tokens_file:
+        all_multiusing = json.load(tokens_file)
+    used = []
+    _description: Token
+    for _token, _description in info.items():
+        if not _description.db:
+            continue
+        if not _description.query:
+            continue
+        for _db in _description.db.keys():
+            if _db not in _description.query.keys():
+                continue
+            types = [_q.type for _q in _description.query[_db]]
+            if 'WHERE' not in types:
+                continue
+            if _token in all_multiusing[_db].keys():
+                used.append((_token, _db, _description))
+    print(f"В {language.name} {len(used)} values")
+
+
 if __name__ == "__main__":
     araneae = Araneae()
     araneae.load()
 
     en_tokens = extract_tokens_info(araneae, Language.EN)
+    make_using_analysis(en_tokens, Language.EN)  # Not for first execution
     save_tokens_info(en_tokens, TOKENS_EN_PATH)
     print("English ends")
 
     ru_tokens = extract_tokens_info(araneae, Language.RU)
     save_tokens_info(ru_tokens, TOKENS_RU_PATH)
+    make_using_analysis(ru_tokens, Language.RU)  # Not for first execution
     print("Russian ends")
