@@ -1,3 +1,22 @@
+"""
+Structure:
+info = {
+    token_1: {
+        "db": {
+            db_id_1: [DBDescription(type, db, table, column, value), ...]
+        },
+        "query": {
+            db_id_1: [QueryDescription(type, db, id, nl), ...]
+        },
+        "question": {
+            db_id_1: [QuestionDescription(db, id, nl), ...]
+        }
+    }
+}
+"""
+
+
+
 from araneae.wrapper import Araneae
 from utils.spider_connectors import *
 from utils.preprocessing.text import *
