@@ -4,6 +4,8 @@ from typing import *
 from dto.sample import *
 import nltk
 from nltk.stem.porter import *
+from utils.nlp import is_russian
+
 
 ru_morpher = pymorphy2.MorphAnalyzer()
 en_stemmer = PorterStemmer()
@@ -27,6 +29,7 @@ def db_token_process(token: str, language: Optional[Language]=None) -> str:
     if language is Language.EN:
         processed = en_stemmer.stem(processed)
     return processed
+
 
 
 if __name__ == "__main__":

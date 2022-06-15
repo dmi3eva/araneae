@@ -23,7 +23,7 @@ def extract_multiusing_entities(path_from: str, path_to: str) -> NoReturn:
                 multiusing[db][token] = different_usings
 
     with open(path_to, "w", encoding='utf-8') as file_from:
-        json.dump(multiusing, file_from, ensure_ascii=True)
+        json.dump(multiusing, file_from, ensure_ascii=False)
 
 
 def extract_entities(path_from: str, path_to: str) -> NoReturn:
@@ -39,7 +39,7 @@ def extract_entities(path_from: str, path_to: str) -> NoReturn:
             multiusing[db][token] = different_usings
 
     with open(path_to, "w", encoding='utf-8') as file_from:
-        json.dump(multiusing, file_from, ensure_ascii=True)
+        json.dump(multiusing, file_from, ensure_ascii=False)
 
 
 def extract_tables_entities(path_from: str, path_to: str) -> NoReturn:
@@ -56,7 +56,7 @@ def extract_tables_entities(path_from: str, path_to: str) -> NoReturn:
                 multiusing[db][token] = different_usings
 
     with open(path_to, "w", encoding='utf-8') as file_from:
-        json.dump(multiusing, file_from, ensure_ascii=True)
+        json.dump(multiusing, file_from, ensure_ascii=False)
 
 
 def extract_columns_entities(path_from: str, path_to: str) -> NoReturn:
@@ -73,7 +73,7 @@ def extract_columns_entities(path_from: str, path_to: str) -> NoReturn:
                 multiusing[db][token] = different_usings
 
     with open(path_to, "w", encoding='utf-8') as file_from:
-        json.dump(multiusing, file_from, ensure_ascii=True)
+        json.dump(multiusing, file_from, ensure_ascii=False)
 
 
 def extract_values_entities(path_from: str, path_to: str) -> NoReturn:
@@ -90,7 +90,7 @@ def extract_values_entities(path_from: str, path_to: str) -> NoReturn:
                 multiusing[db][token] = different_usings
     make_analysis(multiusing)
     with open(path_to, "w", encoding='utf-8') as file_from:
-        json.dump(multiusing, file_from, ensure_ascii=True)
+        json.dump(multiusing, file_from, ensure_ascii=False)
 
 
 def make_analysis(multiusing):

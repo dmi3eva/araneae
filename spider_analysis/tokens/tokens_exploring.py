@@ -1,7 +1,7 @@
-
 from araneae.wrapper import Araneae
 from utils.spider_connectors import *
 from utils.preprocessing.text import *
+from utils.nlp import is_russian
 from dto.sample import *
 from dataclasses import dataclass
 from typing import *
@@ -51,9 +51,6 @@ class Token:
     query: Optional[Dict[str, QueryDescription]] = None
 
 
-
-
-
 def extract_tokens_info(dataset: Araneae, language: Language):
     info = dict()
     info = extract_question_info(info, dataset, language)
@@ -65,7 +62,7 @@ def extract_tokens_info(dataset: Araneae, language: Language):
 def extract_db_info(info: Dict[str, Token], language: Language) -> Dict[str, Token]:
     spider = None
     if language is Language.RU:
-        spider = RuSpiderDBOld()
+        spider = RuSpiderDB()
     else:
         spider = EnSpiderDB()
     columns = spider.extract_columns()
@@ -87,7 +84,11 @@ def extract_question_info(info: Dict[str, Token], dataset: Araneae, language: La
             tokens = sample.russian_question_toks
             nl = sample.russian_question
         for _token in tokens:
-            info = get_question_token(info, db_token_process(_token, language), sample.db_id, nl, sample.id)
+            processing_language = Language.EN
+            if is_russian(_token):
+                processing_language = Language.RU
+            processed_token = db_token_process(_token, processing_language)
+            info = get_question_token(info, processed_token, sample.db_id, nl, sample.id)
     return info
 
 
@@ -276,3 +277,4 @@ if __name__ == "__main__":
 
     ru_tokens = extract_tokens_info(araneae, Language.RU)
     save_tokens_info(ru_tokens, TOKENS_RU_PATH)
+    print("Russian ends")
