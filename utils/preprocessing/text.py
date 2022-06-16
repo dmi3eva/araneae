@@ -20,6 +20,16 @@ def sample_token_processing(token):
     return processed
 
 
+def values_processing(token):
+    processed = str(token).lower()
+    processed = re.sub("[\'\"]+", '', processed)
+    processed = processed.replace('\'', "")
+    processed = processed.replace("\"", "")
+    processed = processed.replace("\'", "")
+    processed = processed.replace("\"", "")
+    return processed
+
+
 def db_token_process(token: str, language: Optional[Language]=None) -> str:
     processed = token.lower()
     if language is Language.RU:

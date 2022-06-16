@@ -218,14 +218,15 @@ def get_question_token(info: Dict[str, Token], token: str, db: str, nl: str, id:
 def get_query_token(info: Dict[str, Token], mention: Mention, db: str, nl: str, id: int) -> Dict[str, Token]:
     tokens = extract_token_from_mentions(mention)
     for _token in tokens:
-        info[_token] = info.get(_token, Token())
-        if not info[_token].query:
-            info[_token].query = {}
-        db_info = info[_token].query.get(db, [])
+        processed_token = values_processing(_token)
+        info[processed_token] = info.get(processed_token, Token())
+        if not info[processed_token].query:
+            info[processed_token].query = {}
+        db_info = info[processed_token].query.get(db, [])
         db_info.append(
             QueryDescription(db=db, nl=nl, id=id, type=mention.type.name)  # TODO: just type
         )
-        info[_token].query[db] = db_info
+        info[processed_token].query[db] = db_info
     return info
 
 
@@ -354,7 +355,7 @@ def column_analyze(info: Dict[str, Token], language: Language) -> NoReturn:
             if _db not in _description.query.keys():
                 continue
             types = [_q.type for _q in _description.query[_db]]
-            if 'SELECT' not in types:
+            if 'SELECT' not in types and 'GROUP_BY' not in types and 'ORDER_BY' not in types:
                 continue
             if _token in all_multiusing[_db].keys():
                 used.append((_token, _db, _description))
@@ -389,11 +390,13 @@ if __name__ == "__main__":
     araneae = Araneae()
     araneae.load()
 
+    print("English starts")
     en_tokens = extract_tokens_info(araneae, Language.EN)
     make_using_analysis(en_tokens, Language.EN)  # Not for first execution
     save_tokens_info(en_tokens, TOKENS_EN_PATH)
     print("English ends")
 
+    print("Russian starts")
     ru_tokens = extract_tokens_info(araneae, Language.RU)
     save_tokens_info(ru_tokens, TOKENS_RU_PATH)
     make_using_analysis(ru_tokens, Language.RU)  # Not for first execution
