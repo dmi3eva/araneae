@@ -359,6 +359,13 @@ def column_analyze(info: Dict[str, Token], language: Language) -> NoReturn:
                 continue
             if _token in all_multiusing[_db].keys():
                 used.append((_token, _db, _description))
+                print('-----')
+                print(_token)
+                print('SQL:')
+                print([(_q.id, _q.nl) for _q in _description.query[_db]])
+                print('Mentions:')
+                print([_q for _q in _description.db[_db]])
+                print()
     print(f"В {language.name} {len(used)} columns")
 
 
