@@ -14,6 +14,9 @@ def get_nl_sizes_statistics(araneae) -> Tuple[NumericalStatistics, NumericalStat
     longest_symbols_en = ""
     longest_symbols_ru = ""
 
+    shortest_symbols_en = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    shortest_symbols_ru = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+
     longest_tokens_en = []
     longest_tokens_ru = []
 
@@ -42,6 +45,13 @@ def get_nl_sizes_statistics(araneae) -> Tuple[NumericalStatistics, NumericalStat
             longest_tokens_en = english_tokens
         if len(russian_tokens) > len(longest_tokens_ru):
             longest_tokens_ru = russian_tokens
+        if len(english_nl) < len(shortest_symbols_en):
+            shortest_symbols_en = english_nl
+            shortest_id_en = sample.id
+        if len(russian_nl) < len(shortest_symbols_ru):
+        # if len(russian_nl) < len(shortest_symbols_ru)  # and 1 == len(russian_tokens):
+            shortest_symbols_ru = russian_nl
+            shortest_id_ru = sample.id
         if russian_nl.startswith("SELECT"):
             a = 7
 
@@ -56,6 +66,9 @@ def get_nl_sizes_statistics(araneae) -> Tuple[NumericalStatistics, NumericalStat
 
     print(f"Average english, tokens:\n {sum(all_english_tokens) / len(all_english_tokens)}")
     print(f"Average russian, tokens:\n {sum(all_russian_tokens) / len(all_russian_tokens)}")
+
+    print(f"Shortest english, symbols:\n {shortest_symbols_en} ({shortest_id_en})")
+    print(f"Shortest russian, symbols:\n {shortest_symbols_ru} ({shortest_id_ru})")
 
     en_symbols_counter = Counter(all_english_symbols)
     ru_symbols_counter = Counter(all_russian_symbols)
