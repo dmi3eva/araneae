@@ -53,6 +53,7 @@ class Araneae:
             QueryType.WHERE: lambda sample: self._specifications_where(sample),
             QueryType.GROUP_BY: lambda sample: self._specifications_group_by(sample),
             QueryType.ORDER_BY: lambda sample: self._specifications_order_by(sample),
+            QueryType.NEW: lambda sample: self._specifications_new(sample)
         }
         schemas, db_names, tables = get_schemas_from_json(SCHEMES_PATH)
         self.schemas = schemas
@@ -643,5 +644,21 @@ class Araneae:
             subtypes.append(QuerySubtype.ORDER_BY_EXISTS)
         if len(order_by_mentions) > 0 and 'order by count(' in sample.query.lower():
             subtypes.append(QuerySubtype.ORDER_BY_COUNT)
+        return subtypes
+
+    def _specifications_new(self, sample: Sample) -> Optional[List[QuerySubtype]]:
+        subtypes = []
+        if sample.id.startswith("L_"):
+            subtypes.append(QuerySubtype.LONG)
+        if sample.id.startswith("E_"):
+            subtypes.append(QuerySubtype.EMPTY)
+        if sample.id.startswith("B_"):
+            subtypes.append(QuerySubtype.NEW_BINARY)
+        if sample.id.startswith("F_"):
+            subtypes.append(QuerySubtype.NEW_FUZZY)
+        if sample.id.startswith("T_"):
+            subtypes.append(QuerySubtype.NEW_DATES)
+        if len(subtypes) > 0:
+            subtypes.append(QuerySubtype.NEW_ALL)
         return subtypes
 

@@ -18,23 +18,44 @@ def save(test_sets_collections: Dict[str, SamplesCollection]):
 ########################################################
 
 # First start
-araneae = Araneae()
-
-# araneae.import_spider()
-araneae.import_russocampus()
-
-araneae.save_in_json()
-araneae.save()
-
-# # Other starts
 # araneae = Araneae()
-# araneae.load()
+# araneae.import_russocampus()
+# araneae.save_in_json()
+# araneae.save()
 
-########################################################
-#############  Experiments   ##############################
-########################################################
+# Other starts
+araneae = Araneae()
+araneae.load()
 
-#########################################################################################
+# #######################################################
+# ############  Experiments   ##############################
+# #######################################################
+#
+
+########################################################################################
+# NEW
+db_pipeline = [QueryType.NEW]
+araneae.add_specifications(db_pipeline)
+
+new_all = araneae.find_all_with_type(QueryType.NEW, subtypes=[QuerySubtype.NEW_ALL])
+empty = araneae.find_all_with_type(QueryType.DB, subtypes=[QuerySubtype.NEW_EMPTY])
+long = araneae.find_all_with_type(QueryType.DB, subtypes=[QuerySubtype.NEW_LONG])
+new_binary = araneae.find_all_with_type(QueryType.DB, subtypes=[QuerySubtype.NEW_BINARY])
+new_fuzzy = araneae.find_all_with_type(QueryType.DB, subtypes=[QuerySubtype.NEW_FUZZY])
+new_dates = araneae.find_all_with_type(QueryType.DB, subtypes=[QuerySubtype.NEW_DATES])
+
+save({
+    "service_new_all": new_all,
+    "finale_empty": empty,
+    "final_long": long,
+    "service_new_binary": new_binary,
+    "service_new_fuzzy": new_fuzzy,
+    "service_new_dates": new_dates
+})
+
+# araneae.save()
+
+# ########################################################################################
 # # DB
 # db_pipeline = [QueryType.DB]
 # araneae.add_specifications(db_pipeline)
@@ -63,6 +84,7 @@ araneae.save()
 #     "db_ru_columns": db_ru_columns,
 #     "db_ru_values": db_ru_values
 # })
+
 
 # #########################################################################################
 # # BINARY
@@ -210,6 +232,7 @@ araneae.save()
 #     "negation_any_all": negation_any_all
 # })
 
+# araneae.save()
 
 
 

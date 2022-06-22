@@ -76,6 +76,7 @@ class QueryType(Enum):
     WHERE = "where"
     GROUP_BY = "group_by"
     ORDER_BY = "order_by"
+    NEW = "new"
 
 
 class QuerySubtype(Enum):
@@ -161,6 +162,14 @@ class QuerySubtype(Enum):
     GROUP_BY_COUNT = "group-by-count"
     ORDER_BY_EXISTS = "order-by-exists"
     ORDER_BY_COUNT = "order-by-count"
+    NEW_ALL = "new"
+    NEW_FUZZY = "fuzzy"
+    NEW_LONG = "long"
+    NEW_EMPTY = "empty"
+    NEW_BINARY = "new_binary"
+    NEW_DATES = "new_dates"
+    BINARY_WITH_NEW = "binary-all"
+    DATES_WITH_NEW = "dates-all"
 
 
 query_type_mapping = {_t.value: _t for _t in QueryType}
@@ -263,6 +272,14 @@ query_mapping = {
     QueryType.ORDER_BY: [
         QuerySubtype.ORDER_BY_EXISTS,
         QuerySubtype.ORDER_BY_COUNT
+    ],
+    QueryType.NEW: [
+        QuerySubtype.NEW_ALL,
+        QuerySubtype.NEW_FUZZY,
+        QuerySubtype.NEW_LONG,
+        QuerySubtype.NEW_EMPTY,
+        QuerySubtype.NEW_BINARY,
+        QuerySubtype.NEW_DATES
     ]
 }
 
@@ -276,7 +293,7 @@ class Triple:
 
 class Sample:
     def __init__(self):
-        self.id: Optional[int] = None
+        self.id: Optional[str] = None
         self.db_id: Optional[str] = None
         self.source: Optional[Source] = None
         self.type: Optional[TrainDevType] = None
