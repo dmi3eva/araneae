@@ -38,15 +38,15 @@ db_pipeline = [QueryType.NEW]
 araneae.add_specifications(db_pipeline)
 
 new_all = araneae.find_all_with_type(QueryType.NEW, subtypes=[QuerySubtype.NEW_ALL])
-empty = araneae.find_all_with_type(QueryType.DB, subtypes=[QuerySubtype.NEW_EMPTY])
-long = araneae.find_all_with_type(QueryType.DB, subtypes=[QuerySubtype.NEW_LONG])
-new_binary = araneae.find_all_with_type(QueryType.DB, subtypes=[QuerySubtype.NEW_BINARY])
-new_fuzzy = araneae.find_all_with_type(QueryType.DB, subtypes=[QuerySubtype.NEW_FUZZY])
-new_dates = araneae.find_all_with_type(QueryType.DB, subtypes=[QuerySubtype.NEW_DATES])
+empty = araneae.find_all_with_type(QueryType.NEW, subtypes=[QuerySubtype.NEW_EMPTY])
+long = araneae.find_all_with_type(QueryType.NEW, subtypes=[QuerySubtype.NEW_LONG])
+new_binary = araneae.find_all_with_type(QueryType.NEW, subtypes=[QuerySubtype.NEW_BINARY])
+new_fuzzy = araneae.find_all_with_type(QueryType.NEW, subtypes=[QuerySubtype.NEW_FUZZY])
+new_dates = araneae.find_all_with_type(QueryType.NEW, subtypes=[QuerySubtype.NEW_DATES])
 
 save({
     "service_new_all": new_all,
-    "finale_empty": empty,
+    "final_empty": empty,
     "final_long": long,
     "service_new_binary": new_binary,
     "service_new_fuzzy": new_fuzzy,

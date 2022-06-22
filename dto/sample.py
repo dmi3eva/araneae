@@ -351,6 +351,7 @@ class Sample:
     def to_dict(self) -> Dict:
         dicted = deepcopy(self.__dict__)
         del dicted['mentions']
+        del dicted['russian_mentions']
         del dicted['query_toks']
         del dicted['query_toks_no_values']
         del dicted['question_toks']

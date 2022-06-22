@@ -382,7 +382,7 @@ class Araneae:
     def find_all_with_type(self, type: QueryType, subtypes: Optional[List[QuerySubtype]] = None) -> SamplesCollection:
         search_result = SamplesCollection()
         for _sample in self.samples.content:
-            sample_subtypes = _sample.specifications[type]
+            sample_subtypes = _sample.specifications.get(type, None)
             condition_1 = not subtypes and sample_subtypes
             condition_2 = subtypes and sample_subtypes and all([_s in sample_subtypes for _s in subtypes])
             if condition_1 or condition_2:
@@ -649,9 +649,9 @@ class Araneae:
     def _specifications_new(self, sample: Sample) -> Optional[List[QuerySubtype]]:
         subtypes = []
         if sample.id.startswith("L_"):
-            subtypes.append(QuerySubtype.LONG)
+            subtypes.append(QuerySubtype.NEW_LONG)
         if sample.id.startswith("E_"):
-            subtypes.append(QuerySubtype.EMPTY)
+            subtypes.append(QuerySubtype.NEW_EMPTY)
         if sample.id.startswith("B_"):
             subtypes.append(QuerySubtype.NEW_BINARY)
         if sample.id.startswith("F_"):
