@@ -63,7 +63,7 @@ class TrainDevType(Enum):
 
 
 class QueryType(Enum):
-    BINARY = "binary"
+    TWO = "two"
     DATETIME = "datetime"
     SIMPLICITY = "simplicity"
     JOIN = "join"
@@ -83,8 +83,8 @@ class QuerySubtype(Enum):
     WITH_VALUES = "with_values"
     WITHOUT_VALUES = "without_values"
     BINARY_TRUE_FALSE = "binary-true-false"
-    BINARY_ANTONYMS = "binary-antonyms"
-    BINARY_GENDER = "binary-gender"
+    TWO_ANTONYMS = "binary-antonyms"
+    TWO_GENDER = "binary-gender"
     BINARY_YES_NO = "binary-yes-no"
     BINARY_0_1 = "binary-0-1"
     DATE = "date"
@@ -168,19 +168,24 @@ class QuerySubtype(Enum):
     NEW_EMPTY = "empty"
     NEW_BINARY = "new_binary"
     NEW_DATES = "new_dates"
-    BINARY_WITH_NEW = "binary-all"
     DATES_WITH_NEW = "dates-all"
+    TWO_WITHOUT_VALUES = "two-without-values"
+    JUST_BINARY = "just-binary"
+    JUST_BINARY_OLD = "just-binary-old"
 
 
 query_type_mapping = {_t.value: _t for _t in QueryType}
 query_subtype_mapping = {_t.value: _t for _t in QuerySubtype}
 query_mapping = {
-    QueryType.BINARY: [
+    QueryType.TWO: [
         QuerySubtype.BINARY_TRUE_FALSE,
-        QuerySubtype.BINARY_ANTONYMS,
-        QuerySubtype.BINARY_GENDER,
+        QuerySubtype.TWO_ANTONYMS,
+        QuerySubtype.TWO_GENDER,
         QuerySubtype.BINARY_YES_NO,
-        QuerySubtype.BINARY_0_1
+        QuerySubtype.BINARY_0_1,
+        QuerySubtype.TWO_WITHOUT_VALUES,
+        QuerySubtype.JUST_BINARY,
+        QuerySubtype.JUST_BINARY_OLD
     ],
     QueryType.DATETIME: [
         QuerySubtype.DATE,

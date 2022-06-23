@@ -28,8 +28,10 @@ def postprocess(sql_structure: List[str]) -> List[str]:
     return processed[1:]
 
 
-def make_sql_statistic(samples: List[Sample], ignore_agg=True) -> Dict[str, int]:
+def make_sql_statistic(samples: List[Sample], ignore_agg=True) -> Tuple(Dict[str, int]):
     statistics = {}
+    statistics_dev = {}
+    statistics_train = {}
     service_words = deepcopy(KEY_WORDS)
     if not ignore_agg:
         service_words += AGGREGATIONS
@@ -37,7 +39,11 @@ def make_sql_statistic(samples: List[Sample], ignore_agg=True) -> Dict[str, int]
         sql_structure = extract_sql_structure(_sample.query_toks, service_words)
         sql_pattern = " ".join(sql_structure)
         statistics[sql_pattern] = statistics.get(sql_pattern, 0) + 1
-    return statistics
+        if _sample.type is TrainDevType.TRAIN:
+            statistics_train[sql_pattern] = statistics_train.get(sql_pattern, 0) + 1
+        else:
+            statistics_dev[sql_pattern] = statistics_dev.get(sql_pattern, 0) + 1
+    return statistics, statistics_train, statistics_dev
 
 
 def save_sql_statistics(statistics, filename):
@@ -52,8 +58,8 @@ def save_sql_statistics(statistics, filename):
 if __name__ == "__main__":
     araneae = Araneae()
     araneae.load()
-    statistics_with_agg = make_sql_statistic(araneae.samples.content, ignore_agg=False)
-    statistics_without_agg = make_sql_statistic(araneae.samples.content)
+    statistics_with_agg, _, _ = make_sql_statistic(araneae.samples.content, ignore_agg=False)
+    statistics_without_agg, _, _ = make_sql_statistic(araneae.samples.content)
     save_sql_statistics(statistics_with_agg, "22_02_25_with_agg")
     save_sql_statistics(statistics_without_agg, "22_02_25_without_functions")
     a = 7

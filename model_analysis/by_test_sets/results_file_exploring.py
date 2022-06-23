@@ -32,7 +32,20 @@ def estimate(araneae: Araneae, source: Source, test_set_path: str, model_path: s
     with open(model_path, "r", encoding='utf-8') as json_file:
         model_report = json.load(json_file)
     executed = model_report['per_item']
-    mapping = make_mapping(araneae, source, executed)
+    template_path = None
+    if len(executed) == 9906:
+        template_path = JSON_ALL
+    if len(executed) == 213:
+        template_path = JSON_NEW_ALL
+    if len(executed) == 1086:
+        template_path = JSON_ALL_DEV
+    if len(executed) == 1034:
+        template_path = JSON_DEV
+    if not template_path:
+        mapping = make_mapping(araneae, source, executed)
+        print("Look at line 44")
+    else:
+        mapping = make_mapping_as_in_file(executed, template_path)
     correct = 0
     size = 0
     for _sample in test_set:
@@ -54,6 +67,12 @@ def enumerate_samples(araneae: Araneae, source: Source, samples: List[dict]):
 
 
 def make_mapping(araneae: Araneae, source: Source, samples: List[dict]) -> dict:
+    """"
+    Returns mapping:
+        id -> sample from eval
+    Example:
+        "D_0001" -> {}
+    """
     mapping = {}
     PREFIX = {
         Source.SPIDER_DEV: 'D',
@@ -65,6 +84,22 @@ def make_mapping(araneae: Araneae, source: Source, samples: List[dict]) -> dict:
         id = start_index + ind
         mapping[f"{PREFIX[source]}_{str(id).zfill(4)}"] = sample
         # mapping[id] = sample
+    return mapping
+
+
+def make_mapping_as_in_file(eval_samples: List[dict], filepath: str) -> dict:
+    """"
+    Returns mapping:
+        id -> sample from eval
+    Example:
+        "D_0001" -> {}
+    """
+    mapping = {}
+    with open(filepath, "r", encoding='utf-8') as template_file:
+        template_samples = json.load(template_file)
+    for ind, json_sample in enumerate(template_samples):
+        id = json_sample["id"]
+        mapping[id] = eval_samples[ind]
     return mapping
 
 
@@ -91,4 +126,4 @@ if __name__ == "__main__":
     araneae = Araneae()
     araneae.load()
     report = make_test_set_report(araneae, Source.SPIDER_DEV)
-    save_sql_statistics(report, "2022-04-29")
+    save_sql_statistics(report, "2022-06-22")
