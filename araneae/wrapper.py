@@ -40,7 +40,7 @@ class Araneae:
         self.russian__mention_extractor = None
         self.start_indices = None
         self.EXTRACTION_FUNCTIONS = {
-            QueryType.BINARY: lambda sample: self._specifications_from_mentions(QueryType.BINARY, sample),
+            QueryType.TWO: lambda sample: self._specifications_binary(sample),
             QueryType.DATETIME: lambda sample: self._specifications_from_mentions(QueryType.DATETIME, sample),
             QueryType.SIMPLICITY: lambda sample: self._specifications_simplicity(sample),
             QueryType.JOIN: lambda sample: self._specifications_join(sample),
@@ -379,12 +379,24 @@ class Araneae:
             specifications[_query_type] = self.EXTRACTION_FUNCTIONS[_query_type](sample)
         return specifications
 
-    def find_all_with_type(self, type: QueryType, subtypes: Optional[List[QuerySubtype]] = None) -> SamplesCollection:
+    def find_all_with_type_and(self, type: QueryType, subtypes: Optional[List[QuerySubtype]] = None) -> SamplesCollection:
+        """Concatinating condition by AND"""
         search_result = SamplesCollection()
         for _sample in self.samples.content:
             sample_subtypes = _sample.specifications.get(type, None)
             condition_1 = not subtypes and sample_subtypes
             condition_2 = subtypes and sample_subtypes and all([_s in sample_subtypes for _s in subtypes])
+            if condition_1 or condition_2:
+                search_result.add(_sample)
+        return search_result
+
+    def find_all_with_type_or(self, type: QueryType, subtypes: Optional[List[QuerySubtype]] = None) -> SamplesCollection:
+        """Concatinating condition by AND"""
+        search_result = SamplesCollection()
+        for _sample in self.samples.content:
+            sample_subtypes = _sample.specifications.get(type, None)
+            condition_1 = not subtypes and sample_subtypes
+            condition_2 = subtypes and sample_subtypes and any([_s in sample_subtypes for _s in subtypes])
             if condition_1 or condition_2:
                 search_result.add(_sample)
         return search_result
@@ -418,6 +430,16 @@ class Araneae:
         if specifications:
             specifications = list(set(specifications))
         return specifications
+
+    def _specifications_binary(self, sample: Sample) -> Optional[List[QuerySubtype]]:
+        subtypes = self._specifications_from_mentions(QueryType.TWO, sample)
+        if not subtypes:
+            return []
+        if QuerySubtype.BINARY_0_1 in subtypes or QuerySubtype.BINARY_YES_NO in subtypes or QuerySubtype.BINARY_TRUE_FALSE in subtypes:
+            subtypes.append(QuerySubtype.JUST_BINARY)
+        if (sample.id.startswith("TS_") or sample.id.startswith("TO_") or sample.id.startswith("D_")) and QuerySubtype.JUST_BINARY in subtypes:
+            subtypes.append(QuerySubtype.JUST_BINARY_OLD)
+        return subtypes
 
     def _specifications_simplicity(self, sample: Sample) -> Optional[List[QuerySubtype]]:
         if if_extra_simple(sample):
