@@ -670,6 +670,22 @@ class Araneae:
 
     def _specifications_new(self, sample: Sample) -> Optional[List[QuerySubtype]]:
         subtypes = []
+        mentions = sample.mentions
+        aggs = ['average', 'mean', 'max', 'min', 'total', 'count', 'sum']
+        for _mention in mentions:
+            if _mention.column:
+                column_tokens = list(map(lambda x: x.lower(), str(_mention.column).split("_")))
+                for agg_key in aggs:
+                    if agg_key in column_tokens:
+                        subtypes.append(QuerySubtype.AGG_IN_COLUMN)
+                        # print(_mention.column)
+            if _mention.values is None:
+                continue
+            for _value in _mention.values:
+                if len(str(_value).split()) > 4:
+                    subtypes.append(QuerySubtype.OLD_LONG)
+                    break
+
         if sample.id.startswith("L_"):
             subtypes.append(QuerySubtype.NEW_LONG)
         if sample.id.startswith("E_"):

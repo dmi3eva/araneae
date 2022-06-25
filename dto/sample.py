@@ -168,10 +168,12 @@ class QuerySubtype(Enum):
     NEW_EMPTY = "empty"
     NEW_BINARY = "new_binary"
     NEW_DATES = "new_dates"
+    OLD_LONG = "old_long"
     DATES_WITH_NEW = "dates-all"
     TWO_WITHOUT_VALUES = "two-without-values"
     JUST_BINARY = "just-binary"
     JUST_BINARY_OLD = "just-binary-old"
+    AGG_IN_COLUMN = "aggregation-in-column"
 
 
 query_type_mapping = {_t.value: _t for _t in QueryType}
@@ -284,7 +286,8 @@ query_mapping = {
         QuerySubtype.NEW_LONG,
         QuerySubtype.NEW_EMPTY,
         QuerySubtype.NEW_BINARY,
-        QuerySubtype.NEW_DATES
+        QuerySubtype.NEW_DATES,
+        QuerySubtype.AGG_IN_COLUMN
     ]
 }
 
