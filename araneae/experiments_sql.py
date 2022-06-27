@@ -36,6 +36,12 @@ group_by_count = araneae.find_all_with_type_and(QueryType.GROUP_BY, subtypes=[Qu
 order_by_exists = araneae.find_all_with_type_and(QueryType.ORDER_BY, subtypes=[QuerySubtype.ORDER_BY_EXISTS])
 order_by_count = araneae.find_all_with_type_and(QueryType.ORDER_BY, subtypes=[QuerySubtype.ORDER_BY_COUNT])
 
+single_join = araneae.find_all_with_type_and(QueryType.JOIN, subtypes=[QuerySubtype.SINGLE_JOIN])
+multi_join = araneae.find_all_with_type_and(QueryType.JOIN, subtypes=[QuerySubtype.MULTI_JOIN])
+multi_select = araneae.find_all_with_type_and(QueryType.SELECT, subtypes=[QuerySubtype.MULTI_SELECT])
+mono_agg = araneae.find_all_with_type_and(QueryType.SELECT, subtypes=[QuerySubtype.MONO_AGG])
+hetero_agg = araneae.find_all_with_type_and(QueryType.SELECT, subtypes=[QuerySubtype.HETERO_AGG])
+
 save({
     "sql_like": sql_like,
     "sql_limit": sql_limit,
@@ -52,7 +58,12 @@ save({
     "group_by_exists": group_by_exists,
     "group_by_count": group_by_count,
     "order_by_exists": order_by_exists,
-    "order_by_count": order_by_count
+    "order_by_count": order_by_count,
+    "single_join": single_join,
+    "multi_join": multi_join,
+    "multi_select": multi_select,
+    "mono_agg": mono_agg,
+    "hetero_agg": hetero_agg
 })
 
 araneae.save()
