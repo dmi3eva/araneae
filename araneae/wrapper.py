@@ -317,14 +317,17 @@ class Araneae:
         all_in_json = [_s.to_json() for _s in self.samples.content]
         train_spider = [_s.to_json() for _s in self.samples.content if _s.source is Source.SPIDER_TRAIN]
         train_others = [_s.to_json() for _s in self.samples.content if _s.source is Source.SPIDER_TRAIN_OTHERS]
-        dev = [_s.to_json() for _s in self.samples.content if _s.source is Source.SPIDER_DEV] # To remove
+        dev = [_s.to_json() for _s in self.samples.content if _s.source is Source.SPIDER_DEV]  # To remove
 
-        all_train = [_s.to_json() for _s in self.samples.content if _s.type is TrainDevType.TRAIN]
-        all_dev = [_s.to_json() for _s in self.samples.content if _s.type is TrainDevType.DEV]
+        all_train = [_s.to_json() for _s in self.samples.content if _s.type is TrainDevType.TRAIN and not _s.id.startswith("E_")]
+        all_dev = [_s.to_json() for _s in self.samples.content if _s.type is TrainDevType.DEV and not _s.id.startswith("E_")]
 
         just_new_all = [_s.to_json() for _s in self.samples.content if _s.source is Source.ADDITION]
         just_new_train = [_s.to_json() for _s in self.samples.content if _s.source is Source.ADDITION and _s.type is TrainDevType.TRAIN]
         just_new_dev = [_s.to_json() for _s in self.samples.content if _s.source is Source.ADDITION and _s.type is TrainDevType.DEV]
+
+        empty_train = [_s.to_json() for _s in self.samples.content if _s.type is TrainDevType.TRAIN and _s.id.startswith("E_")]
+        empty_dev = [_s.to_json() for _s in self.samples.content if _s.type is TrainDevType.DEV and _s.id.startswith("E_")]
 
         with open(JSON_ALL, "w", encoding='utf-8') as outp:
             json.dump(all_in_json, outp, ensure_ascii=False)
@@ -345,6 +348,11 @@ class Araneae:
             json.dump(just_new_train, outp, ensure_ascii=False)
         with open(JSON_NEW_DEV, "w", encoding='utf-8') as outp:
             json.dump(just_new_dev, outp, ensure_ascii=False)
+
+        with open(JSON_EMPTY_TRAIN, "w", encoding='utf-8') as outp:
+            json.dump(empty_train, outp, ensure_ascii=False)
+        with open(JSON_EMPTY_DEV, "w", encoding='utf-8') as outp:
+            json.dump(empty_dev, outp, ensure_ascii=False)
 
     def find_triples(self, triples: List[Triple]) -> List[Sample]:
         desired = []
