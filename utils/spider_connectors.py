@@ -149,7 +149,7 @@ class EnSpiderDB(SpiderDB):
 class RuSpiderDBOld(SpiderDB):
     def __init__(self):
         super().__init__()
-        self.db_path =RUSSOCAMPUS_DB_PATH_OLD
+        self.db_path = RUSSOCAMPUS_DB_PATH_OLD
 
     def extract_dbs(self):
         return os.listdir(self.db_path)
